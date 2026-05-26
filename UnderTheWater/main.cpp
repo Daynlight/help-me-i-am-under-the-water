@@ -1,18 +1,9 @@
-#include "Renderer.h"
-#include "Gui.h"
-
+#include "App.h"
 
 
 
 int main(){
-  CW::Renderer::Renderer window;
-
-  while (!window.getWindowData()->should_close){
-    window.beginFrame();
-    window.swapBuffer();
-
-    window.windowEvents();
-  }
+  UW::App app;
+  while(app.isRunning()) app.run();
+  return 0;
 };
-
-
