@@ -21,6 +21,7 @@ namespace UW::Config{
   inline constexpr float CAMERA_DEFAULT_VELOCITY = 200.0f;
 
   inline constexpr float MAX_HEIGHT = 1024.0f;
+  inline constexpr float WATER_HEIGHT = 300.0f;
   inline constexpr float CHUNK_SIZE = 512.0f;
   inline constexpr unsigned int CHUNK_RADIUS = 5;
   inline constexpr glm::vec2 TESS_BOUND = glm::vec2(8.0f, 512.0f);

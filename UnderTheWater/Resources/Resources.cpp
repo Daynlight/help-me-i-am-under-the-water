@@ -121,6 +121,16 @@ void UW::Resources::initShaders(){
 
 
 
+  // ===================== //
+  // ======= Water ======= //
+  // ===================== //
+  shaders["water"].setVertexShader(WaterShader::vertex);
+  shaders["water"].setFragmentShader(WaterShader::fragment);
+  shaders["water"].setShader(WaterShader::tessellation, GL_TESS_CONTROL_SHADER);
+  shaders["water"].setShader(WaterShader::tessellation_evaluation, GL_TESS_EVALUATION_SHADER);
+
+
+
   // ====================== //
   // ======= SkyBox ======= //
   // ====================== //
@@ -138,6 +148,16 @@ void UW::Resources::initMaterials(){
   materials["terrain"].roughness = 0.60f; 
   materials["terrain"].metallic = 0.0f;
   materials["terrain"].ambient_occlusion = 1.0f;
+
+
+
+  // ======================= //
+  // ======= Water ======= //
+  // ======================= //
+  materials["water"].albedo = glm::vec3(0, 0, 255) / 255.0f;
+  materials["water"].roughness = 0.60f; 
+  materials["water"].metallic = 0.3f;
+  materials["water"].ambient_occlusion = 1.0f;
 };
 
 
@@ -146,7 +166,7 @@ void UW::Resources::initLights(){
   // ====================== //
   // ======= Static ======= //
   // ====================== //
-  UW::Light light = UW::Light({0.0f, 500.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 2.0f);
+  UW::Light light = UW::Light({4347.0f, 1095.0f, 2547.0f}, {1.0f, 1.0f, 1.0f}, 2.0f);
   lights["static"].lights.emplace_back(light);
   lights["static"].compile();
 };

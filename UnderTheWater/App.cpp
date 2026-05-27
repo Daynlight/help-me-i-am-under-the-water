@@ -39,11 +39,12 @@ void UW::App::run(){
 // ========== Core Operations ========== //
 // ===================================== //
 void UW::App::onLoad(){
-  camera.position = {-104.294891, 28.915346, 154.567612};
-  debug_camera.position = {-369.663635, 796.256592, -161.411819};
-  debug_camera.direction = {0.516395, -0.826098, 0.225607};
+  camera.position = {1055, 797, 1331};
+  debug_camera.position = {1157, 2048, 1310};
+  debug_camera.direction = {-0.57, -0.76, -0.28};
 
   objects["terrain"] = std::make_shared<UW::Terrain>();
+  objects["water"] = std::make_shared<UW::Water>();
   objects["sky_box"] = std::make_shared<UW::Skybox>();
 };
 
@@ -60,10 +61,15 @@ void UW::App::render(){
   window.beginFrame();  
 
   Resources::get().lights["static"].bind(0);
-
-  for (const std::pair<std::string, std::shared_ptr<Object>>& el : objects){
-    if(debug_camera_on) el.second->render(&window, camera, debug_camera);
-    else el.second->render(&window, camera, camera);
+  if(debug_camera_on){ 
+    objects["terrain"]->render(&window, camera, debug_camera);
+    objects["sky_box"]->render(&window, camera, debug_camera); 
+    objects["water"]->render(&window, camera, debug_camera);
+  }
+  else {
+    objects["terrain"]->render(&window, camera, camera);
+    objects["sky_box"]->render(&window, camera, camera);
+    objects["water"]->render(&window, camera, camera);
   };
   
   Resources::get().lights["static"].unbind();

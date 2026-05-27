@@ -11,6 +11,7 @@
 #include "Resources/Resources.h"
 #include "Objects/Object.h"
 #include "Objects/Terrain/Terrain.h"
+#include "Objects/Water/Water.h"
 #include "Objects/Skybox/Skybox.h"
 
 
