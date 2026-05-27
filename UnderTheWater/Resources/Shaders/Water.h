@@ -54,7 +54,7 @@ void main(){
   float fresnel = pow(1.0 - max(dot(N, V), 0.0), 5.0);
   fresnel = mix(0.05, 1.0, fresnel);
 
-  vec3 color = vec3(0.0);
+  vec3 color = albedo * 0.1f;
 
   for(int i = 0; i < lightCount; i++){
     vec3 L = normalize(lights[i].position - FragPosition);
@@ -146,9 +146,9 @@ Wave getWave(int i) {
   float seed = float(i) * 12.9898;
   return Wave(
     normalize(vec2(sin(seed), cos(seed * 0.5))),
-    1.0 / float(i + 1),
-    0.05 + float(i) * 0.2,
-    0.5 + fract(seed) * 0.1
+    0.9 / float(i + 1),
+    0.001 + float(i) * 0.7,
+    0.5 + fract(seed) * 0.4
   );
 }
 

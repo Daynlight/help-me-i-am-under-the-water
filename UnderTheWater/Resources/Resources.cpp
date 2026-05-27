@@ -151,12 +151,12 @@ void UW::Resources::initMaterials(){
 
 
 
-  // ======================= //
+  // ===================== //
   // ======= Water ======= //
-  // ======================= //
-  materials["water"].albedo = glm::vec3(0, 0, 255) / 255.0f;
-  materials["water"].roughness = 0.60f; 
-  materials["water"].metallic = 0.3f;
+  // ===================== //
+  materials["water"].albedo = glm::vec3(52, 114, 245) / 255.0f;
+  materials["water"].roughness = 0.44f; 
+  materials["water"].metallic = 0.0f;
   materials["water"].ambient_occlusion = 1.0f;
 };
 
@@ -166,7 +166,7 @@ void UW::Resources::initLights(){
   // ====================== //
   // ======= Static ======= //
   // ====================== //
-  UW::Light light = UW::Light({4347.0f, 1095.0f, 2547.0f}, {1.0f, 1.0f, 1.0f}, 2.0f);
+  UW::Light light = UW::Light({4347.0f, 1095.0f, 2547.0f}, {1.0f, 0.7f, 0.5f}, 2.0f);
   lights["static"].lights.emplace_back(light);
   lights["static"].compile();
 };
