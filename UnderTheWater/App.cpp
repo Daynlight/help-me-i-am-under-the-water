@@ -8,7 +8,7 @@
 UW::App::App()
   :camera(&window), debug_camera(&window), gui(&window){
   initWindow();
-  gui.addWindow("Gui", windowGui());
+  gui.setWorkspace(appWorkspace());
 
   onLoad();
 };
@@ -144,6 +144,72 @@ void UW::App::updateFps(){
 // ========================= //
 // ========== GUI ========== //
 // ========================= //
+void UW::App::menuBarGui(){
+  if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMenu("Window")) {
+      if(ImGui::MenuItem("Info")){
+        if(infoWindowOn){
+          gui.deleteWindow("Info Gui");  
+          infoWindowOn = false;
+        }
+        else{
+          gui.addWindow("Info Gui", windowGui());
+          infoWindowOn = true;
+        }
+      };
+      if(ImGui::MenuItem("Material Explorer")){
+        if(materialWindowOn){
+          gui.deleteWindow("Material Explorer");
+          materialWindowOn = false;
+        }
+        else{
+          gui.addWindow("Material Explorer", materialExplorerGui());
+          materialWindowOn = true;
+        }
+      };
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+  };
+};
+
+
+
+std::function<void(std::function<void()> render_windows)> UW::App::appWorkspace() {
+  return [this](std::function<void()> render_windows){
+  ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar;
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  ImGui::SetNextWindowPos(viewport->WorkPos);
+  ImGui::SetNextWindowSize(viewport->WorkSize);
+  ImGui::SetNextWindowViewport(viewport->ID);
+  
+  window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | 
+                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                  ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+                      
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f)); 
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+  
+  ImGui::Begin("Window DockSpace", nullptr, window_flags);
+  
+  ImGui::PopStyleVar(2);
+  ImGui::PopStyleColor();
+
+  menuBarGui();
+
+  ImGuiID docspace_id = ImGui::GetID("MyDockSpace");
+  ImGui::DockSpace(docspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+  render_windows();
+
+  ImGui::End();
+  };
+};
+
+
+
 inline void UW::App::guiInfo(){
   ImGui::SeparatorText("Info");
   ImGui::Text("FPS: %f", fps);
@@ -176,6 +242,15 @@ void UW::App::guiControlsInfo(){
 
 
 
+inline std::function<void(CW::Renderer::iRenderer *window)> UW::App::windowGui(){
+return [this](CW::Renderer::iRenderer *window){
+  guiControlsInfo();
+  guiInfo();
+};
+};
+
+
+
 inline void UW::App::guiMaterialParameters(){
   ImGui::SeparatorText("Materials Parameters");
 
@@ -191,6 +266,7 @@ inline void UW::App::guiMaterialParameters(){
 };
 
 
+
 inline void UW::App::guiMaterialList(){
   ImGui::SeparatorText("Materials List");
 
@@ -202,10 +278,8 @@ inline void UW::App::guiMaterialList(){
 
 
 
-inline std::function<void(CW::Renderer::iRenderer *window)> UW::App::windowGui(){
+inline std::function<void(CW::Renderer::iRenderer *window)> UW::App::materialExplorerGui(){
 return [this](CW::Renderer::iRenderer *window){
-  guiControlsInfo();
-  guiInfo();
   guiMaterialParameters();
   guiMaterialList();
 };
