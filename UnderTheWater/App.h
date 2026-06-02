@@ -11,6 +11,7 @@
 #include "Resources/Resources.h"
 #include "Objects/Object.h"
 #include "Objects/Terrain/Terrain.h"
+#include "Objects/Water/Water.h"
 #include "Objects/Skybox/Skybox.h"
 
 
@@ -33,6 +34,10 @@ private:
   unsigned int fps_id = 0;
   float camera_swap_cooldown_acc = 0.0f;
   float fixed_update_time_acc = 0.0f;
+
+  // gui
+  bool infoWindowOn = false;
+  bool materialWindowOn = false;
 
   // objects
   std::unordered_map<std::string, std::shared_ptr<Object>> objects;
@@ -64,6 +69,11 @@ private:
   void guiMaterialParameters();
   void guiMaterialList();
 
+  void menuBarGui();
+
+  std::function<void(std::function<void()> render_windows)> appWorkspace();
+
   std::function<void(CW::Renderer::iRenderer *window)> windowGui();
+  std::function<void(CW::Renderer::iRenderer *window)> materialExplorerGui();
 };
 };

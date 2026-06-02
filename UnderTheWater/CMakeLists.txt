@@ -8,6 +8,7 @@ set(src
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"
+  "Objects/Water/Water.cpp"
   "Objects/Skybox/Skybox.cpp"
 )
 

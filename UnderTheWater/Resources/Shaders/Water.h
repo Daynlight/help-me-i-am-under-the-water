@@ -5,7 +5,7 @@
 
 
 
-namespace TerrainShader{
+namespace WaterShader{
 inline std::string vertex = R"(#version 430 core
 
 layout(location = 0) in vec3 aPos;
@@ -24,7 +24,7 @@ inline std::string fragment = R"(#version 430 core
 out vec4 FragColor;
 
 in vec3 FragPosition;
-in vec3 Normal;
+in vec3 Normal; // Passed from Evaluation Shader
 
 )"
 + CW::PBRShaderBRDFUniforms +
@@ -48,11 +48,19 @@ layout(std430, binding = 0) buffer LightsBuffer {
 R"(
 
 void main(){
-  vec3 color = vec3(0.0);
+  vec3 N = normalize(Normal);
+  vec3 V = normalize(cameraPosition - FragPosition);
+
+  float fresnel = pow(1.0 - max(dot(N, V), 0.0), 5.0);
+  fresnel = mix(0.05, 1.0, fresnel);
+
+  vec3 color = albedo * 0.1f;
 
   for(int i = 0; i < lightCount; i++){
+    vec3 L = normalize(lights[i].position - FragPosition);
+    
     color += BRDF(
-      normalize(Normal),
+      N,
       FragPosition,
       cameraPosition,
       lights[i].position,
@@ -60,7 +68,9 @@ void main(){
     ) * lights[i].strength;
   };
 
-  FragColor = vec4(color, 1.0);
+  float alpha = clamp(0.2 + fresnel, 0.0, 1.0);
+  
+  FragColor = vec4(color, alpha);
 }
 )";
 
@@ -121,40 +131,59 @@ out vec3 Normal;
 
 uniform mat4 projection;
 uniform mat4 view;
-uniform sampler2D uTexture;
 uniform vec2 mapSize;
-uniform float maxHeight;
+uniform float waterHeight;
+uniform float time;
 
-float terrainHeight(vec2 p){
-  vec2 worldMin = vec2(-mapSize * 0.5);
-  vec2 uv = (p - worldMin) / mapSize;
+struct Wave {
+  vec2 dir;
+  float amp;
+  float freq;
+  float speed;
+};
 
-  vec2 texelSize = 1.0 / textureSize(uTexture, 0);
-  
-  float texelOffset = 1.5; 
-  vec2 offset = texelSize * texelOffset;
-
-  float center = texture(uTexture, uv).r;
-  float left   = texture(uTexture, uv + vec2(-offset.x, 0.0)).r;
-  float right  = texture(uTexture, uv + vec2(offset.x, 0.0)).r;
-  float top    = texture(uTexture, uv + vec2(0.0, offset.y)).r;
-  float bottom = texture(uTexture, uv + vec2(0.0, -offset.y)).r;
-
-  float height = (center + left + right + top + bottom) / 5.0;
-
-  return height * maxHeight;
+Wave getWave(int i) {
+  float seed = float(i) * 12.9898;
+  return Wave(
+    normalize(vec2(sin(seed), cos(seed * 0.5))),
+    0.9 / float(i + 1),
+    0.001 + float(i) * 0.7,
+    0.5 + fract(seed) * 0.4
+  );
 }
 
-vec3 calcNormal(vec2 p, float hCenter){
-  float eps = 1.0;
+float terrainHeight(vec2 p, float timeScale) {
+  float h = waterHeight;
+  for(int i = 0; i < 20; i++) {
+    Wave w = getWave(i);
+    float angle = dot(p, w.dir) * w.freq + timeScale * w.speed;
+    h += w.amp * sin(angle);
+  }
+  return h;
+}
 
-  float hR = terrainHeight(p + vec2(eps, 0.0));
-  float hU = terrainHeight(p + vec2(0.0, eps));
-
-  float dHdX = hR - hCenter;
-  float dHdZ = hU - hCenter;
-
-  return normalize(vec3(-dHdX, eps, -dHdZ));
+vec3 getGerstnerNormal(vec2 p, float timeScale) {
+  vec3 tangent = vec3(1.0, 0.0, 0.0);
+  vec3 binormal = vec3(0.0, 0.0, 1.0);
+  
+  for(int i = 0; i < 20; i++) {
+    Wave w = getWave(i);
+    float phase = dot(p, w.dir) * w.freq + timeScale * w.speed;
+    float wa = w.freq * w.amp;
+    
+    tangent += vec3(
+      -w.dir.x * w.dir.x * wa * cos(phase),
+      -w.dir.x * w.dir.y * wa * cos(phase),
+      w.dir.x * wa * cos(phase)
+    );
+    binormal += vec3(
+      -w.dir.x * w.dir.y * wa * cos(phase),
+      -w.dir.y * w.dir.y * wa * cos(phase),
+      w.dir.y * wa * cos(phase)
+    );
+  }
+  
+  return normalize(cross(vec3(0.0, 1.0, 0.0) + binormal, vec3(1.0, 0.0, 0.0) + tangent));
 }
 
 void main(){
@@ -169,11 +198,13 @@ void main(){
   vec3 b = mix(p3, p2, uv.x);
   vec3 pos = mix(a, b, uv.y);
 
-  float hCenter = terrainHeight(pos.xz);
+  float timeScale = time * 0.5;
+
+  float hCenter = terrainHeight(pos.xz, timeScale);
   pos.y = hCenter;
 
   FragPosition = pos;
-  Normal  = calcNormal(pos.xz, hCenter);
+  Normal = getGerstnerNormal(pos.xz, timeScale);
 
   gl_Position = projection * view * vec4(pos, 1.0);
 }
