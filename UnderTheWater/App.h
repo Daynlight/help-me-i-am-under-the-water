@@ -27,7 +27,8 @@ private:
   UW::Camera debug_camera;
 
   // control variables
-  std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
+  unsigned int material_id = UW::Config::DEFAULT_GUI_MATERIAL;
+  bool material_is_updated = false;
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
   float fps = 0.0f;
   float fps_acc = 0.0f;

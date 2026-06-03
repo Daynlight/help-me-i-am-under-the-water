@@ -37,9 +37,9 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
   uniform["waterHeight"]->set<float>(UW::Config::WATER_HEIGHT);
   uniform["distanceCoefficient"]->set<float>(UW::Config::TESS_DISTANCE_COFF);
   uniform["time"]->set<float>(elapsed_time);
+  uniform["material_id"]->set<int>(1);
 
 
-  Resources::get().materials["water"].setMaterialUniform(uniform);
   Resources::get().shaders["water"].getUniforms().emplace_back(&uniform);
 
   glPatchParameteri(GL_PATCH_VERTICES, 4);

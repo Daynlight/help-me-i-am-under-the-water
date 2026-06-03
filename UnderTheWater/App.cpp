@@ -61,6 +61,7 @@ void UW::App::render(){
   window.beginFrame();  
 
   Resources::get().lights["static"].bind(0);
+  Resources::get().materials.bind(1);
   if(debug_camera_on){ 
     objects["terrain"]->render(&window, camera, debug_camera);
     objects["sky_box"]->render(&window, camera, debug_camera); 
@@ -72,6 +73,7 @@ void UW::App::render(){
     objects["water"]->render(&window, camera, camera);
   };
   
+  Resources::get().materials.unbind();
   Resources::get().lights["static"].unbind();
   
   gui.render();
@@ -254,14 +256,18 @@ return [this](CW::Renderer::iRenderer *window){
 inline void UW::App::guiMaterialParameters(){
   ImGui::SeparatorText("Materials Parameters");
 
-  auto it = Resources::get().materials.find(material_name);
-  if (it != Resources::get().materials.end()){
-    ImGui::ColorEdit3("Albedo: ", &Resources::get().materials[material_name].albedo[0]);
-    ImGui::SliderFloat("Roughness: ", &Resources::get().materials[material_name].roughness, 0.0f, 1.0f);
-    ImGui::SliderFloat("Metallic: ", &Resources::get().materials[material_name].metallic, 0.0f, 1.0f);
-    ImGui::ColorEdit3("Emission Color: ", &Resources::get().materials[material_name].emission_color[0]);
-    ImGui::SliderFloat("Emission Strength: ", &Resources::get().materials[material_name].emission_strength, 0.0f, 1.0f);
-    ImGui::SliderFloat("Ambient Occlusion: ", &Resources::get().materials[material_name].ambient_occlusion, 0.0f, 1.0f);
+  if(material_id >= Resources::get().materials.materials.size()) return;
+
+  if(ImGui::ColorEdit3("Albedo: ", &Resources::get().materials.materials[material_id].albedo[0])) material_is_updated = true;
+  if(ImGui::SliderFloat("Roughness: ", &Resources::get().materials.materials[material_id].roughness, 0.0f, 1.0f)) material_is_updated = true;
+  if(ImGui::SliderFloat("Metallic: ", &Resources::get().materials.materials[material_id].metallic, 0.0f, 1.0f)) material_is_updated = true;
+  if(ImGui::ColorEdit3("Emission Color: ", &Resources::get().materials.materials[material_id].emission_color[0])) material_is_updated = true;
+  if(ImGui::SliderFloat("Emission Strength: ", &Resources::get().materials.materials[material_id].emission_strength, 0.0f, 1.0f)) material_is_updated = true;
+  if(ImGui::SliderFloat("Ambient Occlusion: ", &Resources::get().materials.materials[material_id].ambient_occlusion, 0.0f, 1.0f)) material_is_updated = true;
+
+  if(material_is_updated){
+    material_is_updated = false;
+    Resources::get().materials.compile();
   };
 };
 
@@ -270,9 +276,9 @@ inline void UW::App::guiMaterialParameters(){
 inline void UW::App::guiMaterialList(){
   ImGui::SeparatorText("Materials List");
 
-  for (const auto& [key, material] : Resources::get().materials) {
-    std::string button_label = "- " + key;
-    if (ImGui::Button(button_label.c_str())) material_name = key;
+  for (unsigned int id = 0; id < Resources::get().materials.materials.size(); id++) {
+    std::string button_label = "- " + std::to_string(id);
+    if (ImGui::Button(button_label.c_str())) material_id = id;
   };
 };
 

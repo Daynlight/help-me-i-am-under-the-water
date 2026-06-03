@@ -32,7 +32,7 @@ void UW::Resources::destroy(){
   meshes.clear();
   textures.clear();
   shaders.clear();
-  materials.clear();
+  materials.destroy();
   lights.clear();
 };
 
@@ -144,20 +144,18 @@ void UW::Resources::initMaterials(){
   // ======================= //
   // ======= Terrain ======= //
   // ======================= //
-  materials["terrain"].albedo = glm::vec3(255, 242, 111) / 255.0f;
-  materials["terrain"].roughness = 0.60f; 
-  materials["terrain"].metallic = 0.0f;
-  materials["terrain"].ambient_occlusion = 1.0f;
+  materials.materials.emplace_back(
+    glm::vec3(255, 242, 111) / 255.0f,
+    0.0f, 0.60f, glm::vec3(0.0f), 0.0f, 1.0f);
 
 
 
   // ===================== //
   // ======= Water ======= //
   // ===================== //
-  materials["water"].albedo = glm::vec3(52, 114, 245) / 255.0f;
-  materials["water"].roughness = 0.44f; 
-  materials["water"].metallic = 0.0f;
-  materials["water"].ambient_occlusion = 1.0f;
+  materials.materials.emplace_back(
+    glm::vec3(52, 114, 245) / 255.0f,
+    0.0f, 0.44f, glm::vec3(0.0f), 0.0f, 1.0f);
 };
 
 

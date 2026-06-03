@@ -6,6 +6,7 @@
 
 #include "../utils.h"
 #include "Lights/Lights.h"
+#include "Materials/Materials.h"
 #include "Shaders/Terrain.h"
 #include "Shaders/SkyBox.h"
 #include "Shaders/Water.h"
@@ -18,7 +19,7 @@ public:
   std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
   std::unordered_map<std::string, CW::Renderer::Texture> textures;
   std::unordered_map<std::string, CW::Renderer::Shader> shaders;
-  std::unordered_map<std::string, CW::PBRMaterial> materials;
+  UW::Materials materials;
   std::unordered_map<std::string, UW::Lights> lights;
 
 
