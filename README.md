@@ -10,8 +10,12 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [TOC](#toc)
 - [Installation and Usage](#installation-and-usage)
 - [Architecture](#architecture)
+  - [Build System](#build-system)
   - [Lights](#lights)
   - [Materials](#materials)
+  - [Assets](#assets)
+  - [Resources](#resources)
+  - [Shaders](#shaders)
   - [Terrain](#terrain)
   - [Water](#water)
 - [Prerequisites](#prerequisites)
@@ -49,17 +53,27 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 
 
 ## Architecture
+### Build System
+We use **cmake** for ease of build with **git submodules** for git packages.
+
 ### Lights
 Lights are store on **SSBO GPU side** with parameters like ```position```, ```color```, ```strength```. It's provides easier way to store light parameters with multiple instances and avoids unnsescary uniforms bindings. They are created once in ```Resources``` Singleton class and reuse for each object. This way we save memory.
 
 ### Materials
 Materials like Lights are stored on **SSBO GPU side** that allows multiple materials by one mesh. Material contains typical **PBR parameters** like ```albedo```, ```roughness```, ```metallic```, ```emission_color```, ```emission_strength```, ```ambient_occlusion```. We can edit materials via **ImGui** every time we change parameters we recompile **SSBO**.
 
+### Assets
+All assets are baked into executable with ```cmrc``` this secures them for **modifications by users** and **stealing**.
+
+### Resources
+Resources is singleton class where we initialize all our assets. We use them in other objects like ```terrain```. Resources contains data about ```materials```, ```textures```, ```meshes```, ```shaders```, ```lights```.
+
+### Shaders
+Shaders are ```inline std::string``` we avoid reading them from file for **safety** and **baking into executable**.
+
 ### Terrain
 
-### Water 
-
-
+### Water
 
 
 ## Prerequisites
@@ -89,9 +103,10 @@ Materials like Lights are stored on **SSBO GPU side** that allows multiple mater
 - [x] Terrain
 - [x] Normals
 - [x] PBR
-- [ ] Readme.md
-- [ ] Update Materials to SSBO
+- [x] Readme.md
+- [x] Update Materials to SSBO
 - [ ] FBO Render to texture
+- [ ] Under water fog
 - [ ] Quaternion Camera
 - [ ] Parallel Transport Layer
 - [ ] SDF ray-marching
