@@ -43,9 +43,8 @@ void UW::App::onLoad(){
   debug_camera.position = {1157, 2048, 1310};
   debug_camera.direction = {-0.57, -0.76, -0.28};
 
-  objects["terrain"] = std::make_shared<UW::Terrain>();
-  objects["water"] = std::make_shared<UW::Water>();
-  objects["sky_box"] = std::make_shared<UW::Skybox>();
+  objects.emplace_back(GameObject("sky_box", "water", {}, 
+    glm::vec3(0.0f, 2000.0f, 0.0f), glm::vec3(0.0f), glm::vec3(5.25f)));
 };
 
 
@@ -63,14 +62,16 @@ void UW::App::render(){
   Resources::get().lights["static"].bind(0);
   Resources::get().materials.bind(1);
   if(debug_camera_on){ 
-    objects["terrain"]->render(&window, camera, debug_camera);
-    objects["sky_box"]->render(&window, camera, debug_camera); 
-    objects["water"]->render(&window, camera, debug_camera);
+    terrain.render(&window, camera, debug_camera);
+    skybox.render(&window, camera, debug_camera); 
+    water.render(&window, camera, debug_camera);
+    for(UW::GameObject& object : objects) object.render(&window, camera, debug_camera);
   }
   else {
-    objects["terrain"]->render(&window, camera, camera);
-    objects["sky_box"]->render(&window, camera, camera);
-    objects["water"]->render(&window, camera, camera);
+    terrain.render(&window, camera, camera);
+    skybox.render(&window, camera, camera);
+    water.render(&window, camera, camera);
+    for(UW::GameObject& object : objects) object.render(&window, camera, camera);
   };
   
   Resources::get().materials.unbind();
@@ -90,7 +91,7 @@ void UW::App::update(){
 
   camera.event(&window);
 
-  for(const std::pair<std::string, std::shared_ptr<Object>>& el : objects) el.second->onUpdate(window.getWindowData()->delta_time);
+  for(UW::GameObject& el : objects) el.onUpdate(window.getWindowData()->delta_time);
 };
 
 
@@ -101,7 +102,7 @@ void UW::App::fixedUpdate(){
   if(fixed_update_time_acc >= 1.0f / UW::Config::FIXED_HZ){
     fixed_update_time_acc -= 1.0f / UW::Config::FIXED_HZ;
     
-    for(const std::pair<std::string, std::shared_ptr<Object>>& el : objects) el.second->onFixedUpdate();
+    for(UW::GameObject& el : objects) el.onFixedUpdate();
   };
 };
 

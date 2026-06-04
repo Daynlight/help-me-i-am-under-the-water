@@ -2,14 +2,14 @@
 #include "Renderer.h"
 #include "Gui.h"
 
-#include <unordered_map>
+#include <vector>
 #include <functional>
-#include <memory>
 
 #include "config.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
 #include "Objects/Object.h"
+#include "Objects/GameObject.h"
 #include "Objects/Terrain/Terrain.h"
 #include "Objects/Water/Water.h"
 #include "Objects/Skybox/Skybox.h"
@@ -49,7 +49,10 @@ private:
   bool shaderEditorWindowOn = false;
 
   // objects
-  std::unordered_map<std::string, std::shared_ptr<Object>> objects;
+  UW::Terrain terrain;
+  UW::Water water;
+  UW::Skybox skybox;
+  std::vector<UW::GameObject> objects;
 
 public:
   App();

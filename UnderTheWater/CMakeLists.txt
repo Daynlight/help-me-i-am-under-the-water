@@ -10,6 +10,7 @@ set(src
   "Objects/Terrain/Terrain.cpp"
   "Objects/Water/Water.cpp"
   "Objects/Skybox/Skybox.cpp"
+  "Objects/GameObject.cpp"
 )
 
 cmrc_add_resource_library(assets
