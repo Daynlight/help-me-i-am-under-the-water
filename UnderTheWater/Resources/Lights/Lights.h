@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <initializer_list>
 
 
 
@@ -22,8 +23,6 @@ class Lights{
 private:
   CW::Renderer::GPUStore buffer;
   bool is_compiled = false;
-
-public:
   std::vector<Light> lights;
 
 public:
@@ -59,6 +58,30 @@ public:
     if(!is_compiled) return;
 
     buffer.unbind();
+  };
+
+  Light& operator[](unsigned int index){
+    is_compiled = false;
+    return lights[index];
+  };
+
+  void clear(){
+    is_compiled = false;
+    lights.clear();
+  };
+
+  unsigned int size() const {
+    return lights.size();
+  };
+
+  void emplace_back(Light light){
+    is_compiled = false;
+    lights.emplace_back(light);
+  };
+
+  void emplace_back(std::initializer_list<Light> lights){
+    is_compiled = false;
+    for (Light el : lights) this->lights.emplace_back(el);
   };
 };
 };

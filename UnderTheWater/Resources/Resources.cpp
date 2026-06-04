@@ -144,18 +144,18 @@ void UW::Resources::initMaterials(){
   // ======================= //
   // ======= Terrain ======= //
   // ======================= //
-  materials.materials.emplace_back(
-    glm::vec3(255, 242, 111) / 255.0f,
-    0.0f, 0.60f, glm::vec3(0.0f), 0.0f, 1.0f);
+  materials.emplace_back(
+    {glm::vec3(255, 242, 111) / 255.0f,
+    0.0f, 0.60f, glm::vec3(0.0f), 0.0f, 1.0f});
 
 
 
   // ===================== //
   // ======= Water ======= //
   // ===================== //
-  materials.materials.emplace_back(
-    glm::vec3(52, 114, 245) / 255.0f,
-    0.0f, 0.44f, glm::vec3(0.0f), 0.0f, 1.0f);
+  materials.emplace_back(
+    {glm::vec3(52, 114, 245) / 255.0f,
+    0.0f, 0.44f, glm::vec3(0.0f), 0.0f, 1.0f});
 };
 
 
@@ -165,6 +165,6 @@ void UW::Resources::initLights(){
   // ======= Static ======= //
   // ====================== //
   UW::Light light = UW::Light({4347.0f, 1095.0f, 2547.0f}, {1.0f, 0.7f, 0.5f}, 2.0f);
-  lights["static"].lights.emplace_back(light);
+  lights["static"].emplace_back(light);
   lights["static"].compile();
 };

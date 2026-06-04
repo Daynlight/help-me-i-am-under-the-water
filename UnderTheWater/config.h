@@ -13,6 +13,9 @@ namespace UW::Config{
   inline constexpr unsigned int FPS_SAMPLES = 200;
   inline constexpr unsigned int VSYNC = 0;
   inline const unsigned int DEFAULT_GUI_MATERIAL = 0;
+  inline const std::string DEFAULT_GUI_SHADER = "terrain";
+  inline const GLenum DEFAULT_GUI_SHADER_TYPE = 0;
+  inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;

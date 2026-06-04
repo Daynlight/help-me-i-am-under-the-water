@@ -36,8 +36,6 @@ class Materials{
 private:
   CW::Renderer::GPUStore buffer;
   bool is_compiled = false;
-
-public:
   std::vector<Material> materials;
 
 public:
@@ -73,6 +71,34 @@ public:
     if(!is_compiled) return;
 
     buffer.unbind();
+  };
+
+  Material& operator[](unsigned int index){
+    is_compiled = false;
+    return materials[index];
+  };
+
+  Material getMaterial(unsigned int index){
+    return materials[index];
+  };
+
+  void clear(){
+    is_compiled = false;
+    materials.clear();
+  };
+
+  unsigned int size() const {
+    return materials.size();
+  };
+
+  void emplace_back(Material material){
+    is_compiled = false;
+    materials.emplace_back(material);
+  };
+
+  void emplace_back(std::initializer_list<Material> materials){
+    is_compiled = false;
+    for (Material el : materials) this->materials.emplace_back(el);
   };
 };
 };

@@ -73,3 +73,5 @@ Testing/
 bin/
 build/
 *.ini
+
+temp*
