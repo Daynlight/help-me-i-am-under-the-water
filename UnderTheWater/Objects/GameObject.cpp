@@ -29,10 +29,15 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
         
     Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
 
-    // [TODO] Bind Textures
+    for(unsigned int i = 0; i < textures.size(); i++) 
+      Resources::get().textures[this->textures[i]].bind(i);
+
     Resources::get().shaders[this->shader].bind();
     Resources::get().meshes[this->mesh].render();
     Resources::get().shaders[this->shader].unbind();
+
+    for(unsigned int i = 0; i < textures.size(); i++) 
+      Resources::get().textures[this->textures[i]].unbind();
 
     Resources::get().shaders[this->shader].getUniforms().clear();
   };

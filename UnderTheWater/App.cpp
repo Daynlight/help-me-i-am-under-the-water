@@ -420,6 +420,9 @@ void UW::App::guiObjectList(){
   for(unsigned int id = 0; id < objects.size(); id++){
     std::string label = "- " + std::to_string(id);
     if(ImGui::Button(label.c_str())) object_id = id;
+    
+    label = "Delete " + std::to_string(id);
+    if(ImGui::Button(label.c_str())) objects.erase(objects.begin() + id);
   };
 
   if(ImGui::Button("Add new")) objects.emplace_back(UW::GameObject("testing", "testing", {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
@@ -444,10 +447,38 @@ void UW::App::guiObjectEditor(){
 
   UW::GameObject& object = objects[object_id];
 
+  char mesh_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+  memcpy(mesh_buffer, object.mesh.data(), object.mesh.size());
+  mesh_buffer[object.mesh.size()] = '\0';
+  ImGui::InputText("mesh", mesh_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+  object.mesh = std::string(mesh_buffer + '\0');
+
+  char shader_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+  memcpy(shader_buffer, object.shader.data(), object.shader.size());
+  shader_buffer[object.shader.size()] = '\0';
+  ImGui::InputText("shader", shader_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+  object.shader = std::string(shader_buffer + '\0');
+
   ImGui::InputFloat3("position: ", &object.position[0]);
   ImGui::InputFloat3("rotate: ", &object.rotation[0]);
   ImGui::InputFloat3("scale: ", &object.scale[0]);
 
+
+  ImGui::SeparatorText("Textures: ");
+  for(int i = 0; i < object.textures.size(); i++){
+    std::string label = "- texture (" + std::to_string(i) + ")";
+    char texture_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+    memcpy(texture_buffer, object.textures[i].data(), object.textures[i].size());
+    texture_buffer[object.textures[i].size()] = '\0';
+    ImGui::InputText(label.c_str(), texture_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    object.textures[i] = std::string(texture_buffer + '\0');
+    
+    label = "Delete texture (" + std::to_string(i) + ")";
+    if(ImGui::Button(label.c_str())) object.textures.erase(object.textures.begin() + i);
+  };
+
+  std::string label = "Add Texture (" + std::to_string(object.textures.size()) + ")";
+  if(ImGui::Button(label.c_str())) object.textures.emplace_back("");
 };
 
 
