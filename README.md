@@ -120,15 +120,15 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 <summary>🌟 Iteration 2 🌟</summary>
 
 - [x] Unified Object system
-- [ ] Object UI
-- [ ] Material UI
+- [ ] Material UI (names)
 - [ ] Shader UI
-- [ ] Texture UI
-- [ ] Mesh UI 
-- [ ] Lights UI
+- [ ] Object UI
 - [ ] Example for Object with all parts.
 - [ ] Asset loader UI
 - [ ] Resource refactor as controller of files
+<!-- - [ ] Texture UI -->
+<!-- - [ ] Mesh UI  -->
+<!-- - [ ] Lights UI -->
 </details>
 
 <details>

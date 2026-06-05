@@ -63,6 +63,7 @@ private:
   void guiMaterialParameters();
   void guiMaterialList();
   void guiShaderLoad(std::string name, GLenum type);
+  std::string getShaderTypeName(GLenum type);
   void guiShaderEditor();
   void guiShaderList();
   void guiObjectEditor();

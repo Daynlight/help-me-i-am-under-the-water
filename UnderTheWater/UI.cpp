@@ -267,7 +267,9 @@ inline void UW::UI::guiMaterialList(){
   for (unsigned int id = 0; id < Resources::get().materials.size(); id++) {
     std::string button_label = "- " + std::to_string(id);
     if (ImGui::Button(button_label.c_str())) guiSettings.material_id = id;
+
     button_label = "Delete " + std::to_string(id);
+    ImGui::SameLine();
     if (ImGui::Button(button_label.c_str())) Resources::get().materials.erase(id);
   };
 
@@ -291,6 +293,7 @@ return [this](CW::Renderer::iRenderer *window){
 // --------------- //
 inline void UW::UI::guiMaterialParameters(){
   ImGui::SeparatorText("Materials Parameters");
+  ImGui::Text("Material id: %d", guiSettings.material_id);
 
   if(guiSettings.material_id >= Resources::get().materials.size()) return;
 
@@ -332,13 +335,23 @@ void UW::UI::guiShaderLoad(std::string name, GLenum type){
 
 
 
+std::string UW::UI::getShaderTypeName(GLenum type){
+  if(type == GL_VERTEX_SHADER) return "Vertex Shader";
+  if(type == GL_FRAGMENT_SHADER) return "Fragment Shader";
+  if(type == GL_GEOMETRY_SHADER) return "Geometry Shader";
+  if(type == GL_TESS_CONTROL_SHADER) return "Tess Control Shader";
+  if(type == GL_TESS_EVALUATION_SHADER) return "Tess Evaluation Shader";
+  return std::to_string(type);
+};
+
+
+
 void UW::UI::guiShaderList(){
   ImGui::SeparatorText("Shader List");
 
   for (const auto& [ key, values ] : Resources::get().shaders) {
     for (const auto& [key_s, values_s] : values.getRegisterShader()){
-      std::string button_label = "- " + key + ": " + std::to_string(key_s);
-      
+      std::string button_label = "- " + key + ": " + getShaderTypeName(key_s);
       if (ImGui::Button(button_label.c_str())) guiShaderLoad(key, key_s);
     };
   };
@@ -362,6 +375,7 @@ void UW::UI::guiShaderEditor(){
   float height = ImGui::GetContentRegionAvail().y - 50.0f;
   
   ImGui::SeparatorText("Shader Editor");
+  ImGui::Text("Shader: %s : %s", guiSettings.shader_name.c_str(), getShaderTypeName(guiSettings.shader_type).c_str());
   
   ImGui::InputTextMultiline("##Shader Content", buffer, UW::Config::SHADER_EDITOR_BUFFER_SIZE, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
 
