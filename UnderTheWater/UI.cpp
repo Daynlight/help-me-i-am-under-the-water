@@ -499,18 +499,19 @@ void UW::UI::guiObjectEditor(){
   ImGui::SeparatorText("Materials: ");
   for(int i = 0; i < object.materials.size(); i++){
     std::string label = "- material (" + std::to_string(i) + ")";
-    char material_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
-    memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
-    material_buffer[object.materials[i].size()] = '\0';
-    ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
-    object.materials[i] = std::string(material_buffer + '\0');
+    // char material_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+    // memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
+    // material_buffer[object.materials[i].size()] = '\0';
+    // ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    // object.materials[i] = std::string(material_buffer + '\0');
+    ImGui::InputInt(label.c_str(), &object.materials[i]);
     
     label = "Delete material (" + std::to_string(i) + ")";
     if(ImGui::Button(label.c_str())) object.materials.erase(object.materials.begin() + i);
   };
 
   label = "Add material (" + std::to_string(object.materials.size()) + ")";
-  if(ImGui::Button(label.c_str())) object.materials.emplace_back("");
+  if(ImGui::Button(label.c_str())) object.materials.emplace_back(0);
 };
 
 
