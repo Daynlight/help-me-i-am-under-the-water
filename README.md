@@ -120,8 +120,17 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 <summary>🌟 Iteration 2 🌟</summary>
 
 - [x] Unified Object system
-- [x] Object Gui
-- [ ] Asset loader Ui
+- [ ] Object UI
+- [ ] Material UI
+- [ ] Shader UI
+- [ ] Texture UI
+- [ ] Mesh UI 
+- [ ] Lights UI
+- [ ] Asset loader UI
+</details>
+
+<details>
+<summary>Iteration 3</summary>
 - [ ] Compile flag for end product
 - [ ] Resource refactor as controller of files
 - [ ] Engine like Shaders, Assets, Textures:
@@ -134,7 +143,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 </details>
 
 <details>
-<summary>Iteration 2</summary>
+<summary>Iteration 4</summary>
 
 - [ ] Water surface shader
 - [ ] FBO Render to texture
