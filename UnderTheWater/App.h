@@ -1,12 +1,10 @@
 #pragma once
 #include "Renderer.h"
-#include "Gui.h"
-#include "imgui.h"
-#include "imgui_internal.h"
 
 #include <vector>
 #include <functional>
 
+#include "UI.h"
 #include "config.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
@@ -19,38 +17,14 @@
 
 
 namespace UW{
-struct GuiSettings{
-  bool infoWindowOn = false;
-  bool materialWindowOn = false;
-  bool shaderExplorerWindowOn = false;
-  bool shaderEditorWindowOn = false;
-  bool objectExplorerWindowOn = false;
-  bool objectEditorWindowOn = false;
-  unsigned int material_id = UW::Config::DEFAULT_GUI_MATERIAL;
-  unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
-  GLenum shader_type = UW::Config::DEFAULT_GUI_SHADER_TYPE;
-  std::string shader_name = UW::Config::DEFAULT_GUI_SHADER;
-  int window_width = 800;
-  int window_height = 600;
-};
-
-static GuiSettings guiSettings;
-
-
-
 class App{
 private:
   // app
   CW::Renderer::Renderer window;
-  CW::Gui::Gui gui;
+  UW::UI ui;
 
   UW::Camera camera;
   UW::Camera debug_camera;
-
-  // control variables  
-  bool material_is_updated = false;
-  bool shader_is_updated = false;
-  char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
 
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
   float fps = 0.0f;
@@ -84,32 +58,5 @@ private:
   void initWindow();
   void swapCamera();
   void updateFps();
-
-private:
-  // gui
-  void uiLoad();
-  void configControl();
-  void uiControl();
-
-  void guiInfo();
-  void guiControlsInfo();
-  void guiMaterialParameters();
-  void guiMaterialList();
-  void guiShaderLoad(std::string name, GLenum type);
-  void guiShaderEditor();
-  void guiShaderList();
-  void guiObjectEditor();
-  void guiObjectList();
-
-  void menuBarGui();
-
-  std::function<void(std::function<void()> render_windows)> appWorkspace();
-
-  std::function<void(CW::Renderer::iRenderer *window)> windowGui();
-  std::function<void(CW::Renderer::iRenderer *window)> materialExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> shaderExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> shaderEditorGui();
-  std::function<void(CW::Renderer::iRenderer *window)> objectExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> objectEditorGui();
 };
 };

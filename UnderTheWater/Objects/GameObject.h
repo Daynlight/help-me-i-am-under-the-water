@@ -7,6 +7,9 @@
 
 #include <string>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "../vendor/glm/glm/gtx/euler_angles.hpp"
+
 
 
 namespace UW{

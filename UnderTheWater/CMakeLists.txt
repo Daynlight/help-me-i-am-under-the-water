@@ -5,6 +5,7 @@ project(UnderTheWater LANGUAGES CXX C)
 set(src
   "main.cpp"
   "App.cpp"
+  "UI.cpp"
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"

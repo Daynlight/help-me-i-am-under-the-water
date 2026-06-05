@@ -22,8 +22,14 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
   uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
 
-  glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-  model = glm::scale(model, this->scale);
+  glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
+  glm::mat4 rotationMat = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
+  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->scale);
+  glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
+  glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
+  glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
+
   if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[this->mesh])){
     uniform["model"]->set<glm::mat4>(model);
         

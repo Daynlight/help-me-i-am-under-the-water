@@ -121,7 +121,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 
 - [x] Unified Object system
 - [x] Object Gui
-- [ ] Asset manager
+- [ ] Asset loader Ui
 - [ ] Compile flag for end product
 - [ ] Resource refactor as controller of files
 - [ ] Engine like Shaders, Assets, Textures:
