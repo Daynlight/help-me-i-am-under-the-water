@@ -31,11 +31,15 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     uniform["model"]->set<glm::mat4>(model);
         
     // [TODO] Materials maping to SSBO
-    Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
-
-    for(unsigned int i = 0; i < textures.size(); i++) 
+    
+    
+    for(unsigned int i = 0; i < textures.size(); i++){
       Resources::get().textures[this->textures[i]].bind(i);
+      uniform[this->textures[i]]->set<int>(i);
+    };
 
+    Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
+    
     Resources::get().shaders[this->shader].bind();
     Resources::get().meshes[this->mesh].render();
     Resources::get().shaders[this->shader].unbind();

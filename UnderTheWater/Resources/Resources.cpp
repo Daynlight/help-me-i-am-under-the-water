@@ -100,7 +100,33 @@ void UW::Resources::initMeshes(){
     4, 5, 1, 1, 0, 4,
     3, 2, 6, 6, 7, 3
   };
+  std::vector<GLfloat> normals = {
+    0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f,
+  };
+  std::vector<GLfloat> uvs = {
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+  };
+  std::vector<GLint> mat_id = {
+    0, 0, 0, 0, 1, 1, 1, 1
+  };
   meshes["testing"].addVertices(vertices, 3, 0);
+  meshes["testing"].setData<GLfloat>(normals, 3, 1);
+  meshes["testing"].setData<GLfloat>(uvs, 2, 2);
+  meshes["testing"].setData<GLint>(mat_id, 1, 3);
   meshes["testing"].addIndices(indices);
 };
 

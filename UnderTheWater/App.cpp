@@ -44,7 +44,7 @@ void UW::App::onLoad(){
   debug_camera.position = {1157, 2048, 1310};
   debug_camera.direction = {-0.57, -0.76, -0.28};
 
-  objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
+  objects.emplace_back(UW::GameObject("testing", "testing", "testing", {"sky_box"}, glm::vec3(0.0f, 1000.0f, 0.0f), glm::vec3(0.0f), glm::vec3(100.0f)));
 };
 
 
