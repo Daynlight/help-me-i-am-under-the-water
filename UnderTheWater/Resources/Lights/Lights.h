@@ -70,6 +70,11 @@ public:
     lights.clear();
   };
 
+  void erase(unsigned int index){
+    is_compiled = false;
+    lights.erase(lights.begin() + index);
+  };
+
   unsigned int size() const {
     return lights.size();
   };

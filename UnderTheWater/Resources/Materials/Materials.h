@@ -87,6 +87,11 @@ public:
     materials.clear();
   };
 
+  void erase(unsigned int index){
+    is_compiled = false;
+    materials.erase(materials.begin() + index);
+  };
+
   unsigned int size() const {
     return materials.size();
   };
