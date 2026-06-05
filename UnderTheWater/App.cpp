@@ -39,6 +39,8 @@ void UW::App::run(){
 // ========== Core Operations ========== //
 // ===================================== //
 void UW::App::onLoad(){
+  configControl();
+  
   camera.position = {1055, 797, 1331};
   debug_camera.position = {1157, 2048, 1310};
   debug_camera.direction = {-0.57, -0.76, -0.28};
@@ -146,68 +148,143 @@ void UW::App::updateFps(){
 // ========================= //
 // ========== GUI ========== //
 // ========================= //
+void UW::App::configControl(){
+  ImGuiSettingsHandler handler;
+  handler.TypeName = "GuiSettings";
+  handler.TypeHash = ImHashStr("GuiSettings");
+
+  handler.ReadOpenFn = [](ImGuiContext*, ImGuiSettingsHandler*, const char*){
+    return (void*)&UW::guiSettings;
+  };
+
+  handler.ReadLineFn = [](ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line){
+    GuiSettings* s = (GuiSettings*)entry;
+
+    int value;
+    if (sscanf(line, "InfoWindowOn=%d", &value) == 1) s->infoWindowOn = value;
+    if (sscanf(line, "MaterialWindowOn=%d", &value) == 1) s->materialWindowOn= value;
+    if (sscanf(line, "ShaderExplorerWindowOn=%d", &value) == 1) s->shaderExplorerWindowOn = value;
+    if (sscanf(line, "ShaderEditorWindowOn=%d", &value) == 1) s->shaderEditorWindowOn = value;
+    if (sscanf(line, "ObjectExplorerWindowOn=%d", &value) == 1) s->objectExplorerWindowOn = value;
+    if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
+
+  };
+
+  handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf){
+    out_buf->appendf("[%s][Main]\n", handler->TypeName);
+    out_buf->appendf("InfoWindowOn=%d\n", guiSettings.infoWindowOn);
+    out_buf->appendf("MaterialWindowOn=%d\n", guiSettings.materialWindowOn);
+    out_buf->appendf("ShaderExplorerWindowOn=%d\n", guiSettings.shaderExplorerWindowOn);
+    out_buf->appendf("ShaderEditorWindowOn=%d\n", guiSettings.shaderEditorWindowOn);
+    out_buf->appendf("ObjectExplorerWindowOn=%d\n", guiSettings.objectExplorerWindowOn);
+    out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
+    out_buf->append("\n");
+  };
+
+  ImGui::GetCurrentContext()->SettingsHandlers.push_back(handler);
+  ImGui::LoadIniSettingsFromDisk(ImGui::GetIO().IniFilename);
+  uiControl();
+};
+
+
+
+void UW::App::uiControl(){
+  if(guiSettings.infoWindowOn){
+    gui.addWindow("Info Gui", windowGui());
+  }
+  else{
+    gui.deleteWindow("Info Gui");  
+  };
+  if(guiSettings.materialWindowOn){
+    gui.addWindow("Material Explorer", materialExplorerGui());
+  }
+  else{
+    gui.deleteWindow("Material Explorer");
+  };
+  if(guiSettings.shaderExplorerWindowOn){
+    gui.addWindow("Shader Explorer", shaderExplorerGui());
+  }
+  else{
+    gui.deleteWindow("Shader Explorer");
+  };
+  if(guiSettings.shaderEditorWindowOn){
+    gui.addWindow("Shader Editor", shaderEditorGui());
+  }
+  else{
+    gui.deleteWindow("Shader Editor");
+  };
+  if(guiSettings.objectExplorerWindowOn){
+    gui.addWindow("Object Explorer", objectExplorerGui());
+  }
+  else{
+    gui.deleteWindow("Object Explorer");
+  };
+  if(guiSettings.objectEditorWindowOn){
+    gui.addWindow("Object Editor", objectEditorGui());
+  }
+  else{
+    gui.deleteWindow("Object Editor");
+  };
+};
+
+
+
 void UW::App::menuBarGui(){
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("Window")) {
       if(ImGui::MenuItem("Info")){
-        if(infoWindowOn){
-          gui.deleteWindow("Info Gui");  
-          infoWindowOn = false;
+        if(guiSettings.infoWindowOn){
+          guiSettings.infoWindowOn = false;
         }
         else{
-          gui.addWindow("Info Gui", windowGui());
-          infoWindowOn = true;
-        }
+          guiSettings.infoWindowOn = true;
+        };
+        uiControl();
       };
       if(ImGui::MenuItem("Material Explorer")){
-        if(materialWindowOn){
-          gui.deleteWindow("Material Explorer");
-          materialWindowOn = false;
+        if(guiSettings.materialWindowOn){
+          guiSettings.materialWindowOn = false;
         }
         else{
-          gui.addWindow("Material Explorer", materialExplorerGui());
-          materialWindowOn = true;
-        }
+          guiSettings.materialWindowOn = true;
+        };
+        uiControl();
       };
       if(ImGui::MenuItem("Shader Explorer")){
-        if(shaderExplorerWindowOn){
-          gui.deleteWindow("Shader Explorer");
-          shaderExplorerWindowOn = false;
+        if(guiSettings.shaderExplorerWindowOn){
+          guiSettings.shaderExplorerWindowOn = false;
         }
         else{
-          gui.addWindow("Shader Explorer", shaderExplorerGui());
-          shaderExplorerWindowOn = true;
-        }
+          guiSettings.shaderExplorerWindowOn = true;
+        };
+        uiControl();
       };
       if(ImGui::MenuItem("Shader Editor")){
-        if(shaderEditorWindowOn){
-          gui.deleteWindow("Shader Editor");
-          shaderEditorWindowOn = false;
+        if(guiSettings.shaderEditorWindowOn){
+          guiSettings.shaderEditorWindowOn = false;
         }
         else{
-          gui.addWindow("Shader Editor", shaderEditorGui());
-          shaderEditorWindowOn = true;
-        }
+          guiSettings.shaderEditorWindowOn = true;
+        };
+        uiControl();
       };
       if(ImGui::MenuItem("Object Explorer")){
-        if(objectExplorerWindowOn){
-          gui.deleteWindow("Object Explorer");
-          objectExplorerWindowOn = false;
+        if(guiSettings.objectExplorerWindowOn){
+          guiSettings.objectExplorerWindowOn = false;
         }
         else{
-          gui.addWindow("Object Explorer", objectExplorerGui());
-          objectExplorerWindowOn = true;
-        }
+          guiSettings.objectExplorerWindowOn = true;
+        };
+        uiControl();
       };
       if(ImGui::MenuItem("Object Editor")){
-        if(materialWindowOn){
-          gui.deleteWindow("Object Editor");
-          objectEditorWindowOn = false;
+        if(guiSettings.objectEditorWindowOn){
+          guiSettings.objectEditorWindowOn = false;
         }
         else{
-          gui.addWindow("Object Editor", objectEditorGui());
-          objectEditorWindowOn = true;
-        }
+          guiSettings.objectEditorWindowOn = true;
+        };
+        uiControl();
       };
       ImGui::EndMenu();
     }
@@ -361,6 +438,7 @@ void UW::App::guiShaderList(){
       if (ImGui::Button(button_label.c_str())) {
         shader_name = key;
         shader_type = key_s;
+        memset(buffer, '\0', UW::Config::SHADER_EDITOR_BUFFER_SIZE);
         std::string source = values_s.getSource();
         memcpy(buffer, source.data(), source.size());
       };

@@ -1,6 +1,8 @@
 #pragma once
 #include "Renderer.h"
 #include "Gui.h"
+#include "imgui.h"
+#include "imgui_internal.h"
 
 #include <vector>
 #include <functional>
@@ -17,6 +19,18 @@
 
 
 namespace UW{
+struct GuiSettings{
+  bool infoWindowOn = false;
+  bool materialWindowOn = false;
+  bool shaderExplorerWindowOn = false;
+  bool shaderEditorWindowOn = false;
+  bool objectExplorerWindowOn = false;
+  bool objectEditorWindowOn = false;
+};
+static GuiSettings guiSettings;
+
+
+
 class App{
 private:
   // app
@@ -43,14 +57,6 @@ private:
   unsigned int fps_id = 0;
   float camera_swap_cooldown_acc = 0.0f;
   float fixed_update_time_acc = 0.0f;
-
-  // gui
-  bool infoWindowOn = false;
-  bool materialWindowOn = false;
-  bool shaderExplorerWindowOn = false;
-  bool shaderEditorWindowOn = false;
-  bool objectExplorerWindowOn = false;
-  bool objectEditorWindowOn = false;
 
   // objects
   UW::Terrain terrain;
@@ -80,6 +86,9 @@ private:
 
 private:
   // gui
+  void configControl();
+  void uiControl();
+
   void guiInfo();
   void guiControlsInfo();
   void guiMaterialParameters();
