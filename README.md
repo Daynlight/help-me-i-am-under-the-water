@@ -126,13 +126,14 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [ ] Texture UI
 - [ ] Mesh UI 
 - [ ] Lights UI
+- [ ] Example for Object with all parts.
 - [ ] Asset loader UI
+- [ ] Resource refactor as controller of files
 </details>
 
 <details>
 <summary>Iteration 3</summary>
 - [ ] Compile flag for end product
-- [ ] Resource refactor as controller of files
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder

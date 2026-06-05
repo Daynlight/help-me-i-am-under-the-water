@@ -400,14 +400,15 @@ void UW::UI::guiObjectList(){
   ImGui::SeparatorText("Object List");
 
   for(unsigned int id = 0; id < objects.size(); id++){
-    std::string label = "- " + std::to_string(id);
+    std::string label = "- " + objects[id].name + " (" + std::to_string(id) + ")";
     if(ImGui::Button(label.c_str())) guiSettings.object_id = id;
     
     label = "Delete " + std::to_string(id);
+    ImGui::SameLine();
     if(ImGui::Button(label.c_str())) objects.erase(objects.begin() + id);
   };
 
-  if(ImGui::Button("Add new")) objects.emplace_back(UW::GameObject("testing", "testing", {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
+  if(ImGui::Button("Add new")) objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
 };
 
 
@@ -429,6 +430,12 @@ void UW::UI::guiObjectEditor(){
 
   UW::GameObject& object = objects[guiSettings.object_id];
 
+  char name_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+  memcpy(name_buffer, object.name.data(), object.name.size());
+  name_buffer[object.name.size()] = '\0';
+  ImGui::InputText("name", name_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+  object.name = std::string(name_buffer + '\0');
+
   char mesh_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
   memcpy(mesh_buffer, object.mesh.data(), object.mesh.size());
   mesh_buffer[object.mesh.size()] = '\0';
@@ -441,9 +448,21 @@ void UW::UI::guiObjectEditor(){
   ImGui::InputText("shader", shader_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
   object.shader = std::string(shader_buffer + '\0');
 
+
   ImGui::InputFloat3("position: ", &object.position[0]);
+  glm::vec3 position_offset = glm::vec3(0.0f);
+  ImGui::SliderFloat3("position slider: ", &position_offset[0], -100.0f, 100.0f);
+  object.position += position_offset * window.getWindowData()->delta_time;
+
   ImGui::InputFloat3("rotate: ", &object.rotation[0]);
+  glm::vec3 rotate_offset = glm::vec3(0.0f);
+  ImGui::SliderFloat3("rotate slider: ", &rotate_offset[0], -1.0f, 1.0f);
+  object.rotation += rotate_offset * window.getWindowData()->delta_time;
+
   ImGui::InputFloat3("scale: ", &object.scale[0]);
+  glm::vec3 scale_offset = glm::vec3(0.0f);
+  ImGui::SliderFloat3("scale slider: ", &scale_offset[0], -100.0f, 100.0f);
+  object.scale += scale_offset * window.getWindowData()->delta_time;
 
 
   ImGui::SeparatorText("Textures: ");
@@ -461,6 +480,23 @@ void UW::UI::guiObjectEditor(){
 
   std::string label = "Add Texture (" + std::to_string(object.textures.size()) + ")";
   if(ImGui::Button(label.c_str())) object.textures.emplace_back("");
+
+
+  ImGui::SeparatorText("Materials: ");
+  for(int i = 0; i < object.materials.size(); i++){
+    std::string label = "- material (" + std::to_string(i) + ")";
+    char material_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+    memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
+    material_buffer[object.materials[i].size()] = '\0';
+    ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    object.materials[i] = std::string(material_buffer + '\0');
+    
+    label = "Delete material (" + std::to_string(i) + ")";
+    if(ImGui::Button(label.c_str())) object.materials.erase(object.materials.begin() + i);
+  };
+
+  label = "Add material (" + std::to_string(object.materials.size()) + ")";
+  if(ImGui::Button(label.c_str())) object.materials.emplace_back("");
 };
 
 

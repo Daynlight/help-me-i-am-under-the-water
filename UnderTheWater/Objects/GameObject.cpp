@@ -2,17 +2,14 @@
 
 
 
-UW::GameObject::GameObject(std::string mesh, std::string shader, 
-                           const std::vector<std::string>& textures, 
-                           glm::vec3 position,
-                           glm::vec3 rotation, 
-                           glm::vec3 scale)
-  :mesh(mesh), shader(shader), textures(textures), position(position), rotation(rotation), scale(scale) {};
+UW::GameObject::GameObject(std::string name, std::string mesh, std::string shader, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+  :name(name), mesh(mesh), shader(shader), textures(textures), position(position), rotation(rotation), scale(scale) {};
 
 
 
 UW::GameObject::~GameObject(){
 };
+
 
 
 void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_camera, Camera &render_camera){
@@ -33,6 +30,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[this->mesh])){
     uniform["model"]->set<glm::mat4>(model);
         
+    // [TODO] Materials maping to SSBO
     Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
 
     for(unsigned int i = 0; i < textures.size(); i++) 
