@@ -1,7 +1,7 @@
 [submodule "vendor/CWindow"]
 	path = vendor/CWindow
 	url = https://github.com/Daynlight/CWindow.git
-	branch = dev
+	branch = under_water
 [submodule "vendor/cmrc"]
 	path = vendor/cmrc
 	url = https://github.com/vector-of-bool/cmrc.git

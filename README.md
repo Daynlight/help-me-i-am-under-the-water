@@ -80,7 +80,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [**CMake**](https://cmake.org/): 3.31.6
 - [**Ninja**](https://ninja-build.org/): 1.12.1
 - [**gcc**](https://gcc.gnu.org/): 14.2.0
-- [**CWindow**](https://github.com/Daynlight/CWindow.git): dev
+- [**CWindow**](https://github.com/Daynlight/CWindow.git): under_water
   - **assimp**
   - **Dear ImGui**
   - **Glad**
