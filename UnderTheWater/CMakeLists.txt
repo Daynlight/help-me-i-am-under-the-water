@@ -6,6 +6,7 @@ set(src
   "main.cpp"
   "App.cpp"
   "UI.cpp"
+  "ObjectManager.cpp"
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"

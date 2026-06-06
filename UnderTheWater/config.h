@@ -17,6 +17,7 @@ namespace UW::Config{
   inline const unsigned int DEFAULT_GUI_OBJECT = 0;
   inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;
   inline const unsigned int OBJECT_NAME_BUFFER_SIZE = 1024;
+  inline const float SAVE_TIMESTAMP = 350;
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;

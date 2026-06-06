@@ -4,6 +4,7 @@
 #include "imgui_internal.h"
 
 #include "config.h"
+#include "ObjectManager.h"
 #include "Objects/GameObject.h"
 #include "Camera/Camera.h"
 
@@ -39,14 +40,14 @@ private:
   bool &debug_camera_on;
   UW::Camera &camera;
   UW::Camera &debug_camera;
-  std::vector<UW::GameObject> &objects;
+  UW::ObjectManager& object_manager;
 
   bool material_is_updated = false;
   bool shader_is_updated = false;
   char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, std::vector<UW::GameObject> &objects);
+  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
   ~UI();
   void onLoad();
   void render();

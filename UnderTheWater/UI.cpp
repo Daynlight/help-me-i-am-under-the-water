@@ -2,8 +2,8 @@
 
 
 
-UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, std::vector<UW::GameObject> &objects)
-  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), objects(objects){
+UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager)
+  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager){
   gui.setWorkspace(appWorkspace());
 };
 
@@ -423,16 +423,16 @@ inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI::shaderEditor
 void UW::UI::guiObjectList(){
   ImGui::SeparatorText("Object List");
 
-  for(unsigned int id = 0; id < objects.size(); id++){
-    std::string label = "- " + objects[id].name + " (" + std::to_string(id) + ")";
+  for(unsigned int id = 0; id < object_manager.objects.size(); id++){
+    std::string label = "- " + object_manager.objects[id].name + " (" + std::to_string(id) + ")";
     if(ImGui::Button(label.c_str())) guiSettings.object_id = id;
     
     label = "Delete " + std::to_string(id);
     ImGui::SameLine();
-    if(ImGui::Button(label.c_str())) objects.erase(objects.begin() + id);
+    if(ImGui::Button(label.c_str())) object_manager.objects.erase(object_manager.objects.begin() + id);
   };
 
-  if(ImGui::Button("Add new")) objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
+  if(ImGui::Button("Add new")) object_manager.objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
 };
 
 
@@ -450,9 +450,9 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectExplorerGui()
 // ------------- //
 void UW::UI::guiObjectEditor(){
   ImGui::SeparatorText("Object Editor");
-  if(guiSettings.object_id >= objects.size()) return;
+  if(guiSettings.object_id >= object_manager.objects.size()) return;
 
-  UW::GameObject& object = objects[guiSettings.object_id];
+  UW::GameObject& object = object_manager.objects[guiSettings.object_id];
 
   char name_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
   memcpy(name_buffer, object.name.data(), object.name.size());

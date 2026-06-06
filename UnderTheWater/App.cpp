@@ -6,7 +6,7 @@
 // ========== APP ========== //
 // ========================= //
 UW::App::App()
-  :camera(&window), debug_camera(&window), ui(window, fps, debug_camera_on, camera, debug_camera, objects){
+  :camera(&window), debug_camera(&window), ui(window, fps, debug_camera_on, camera, debug_camera, object_manager){
   initWindow();
 
   onLoad();
@@ -44,13 +44,14 @@ void UW::App::onLoad(){
   debug_camera.position = {1157, 2048, 1310};
   debug_camera.direction = {-0.57, -0.76, -0.28};
 
-  objects.emplace_back(UW::GameObject("testing", "testing", "testing", {}, {"sky_box"}, glm::vec3(0.0f, 1000.0f, 0.0f), glm::vec3(0.0f), glm::vec3(100.0f)));
+  object_manager.load();
 };
 
 
 
 void UW::App::onDestroy() {
-  objects.clear();
+  object_manager.save();
+  object_manager.objects.clear();
   Resources::get().destroy();
 };
 
@@ -65,13 +66,13 @@ void UW::App::render(){
     terrain.render(&window, camera, debug_camera);
     skybox.render(&window, camera, debug_camera); 
     water.render(&window, camera, debug_camera);
-    for(UW::GameObject& object : objects) object.render(&window, camera, debug_camera);
+    for(UW::GameObject& object : object_manager.objects) object.render(&window, camera, debug_camera);
   }
   else {
     terrain.render(&window, camera, camera);
     skybox.render(&window, camera, camera);
     water.render(&window, camera, camera);
-    for(UW::GameObject& object : objects) object.render(&window, camera, camera);
+    for(UW::GameObject& object : object_manager.objects) object.render(&window, camera, camera);
   };
   
   Resources::get().materials.unbind();
@@ -91,7 +92,7 @@ void UW::App::update(){
 
   camera.event(&window);
   
-  for(UW::GameObject& el : objects) el.onUpdate(window.getWindowData()->delta_time);
+  for(UW::GameObject& el : object_manager.objects) el.onUpdate(window.getWindowData()->delta_time);
 };
 
 
@@ -100,12 +101,20 @@ void UW::App::fixedUpdate(){
   fixed_update_time_acc += window.getWindowData()->delta_time;
 
   if(fixed_update_time_acc >= 1.0f / UW::Config::FIXED_HZ){
-    fixed_update_time_acc -= 1.0f / UW::Config::FIXED_HZ;
-
+    
     guiSettings.window_width = window.getWindowData()->width;
     guiSettings.window_height = window.getWindowData()->height;
+
+    if(save_acc >= UW::Config::SAVE_TIMESTAMP){
+      save_acc -= UW::Config::SAVE_TIMESTAMP;
+      object_manager.save();
+    }
+    else{
+      save_acc += fixed_update_time_acc;
+    }
     
-    for(UW::GameObject& el : objects) el.onFixedUpdate();
+    for(UW::GameObject& el : object_manager.objects) el.onFixedUpdate();
+    fixed_update_time_acc -= 1.0f / UW::Config::FIXED_HZ;
   };
 };
 

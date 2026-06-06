@@ -8,6 +8,7 @@
 #include "config.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
+#include "ObjectManager.h"
 #include "Objects/Object.h"
 #include "Objects/GameObject.h"
 #include "Objects/Terrain/Terrain.h"
@@ -32,12 +33,14 @@ private:
   unsigned int fps_id = 0;
   float camera_swap_cooldown_acc = 0.0f;
   float fixed_update_time_acc = 0.0f;
+  float save_acc = 0.0f;
 
   // objects
   UW::Terrain terrain;
   UW::Water water;
   UW::Skybox skybox;
-  std::vector<UW::GameObject> objects;
+  UW::ObjectManager object_manager;
+
 
 public:
   App();
