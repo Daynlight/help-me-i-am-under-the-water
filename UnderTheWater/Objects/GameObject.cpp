@@ -2,7 +2,7 @@
 
 
 
-UW::GameObject::GameObject(std::string name, std::string mesh, std::string shader, const std::vector<int>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+UW::GameObject::GameObject(std::string name, std::string mesh, std::string shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
   :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {};
 
 
@@ -39,8 +39,13 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     
     Resources::get().shaders[this->shader].bind();
     
+    std::vector<int> translation;
+    for(std::string el : materials){
+      translation.emplace_back(Resources::get().materials.translate_material(el));
+    };
+
     GLint loc = glGetUniformLocation(Resources::get().shaders[shader].getShaderProgram(), "mat_translate");
-    glUniform1iv(loc, materials.size(), materials.data());
+    glUniform1iv(loc, translation.size(), translation.data());
     
     Resources::get().meshes[this->mesh].render();
     

@@ -18,7 +18,7 @@ struct GuiSettings{
   bool shaderEditorWindowOn = false;
   bool objectExplorerWindowOn = false;
   bool objectEditorWindowOn = false;
-  unsigned int material_id = UW::Config::DEFAULT_GUI_MATERIAL;
+  std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
   unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
   GLenum shader_type = UW::Config::DEFAULT_GUI_SHADER_TYPE;
   std::string shader_name = UW::Config::DEFAULT_GUI_SHADER;

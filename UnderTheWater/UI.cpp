@@ -60,7 +60,6 @@ void UW::UI::configControl(){
     if (sscanf(line, "ShaderEditorWindowOn=%d", &value) == 1) s->shaderEditorWindowOn = value;
     if (sscanf(line, "ObjectExplorerWindowOn=%d", &value) == 1) s->objectExplorerWindowOn = value;
     if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
-    if (sscanf(line, "Material_ID=%d", &value) == 1) s->material_id = value;
     if (sscanf(line, "Object_ID=%d", &value) == 1) s->object_id = value;
     if (sscanf(line, "Shader_Type=%d", &value) == 1) s->shader_type = value;
     if (sscanf(line, "Window_Width=%d", &value) == 1) s->window_width = value;
@@ -68,6 +67,7 @@ void UW::UI::configControl(){
     
     char value_str[256];
     if (sscanf(line, "Shader_Name=%256s", &value_str) == 1) s->shader_name = std::string(value_str);
+    if (sscanf(line, "Material_ID=%256s", &value_str) == 1) s->material_name = std::string(value_str);
   };
 
   handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf){
@@ -79,12 +79,12 @@ void UW::UI::configControl(){
     out_buf->appendf("ShaderEditorWindowOn=%d\n", guiSettings.shaderEditorWindowOn);
     out_buf->appendf("ObjectExplorerWindowOn=%d\n", guiSettings.objectExplorerWindowOn);
     out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
-    out_buf->appendf("Material_ID=%d\n", guiSettings.material_id);
     out_buf->appendf("Object_ID=%d\n", guiSettings.object_id);
     out_buf->appendf("Shader_Type=%d\n", guiSettings.shader_type);
     out_buf->appendf("Window_Width=%d\n", guiSettings.window_width);
     out_buf->appendf("Window_Height=%d\n", guiSettings.window_height);
     out_buf->appendf("Shader_Name=%s\n", guiSettings.shader_name.c_str());
+    out_buf->appendf("Material_ID=%s\n", guiSettings.material_name.c_str());
     out_buf->append("\n");
   };
 
@@ -264,17 +264,17 @@ return [this](CW::Renderer::iRenderer *window){
 inline void UW::UI::guiMaterialList(){
   ImGui::SeparatorText("Materials List");
 
-  for (unsigned int id = 0; id < Resources::get().materials.size(); id++) {
-    std::string button_label = "- " + std::to_string(id);
-    if (ImGui::Button(button_label.c_str())) guiSettings.material_id = id;
+  for (std::pair<std::string, Material> el : Resources::get().materials.getMaterialReg()) {
+    std::string button_label = "- " + el.first;
+    if (ImGui::Button(button_label.c_str())) guiSettings.material_name = el.first;
 
-    button_label = "Delete " + std::to_string(id);
+    button_label = "Delete " + el.first;
     ImGui::SameLine();
-    if (ImGui::Button(button_label.c_str())) Resources::get().materials.erase(id);
+    if (ImGui::Button(button_label.c_str())) Resources::get().materials.erase(el.first);
   };
 
   std::string button_label = "Add " + std::to_string(Resources::get().materials.size());
-  if (ImGui::Button(button_label.c_str())) Resources::get().materials.emplace_back(UW::Material());
+  if (ImGui::Button(button_label.c_str())) Resources::get().materials.emplace_back("new material", UW::Material());
   
 };
 
@@ -293,12 +293,21 @@ return [this](CW::Renderer::iRenderer *window){
 // --------------- //
 inline void UW::UI::guiMaterialParameters(){
   ImGui::SeparatorText("Materials Parameters");
-  ImGui::Text("Material id: %d", guiSettings.material_id);
+  ImGui::Text("Material id: %s", guiSettings.material_name.c_str());
 
-  if(guiSettings.material_id >= Resources::get().materials.size()) return;
+  if(!Resources::get().materials.find(guiSettings.material_name)) return;
 
-  Material temp_mat = Resources::get().materials.getMaterial(guiSettings.material_id);
+  Material temp_mat = Resources::get().materials.getMaterial(guiSettings.material_name);
 
+  char name_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+  memcpy(name_buffer, guiSettings.material_name.data(), guiSettings.material_name.size());
+  name_buffer[guiSettings.material_name.size()] = '\0';
+  if(ImGui::InputText("name", name_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE)){
+    Resources::get().materials.erase(guiSettings.material_name);
+    guiSettings.material_name = std::string(name_buffer + '\0');
+    Resources::get().materials.emplace_back(guiSettings.material_name, temp_mat);
+  };
+  
   if(ImGui::ColorEdit3("Albedo: ", &temp_mat.albedo[0])) material_is_updated = true;
   if(ImGui::SliderFloat("Roughness: ", &temp_mat.roughness, 0.0f, 1.0f)) material_is_updated = true;
   if(ImGui::SliderFloat("Metallic: ", &temp_mat.metallic, 0.0f, 1.0f)) material_is_updated = true;
@@ -308,7 +317,7 @@ inline void UW::UI::guiMaterialParameters(){
 
   if(material_is_updated){
     material_is_updated = false;
-    Resources::get().materials[guiSettings.material_id] = temp_mat;
+    Resources::get().materials[guiSettings.material_name] = temp_mat;
     Resources::get().materials.compile();
   };
 };
@@ -499,19 +508,19 @@ void UW::UI::guiObjectEditor(){
   ImGui::SeparatorText("Materials: ");
   for(int i = 0; i < object.materials.size(); i++){
     std::string label = "- material (" + std::to_string(i) + ")";
-    // char material_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
-    // memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
-    // material_buffer[object.materials[i].size()] = '\0';
-    // ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
-    // object.materials[i] = std::string(material_buffer + '\0');
-    ImGui::InputInt(label.c_str(), &object.materials[i]);
+    
+    char material_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+    memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
+    material_buffer[object.materials[i].size()] = '\0';
+    ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    object.materials[i] = std::string(material_buffer + '\0');
     
     label = "Delete material (" + std::to_string(i) + ")";
     if(ImGui::Button(label.c_str())) object.materials.erase(object.materials.begin() + i);
   };
 
   label = "Add material (" + std::to_string(object.materials.size()) + ")";
-  if(ImGui::Button(label.c_str())) object.materials.emplace_back(0);
+  if(ImGui::Button(label.c_str())) object.materials.emplace_back("new material");
 };
 
 

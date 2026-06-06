@@ -120,20 +120,20 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 <summary>🌟 Iteration 2 🌟</summary>
 
 - [x] Unified Object system
-- [ ] Material UI (names)
-- [ ] Shader UI
-- [ ] Object UI
-- [ ] Example for Object with all parts.
-- [ ] Asset loader UI
+- [x] Base Object UI
+- [x] Base Example for Object with all parts.
+- [x] Base Material UI (names)
+- [ ] Base Shader UI
 - [ ] Resource refactor as controller of files
-<!-- - [ ] Texture UI -->
-<!-- - [ ] Mesh UI  -->
-<!-- - [ ] Lights UI -->
 </details>
 
 <details>
 <summary>Iteration 3</summary>
+<!-- - [ ] Mesh UI  -->
+<!-- - [ ] Lights UI -->
 - [ ] Compile flag for end product
+- [ ] Asset loader UI
+- [ ] Texture UI
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder

@@ -11,7 +11,7 @@ namespace UW::Config{
   inline constexpr float FIXED_HZ = 60.0f;
   inline constexpr unsigned int FPS_SAMPLES = 200;
   inline constexpr unsigned int VSYNC = 0;
-  inline const unsigned int DEFAULT_GUI_MATERIAL = 0;
+  inline const std::string DEFAULT_GUI_MATERIAL = "Terrain";
   inline const std::string DEFAULT_GUI_SHADER = "terrain";
   inline const GLenum DEFAULT_GUI_SHADER_TYPE = 0;
   inline const unsigned int DEFAULT_GUI_OBJECT = 0;
