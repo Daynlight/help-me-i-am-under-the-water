@@ -125,17 +125,18 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] Base Material UI (names)
 - [x] Base Shader UI
 - [x] Pbr serialization
-- [ ] mesh serialization
-- [ ] shader serialization
-- [ ] texture movement to gamedata
+- [x] lights serialization
+- [ ] mesh movement to ```GameData```
+- [ ] shader movement to ```GameData```
+- [ ] texture movement to ```GameData```
 - [ ] Resource refactor as controller of files
+- [ ] Compile flag for end product
 </details>
 
 <details>
 <summary>Iteration 3</summary>
 <!-- - [ ] Mesh UI  -->
 <!-- - [ ] Lights UI -->
-- [ ] Compile flag for end product
 - [ ] Asset loader UI
 - [ ] Texture UI
 - [ ] Engine like Shaders, Assets, Textures:
