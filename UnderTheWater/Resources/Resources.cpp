@@ -204,7 +204,7 @@ void UW::Resources::initMaterials(){
   // ======================= //
   // ======= Terrain ======= //
   // ======================= //
-  materials.emplace_back("Terrain",
+  materials.emplace_back("terrain",
     {glm::vec3(255, 242, 111) / 255.0f,
     0.0f, 0.60f, glm::vec3(0.0f), 0.0f, 1.0f});
 
@@ -213,7 +213,7 @@ void UW::Resources::initMaterials(){
   // ===================== //
   // ======= Water ======= //
   // ===================== //
-  materials.emplace_back("Water",
+  materials.emplace_back("water",
     {glm::vec3(52, 114, 245) / 255.0f,
     0.0f, 0.44f, glm::vec3(0.0f), 0.0f, 1.0f});
 };
