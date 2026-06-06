@@ -65,6 +65,10 @@ public:
     return lights[index];
   };
 
+  Light get(unsigned int index) const{
+    return lights[index];
+  };
+
   void clear(){
     is_compiled = false;
     lights.clear();

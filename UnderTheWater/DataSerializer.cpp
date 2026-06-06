@@ -94,6 +94,32 @@ std::istream& UW::operator>>(std::istream& is, UW::MaterialsRecord& record) {
 };
 
 
+std::ostream& UW::operator<<(std::ostream& os, const UW::LightsRecord& record) {
+  os << record.name << "\n" 
+     << record.position.x << " " << record.position.y << " " << record.position.z << "\n"
+     << record.color.x << " " << record.color.y << " " << record.color.z << "\n"
+     << record.strength << "\n";
+
+  return os;
+};
+
+
+
+std::istream& UW::operator>>(std::istream& is, UW::LightsRecord& record) {
+  if (!std::getline(is, record.name)) return is;
+
+  if (!(is >> record.position.x >> record.position.y >> record.position.z
+           >> record.color.x >> record.color.y >> record.color.z
+           >> record.strength)) {
+    return is;
+  }
+  
+  is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+  return is;
+};
+
+
 
 
 
@@ -254,6 +280,84 @@ void UW::DataSerializer::load(UW::Materials &materials) {
       };
     };
 
+  } catch(const std::exception& e){
+    std::cerr << "Exception caught during CMRC GameObject load: " << e.what() << std::endl;
+  }
+};
+
+
+
+void UW::DataSerializer::save(std::unordered_map<std::string, UW::Lights> &lights) {
+  try {
+    std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME);
+    if (p.has_parent_path())
+      std::filesystem::create_directories(p.parent_path());
+  } catch (const std::filesystem::filesystem_error& e) {
+    std::cerr << "Filesystem error while creating directories: " << e.what() << std::endl;
+    return;
+  };
+
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME);
+  if (!outFile.is_open()) {
+    std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME << std::endl;
+    return;
+  };
+
+  unsigned int size = 0;
+  for (const auto& el : lights) size += el.second.size();
+
+  outFile << size << "\n";
+
+  for (const auto& el : lights) {
+    UW::Lights lights_data = el.second;
+    for(int i = 0; i < lights_data.size(); i++){
+      UW::Light light = lights_data.get(i);
+      UW::LightsRecord record;
+       
+      record.name = el.first;
+      record.position = light.position;
+      record.color = light.color;
+      record.strength = light.strength;
+
+      outFile << record;
+    }
+  };
+  
+  outFile.close();
+};
+
+
+
+void UW::DataSerializer::load(std::unordered_map<std::string, UW::Lights> &lights) {
+  try{
+    auto fs = cmrc::GameData::get_filesystem();
+    std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME;
+    
+    if (!fs.exists(resourcePath)) {
+      std::cerr << "CMRC Error: File not found in resources: " << resourcePath << std::endl;
+      return;
+    };
+
+    auto embeddedFile = fs.open(resourcePath);
+    std::string dataStr(embeddedFile.begin(), embeddedFile.end());
+    std::stringstream inFile(dataStr);
+
+    lights.clear();
+
+    size_t lightCount = 0;
+    if (!(inFile >> lightCount)) return;
+    inFile.ignore();
+
+    for (size_t i = 0; i < lightCount; ++i) {
+      UW::LightsRecord record;
+      if (inFile >> record) {
+        UW::Light light(record.position, record.color, record.strength);
+        lights[record.name].emplace_back(light);
+      } else {
+        std::cerr << "Error: File format corrupted at object index " << i << std::endl;
+        break;
+      };
+    };
   } catch(const std::exception& e){
     std::cerr << "Exception caught during CMRC GameObject load: " << e.what() << std::endl;
   }

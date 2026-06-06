@@ -41,6 +41,16 @@ struct MaterialsRecord{
   friend std::istream& operator>>(std::istream& is, MaterialsRecord& record);
 };
 
+struct LightsRecord{
+  std::string name = "";
+  glm::vec3 position;
+  glm::vec3 color;
+  float strength;
+
+  friend std::ostream& operator<<(std::ostream& os, const LightsRecord& record);
+  friend std::istream& operator>>(std::istream& is, LightsRecord& record);
+};
+
   
 
 
@@ -51,5 +61,8 @@ public:
 
   void save(UW::Materials &materials);
   void load(UW::Materials &materials);
+
+  void save(std::unordered_map<std::string, UW::Lights> &lights);
+  void load(std::unordered_map<std::string, UW::Lights> &lights);
 };
 }; // namespace UW

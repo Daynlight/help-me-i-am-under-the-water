@@ -16,7 +16,6 @@ UW::Resources::Resources(){
   initMeshes();
   initTextures();
   initShaders();
-  initLights();
 };
 
 
@@ -197,13 +196,3 @@ void UW::Resources::initShaders(){
   shaders["testing"].setFragmentShader(TestingCubeShader::fragment);
 };
 
-
-
-void UW::Resources::initLights(){
-  // ====================== //
-  // ======= Static ======= //
-  // ====================== //
-  UW::Light light = UW::Light({4347.0f, 1095.0f, 2547.0f}, {1.0f, 0.7f, 0.5f}, 2.0f);
-  lights["static"].emplace_back(light);
-  lights["static"].compile();
-};

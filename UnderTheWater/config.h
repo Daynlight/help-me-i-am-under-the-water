@@ -21,6 +21,7 @@ namespace UW::Config{
   inline const std::string GAME_DATA_FOLDER = "GameData/";
   inline const std::string MATERIALS_FILENAME = "Materials.pbr";
   inline const std::string OBJECTS_FILENAME = "Objects.obj";
+  inline const std::string LIGHTS_FILENAME = "Lights.lit";
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;
