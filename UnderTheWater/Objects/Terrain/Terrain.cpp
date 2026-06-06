@@ -37,7 +37,7 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
   uniform["maxHeight"]->set<float>(UW::Config::MAX_HEIGHT);
   uniform["distanceCoefficient"]->set<float>(UW::Config::TESS_DISTANCE_COFF);
   uniform["uTexture"]->set<int>(0);
-  uniform["material_id"]-> set<int>(0);
+  uniform["material_id"]-> set<int>(Resources::get().materials.translate_material("terrain"));
 
 
   Resources::get().shaders["terrain"].getUniforms().emplace_back(&uniform);

@@ -84,7 +84,7 @@ void main(){
     ) * lights[i].strength;
   };
 
-  float alpha = clamp(0.2 + fresnel, 0.0, 1.0);
+  float alpha = clamp(0.2 + fresnel, 0.0, 0.2);
   
   FragColor = vec4(color, alpha);
 }

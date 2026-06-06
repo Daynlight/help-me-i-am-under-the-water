@@ -4,7 +4,6 @@
 #include <string>
 
 
-
 namespace UW::Config{
   inline constexpr float PI = 3.14159265358979f;
   inline constexpr float EPS = 1e-5f;
@@ -12,10 +11,16 @@ namespace UW::Config{
   inline constexpr float FIXED_HZ = 60.0f;
   inline constexpr unsigned int FPS_SAMPLES = 200;
   inline constexpr unsigned int VSYNC = 0;
-  inline const unsigned int DEFAULT_GUI_MATERIAL = 0;
+  inline const std::string DEFAULT_GUI_MATERIAL = "Terrain";
   inline const std::string DEFAULT_GUI_SHADER = "terrain";
   inline const GLenum DEFAULT_GUI_SHADER_TYPE = 0;
+  inline const unsigned int DEFAULT_GUI_OBJECT = 0;
   inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;
+  inline const unsigned int OBJECT_NAME_BUFFER_SIZE = 1024;
+  inline const float SAVE_TIMESTAMP = 350;
+  inline const std::string GAME_DATA_FOLDER = "GameData/";
+  inline const std::string MATERIALS_FILENAME = "Materials.pbr";
+  inline const std::string OBJECTS_FILENAME = "Objects.obj";
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;

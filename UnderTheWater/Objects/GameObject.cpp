@@ -1,92 +1,76 @@
-#include "Water.h"
+#include "GameObject.h"
 
 
 
-UW::Water::Water(){
-  generateChunks();
+UW::GameObject::GameObject(std::string name, std::string mesh, std::string shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {};
+
+
+
+UW::GameObject::~GameObject(){
 };
 
 
 
-UW::Water::~Water(){
+void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_camera, Camera &render_camera){
+  uniform["projection"]->set<glm::mat4>(render_camera.projection(renderer));
+  uniform["view"]->set<glm::mat4>(render_camera.view(renderer));
   
-};
-
-
-
-void UW::Water::onUpdate(float delta_time){
-  elapsed_time += delta_time;
-};
-
-
-
-void UW::Water::onFixedUpdate(){
-
-};
-
-
-
-void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
-  uniform["projection"]->set(render_camera.transformation(renderer));
-  uniform["view"]->set(glm::mat4(1.0f));
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
   uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
 
-  uniform["tessBound"]->set<glm::vec2>(UW::Config::TESS_BOUND);
-  uniform["mapSize"]->set<glm::vec2>(map_size);
-  uniform["waterHeight"]->set<float>(UW::Config::WATER_HEIGHT);
-  uniform["distanceCoefficient"]->set<float>(UW::Config::TESS_DISTANCE_COFF);
-  uniform["time"]->set<float>(elapsed_time);
-  uniform["material_id"]->set<int>(Resources::get().materials.translate_material("water"));
+  glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
+  glm::mat4 rotationMat = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
+  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->scale);
+  glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
+  glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
+  glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
 
+  if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[this->mesh])){
+    uniform["model"]->set<glm::mat4>(model);
 
-  Resources::get().shaders["water"].getUniforms().emplace_back(&uniform);
-
-  glPatchParameteri(GL_PATCH_VERTICES, 4);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDepthMask(GL_FALSE);
-  
-  for (auto& c : chunks){
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(c.x * UW::Config::CHUNK_SIZE, 0.0f, c.y * UW::Config::CHUNK_SIZE));
-    model = glm::scale(model, glm::vec3(UW::Config::CHUNK_SIZE));
+    for(unsigned int i = 0; i < textures.size(); i++){
+      Resources::get().textures[this->textures[i]].bind(i);
+      uniform[this->textures[i]]->set<int>(i);
+    };
     
-    if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes["terrain_chunk"])){
-      uniform["model"]->set<glm::mat4>(model);
-      
-      Resources::get().shaders["water"].bind();
-      Resources::get().meshes["terrain_chunk"].render(GL_PATCHES);
+    Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
+    
+    Resources::get().shaders[this->shader].bind();
+    
+    std::vector<int> translation;
+    for(std::string el : materials){
+      translation.emplace_back(Resources::get().materials.translate_material(el));
     };
+
+    GLint loc = glGetUniformLocation(Resources::get().shaders[shader].getShaderProgram(), "mat_translate");
+    glUniform1iv(loc, translation.size(), translation.data());
+    
+    Resources::get().meshes[this->mesh].render();
+    
+    Resources::get().shaders[this->shader].unbind();
+
+    for(unsigned int i = 0; i < textures.size(); i++) 
+      Resources::get().textures[this->textures[i]].unbind();
+
+    Resources::get().shaders[this->shader].getUniforms().clear();
   };
-
-  Resources::get().shaders["water"].unbind();
-  Resources::get().shaders["water"].getUniforms().clear();
-
-  glDepthMask(GL_TRUE);
-  glDisable(GL_BLEND);
 };
 
 
 
-void UW::Water::generateChunks(){
-  chunks.clear();
-  chunks.reserve((2 * UW::Config::CHUNK_RADIUS + 1) * (2 * UW::Config::CHUNK_RADIUS + 1));
-  
-  int radius = UW::Config::CHUNK_RADIUS;
-  
-  for (int x = -radius; x <= radius; x++){
-    for (int z = -radius; z <= radius; z++){
-      glm::vec2 position = glm::vec2(x, z);
-      chunks.emplace_back(position);
-    };
-  };
-
-  map_size = glm::vec2(UW::Config::CHUNK_SIZE * (UW::Config::CHUNK_RADIUS * 2.0f + 1.0f));
+void UW::GameObject::onUpdate(float delta_time){
 };
 
 
 
-bool UW::Water::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, const CW::Renderer::Mesh& mesh){
+void UW::GameObject::onFixedUpdate(){
+};
+
+
+
+bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, const CW::Renderer::Mesh& mesh){
   const float epsilonHeight = 1.0f;
 
   glm::vec3 localMin(0.0f, -epsilonHeight, 0.0f);

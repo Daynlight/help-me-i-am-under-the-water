@@ -36,22 +36,36 @@ class Materials{
 private:
   CW::Renderer::GPUStore buffer;
   bool is_compiled = false;
+  std::unordered_map<std::string, Material> material_reg;
+  std::unordered_map<std::string, unsigned int> material_translate;
   std::vector<Material> materials;
 
 public:
   Materials() = default;
 
-  Materials(std::initializer_list<Material> materials)
-  : materials(materials) {
-    compile();
-  };
+  // Materials(std::initializer_list<Material> materials)
+  // : materials(materials) {
+  //   compile();
+  // };
 
   ~Materials(){
     destroy();
   };
 
+
+  void genVectors(){
+    materials.clear();
+    material_translate.clear();
+
+    for(const std::pair<std::string, Material>& el : material_reg){
+      material_translate[el.first] = materials.size();
+      materials.emplace_back(el.second);
+    };
+  };
+
   void compile(){
     buffer.create();
+    genVectors();
     buffer.set<Material>(materials);
     is_compiled = true;
   };
@@ -73,32 +87,52 @@ public:
     buffer.unbind();
   };
 
-  Material& operator[](unsigned int index){
-    is_compiled = false;
-    return materials[index];
+  unsigned int translate_material(std::string name){
+    return material_translate[name];
   };
 
-  Material getMaterial(unsigned int index){
-    return materials[index];
+  Material& operator[](std::string name){
+    is_compiled = false;
+    return material_reg[name];
+  };
+
+  const std::unordered_map<std::string, Material>& getMaterialReg(){
+    return material_reg;
+  };
+
+  bool find(std::string name){
+    auto it = material_reg.find(name);
+    if(it == material_reg.end()) return false;
+    return true;
+  };
+
+  Material getMaterial(std::string name){
+    return material_reg[name];
   };
 
   void clear(){
     is_compiled = false;
+    material_reg.clear();
     materials.clear();
   };
 
+  void erase(std::string name){
+    is_compiled = false;
+    material_reg.erase(name);
+  };
+
   unsigned int size() const {
-    return materials.size();
+    return material_reg.size();
   };
 
-  void emplace_back(Material material){
+  void emplace_back(std::string name, Material material){
     is_compiled = false;
-    materials.emplace_back(material);
+    material_reg[name] = material;
   };
 
-  void emplace_back(std::initializer_list<Material> materials){
+  void emplace_back(std::initializer_list<std::pair<std::string, Material>> materials){
     is_compiled = false;
-    for (Material el : materials) this->materials.emplace_back(el);
+    for (std::pair<std::string, Material> el : materials) this->material_reg[el.first] = el.second;
   };
 };
 };

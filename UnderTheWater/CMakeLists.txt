@@ -5,11 +5,15 @@ project(UnderTheWater LANGUAGES CXX C)
 set(src
   "main.cpp"
   "App.cpp"
+  "UI.cpp"
+  "ObjectManager.cpp"
+  "DataSerializer.cpp"
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"
   "Objects/Water/Water.cpp"
   "Objects/Skybox/Skybox.cpp"
+  "Objects/GameObject.cpp"
 )
 
 cmrc_add_resource_library(assets
@@ -17,5 +21,13 @@ cmrc_add_resource_library(assets
   "Assets/Terrain/Terrain.png"
 )
 
+file(GLOB_RECURSE GameDataSet CONFIGURE_DEPENDS "GameData/**")
+
+cmrc_add_resource_library(GameData
+  ${GameDataSet}
+)
+
+
 add_executable(UnderTheWater ${src})
-target_link_libraries(UnderTheWater CWindow assets)
+target_link_libraries(UnderTheWater CWindow assets GameData)
+target_include_directories(UnderTheWater PUBLIC .)

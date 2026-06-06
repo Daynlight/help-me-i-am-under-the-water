@@ -1,18 +1,20 @@
 #pragma once
 #include "Renderer.h"
-#include "Gui.h"
 
-#include <unordered_map>
+#include <vector>
 #include <functional>
-#include <memory>
 
+#include "UI.h"
 #include "config.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
+#include "ObjectManager.h"
 #include "Objects/Object.h"
+#include "Objects/GameObject.h"
 #include "Objects/Terrain/Terrain.h"
 #include "Objects/Water/Water.h"
 #include "Objects/Skybox/Skybox.h"
+#include "DataSerializer.h"
 
 
 
@@ -21,35 +23,26 @@ class App{
 private:
   // app
   CW::Renderer::Renderer window;
-  CW::Gui::Gui gui;
+  UW::UI ui;
+  UW::DataSerializer serializer;
 
   UW::Camera camera;
   UW::Camera debug_camera;
 
-  // control variables
-  unsigned int material_id = UW::Config::DEFAULT_GUI_MATERIAL;
-  bool material_is_updated = false;
-
-  std::string shader_name = UW::Config::DEFAULT_GUI_SHADER;
-  GLenum shader_type = UW::Config::DEFAULT_GUI_SHADER_TYPE;
-  char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
-  bool shader_is_updated = false;
-  
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
   float camera_swap_cooldown_acc = 0.0f;
   float fixed_update_time_acc = 0.0f;
-
-  // gui
-  bool infoWindowOn = false;
-  bool materialWindowOn = false;
-  bool shaderExplorerWindowOn = false;
-  bool shaderEditorWindowOn = false;
+  float save_acc = 0.0f;
 
   // objects
-  std::unordered_map<std::string, std::shared_ptr<Object>> objects;
+  UW::Terrain terrain;
+  UW::Water water;
+  UW::Skybox skybox;
+  UW::ObjectManager object_manager;
+
 
 public:
   App();
@@ -70,23 +63,5 @@ private:
   void initWindow();
   void swapCamera();
   void updateFps();
-
-private:
-  // gui
-  void guiInfo();
-  void guiControlsInfo();
-  void guiMaterialParameters();
-  void guiMaterialList();
-  void guiShaderEditor();
-  void guiShaderList();
-
-  void menuBarGui();
-
-  std::function<void(std::function<void()> render_windows)> appWorkspace();
-
-  std::function<void(CW::Renderer::iRenderer *window)> windowGui();
-  std::function<void(CW::Renderer::iRenderer *window)> materialExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> shaderExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> shaderEditorGui();
 };
 };

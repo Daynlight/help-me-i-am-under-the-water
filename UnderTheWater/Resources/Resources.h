@@ -3,13 +3,19 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
+#include <fstream>
+#include <filesystem>
+#include <iostream>
 
 #include "../utils.h"
+#include "config.h"
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
 #include "Shaders/Terrain.h"
 #include "Shaders/SkyBox.h"
 #include "Shaders/Water.h"
+#include "Shaders/Cube.h"
 
 
 
@@ -21,7 +27,6 @@ public:
   std::unordered_map<std::string, CW::Renderer::Shader> shaders;
   UW::Materials materials;
   std::unordered_map<std::string, UW::Lights> lights;
-
 
 public:
   static Resources& get();
@@ -41,7 +46,6 @@ private:
   void initMeshes();
   void initTextures();
   void initShaders();
-  void initMaterials();
   void initLights();
 };
 };

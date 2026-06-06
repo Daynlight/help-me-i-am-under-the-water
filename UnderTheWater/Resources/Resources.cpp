@@ -16,7 +16,6 @@ UW::Resources::Resources(){
   initMeshes();
   initTextures();
   initShaders();
-  initMaterials();
   initLights();
 };
 
@@ -76,6 +75,58 @@ void UW::Resources::initMeshes(){
   };
   meshes["sky_box"].addVertices(vertices, 3, 0);
   meshes["sky_box"].addIndices(indices);
+
+
+
+  // ============================ //
+  // ======= Testing Cube ======= //
+  // ============================ //
+  vertices = {         
+    -1.0f, -1.0f,  1.0f,
+    1.0f, -1.0f,  1.0f,
+    1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    1.0f, -1.0f, -1.0f,
+    1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f
+  };
+  indices = {
+    0, 1, 2, 2, 3, 0,
+    1, 5, 6, 6, 2, 1,
+    5, 4, 7, 7, 6, 5,
+    4, 0, 3, 3, 7, 4,
+    4, 5, 1, 1, 0, 4,
+    3, 2, 6, 6, 7, 3
+  };
+  std::vector<GLfloat> normals = {
+    0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f,
+  };
+  std::vector<GLfloat> uvs = {
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f,
+  };
+  std::vector<GLint> mat_id = {
+    0, 0, 0, 0, 1, 1, 1, 1
+  };
+  meshes["testing"].addVertices(vertices, 3, 0);
+  meshes["testing"].setData<GLfloat>(normals, 3, 1);
+  meshes["testing"].setData<GLfloat>(uvs, 2, 2);
+  meshes["testing"].setData<GLint>(mat_id, 1, 3);
+  meshes["testing"].addIndices(indices);
 };
 
 
@@ -136,26 +187,14 @@ void UW::Resources::initShaders(){
   // ====================== //
   shaders["sky_box"].setVertexShader(SkyBoxShader::vertex);
   shaders["sky_box"].setFragmentShader(SkyBoxShader::fragment);
-};
 
 
 
-void UW::Resources::initMaterials(){
-  // ======================= //
-  // ======= Terrain ======= //
-  // ======================= //
-  materials.emplace_back(
-    {glm::vec3(255, 242, 111) / 255.0f,
-    0.0f, 0.60f, glm::vec3(0.0f), 0.0f, 1.0f});
-
-
-
-  // ===================== //
-  // ======= Water ======= //
-  // ===================== //
-  materials.emplace_back(
-    {glm::vec3(52, 114, 245) / 255.0f,
-    0.0f, 0.44f, glm::vec3(0.0f), 0.0f, 1.0f});
+  // ============================ //
+  // ======= Testing Cube ======= //
+  // ============================ //
+  shaders["testing"].setVertexShader(TestingCubeShader::vertex);
+  shaders["testing"].setFragmentShader(TestingCubeShader::fragment);
 };
 
 

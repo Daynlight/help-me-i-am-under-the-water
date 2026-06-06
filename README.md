@@ -80,7 +80,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [**CMake**](https://cmake.org/): 3.31.6
 - [**Ninja**](https://ninja-build.org/): 1.12.1
 - [**gcc**](https://gcc.gnu.org/): 14.2.0
-- [**CWindow**](https://github.com/Daynlight/CWindow.git): dev
+- [**CWindow**](https://github.com/Daynlight/CWindow.git): under_water
   - **assimp**
   - **Dear ImGui**
   - **Glad**
@@ -102,33 +102,60 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 <details>
 <summary>Iteration 1</summary>
 
+- [x] Engine setup
 - [x] Normals
-- [x] PBR
 - [x] Readme.md
-- [x] Update Materials to SSBO
-- [x] BRDF Shader
-- [x] Add operator[] to Materials and Lights.
-- [x] Lazy loading and auto compile for Materials and Lights.
+- [x] Materials oo SSBO
+- [x] Lights on SSBO
+- [x] BRDF Shader and PBR
+- [x] Add operator[] to Materials and Lights
+- [x] Lazy loading and auto compile for Materials and Lights SSBO
 - [x] Skybox
 - [x] Terrain with height map
 - [x] Shader Editor GUI
+- [x] cmrc for baking assets
 </details>
 
 <details open>
 <summary>🌟 Iteration 2 🌟</summary>
 
-- [ ] Water surface shader
-- [ ] Unified Object system
-- [ ] Object Gui
-- [ ] FBO Render to texture
-- [ ] Under water fog
-- [ ] Quaternion Camera
+- [x] Unified Object system
+- [x] Base Object UI
+- [x] Base Example for Object with all parts.
+- [x] Base Material UI (names)
+- [x] Base Shader UI
+- [x] Pbr serialization
+- [ ] mesh serialization
+- [ ] shader serialization
+- [ ] texture movement to gamedata
+- [ ] Resource refactor as controller of files
 </details>
 
 <details>
-<summary>Iteration 2</summary>
+<summary>Iteration 3</summary>
+<!-- - [ ] Mesh UI  -->
+<!-- - [ ] Lights UI -->
+- [ ] Compile flag for end product
+- [ ] Asset loader UI
+- [ ] Texture UI
+- [ ] Engine like Shaders, Assets, Textures:
+    - [ ] Bake into exe
+    - [ ] When edit save to folder
+    - [ ] Create new once
+    - [ ] Auto load update on folder change
+    - [ ] Explorers
+    - [ ] Editor
+</details>
 
+<details>
+<summary>Iteration 4</summary>
+
+- [ ] Water surface shader
+- [ ] FBO Render to texture
+- [ ] Under water fog
+- [ ] Quaternion Camera
 - [ ] Parallel Transport Layer
 - [ ] SDF ray-marching
 - [ ] Shadow Mapping
+- [ ] Script system
 </details>
