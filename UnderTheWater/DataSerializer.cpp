@@ -1,5 +1,7 @@
 #include "DataSerializer.h"
 
+#include <cmrc/cmrc.hpp>
+CMRC_DECLARE(GameData);
 
 
 
@@ -135,36 +137,44 @@ void UW::DataSerializer::save(std::vector<UW::GameObject> &objects) {
 
 
 void UW::DataSerializer::load(std::vector<UW::GameObject> &objects) {
-  std::ifstream inFile(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
-  if (!inFile.is_open()) {
-    std::cerr << "Failed to open file for loading: " << UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME << std::endl;
-    return;
-  };
+  try{
+    auto fs = cmrc::GameData::get_filesystem();
+    std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME;
+    
+    if (!fs.exists(resourcePath)) {
+      std::cerr << "CMRC Error: File not found in resources: " << resourcePath << std::endl;
+      return;
+    }
 
-  objects.clear();
+    auto embeddedFile = fs.open(resourcePath);
+    std::string dataStr(embeddedFile.begin(), embeddedFile.end());
+    std::stringstream inFile(dataStr);
+    
+    objects.clear();
 
-  size_t objectCount = 0;
-  if (!(inFile >> objectCount)) return;
-  inFile.ignore();
+    size_t objectCount = 0;
+    if (!(inFile >> objectCount)) return;
+    inFile.ignore();
 
-  for (size_t i = 0; i < objectCount; ++i) {
-    UW::GameObjectRecord record;
-    if (inFile >> record) {
-      GameObject object(record.name, record.mesh, record.shader);
-      object.position = record.position;
-      object.rotation = record.rotation;
-      object.scale = record.scale;
-      object.textures = std::move(record.textures);
-      object.materials = std::move(record.materials);
+    for (size_t i = 0; i < objectCount; ++i) {
+      UW::GameObjectRecord record;
+      if (inFile >> record) {
+        GameObject object(record.name, record.mesh, record.shader);
+        object.position = record.position;
+        object.rotation = record.rotation;
+        object.scale = record.scale;
+        object.textures = std::move(record.textures);
+        object.materials = std::move(record.materials);
 
-      objects.push_back(std::move(object));
-    } else {
-      std::cerr << "Error: File format corrupted at object index " << i << std::endl;
-      break;
+        objects.push_back(std::move(object));
+      } else {
+        std::cerr << "Error: File format corrupted at object index " << i << std::endl;
+        break;
+      };
     };
+  } catch(const std::exception& e){
+    std::cerr << "Exception caught during CMRC GameObject load: " << e.what() << std::endl;
   };
-
-  inFile.close();
 };
 
 
@@ -207,35 +217,44 @@ void UW::DataSerializer::save(UW::Materials &materials) {
 
 
 void UW::DataSerializer::load(UW::Materials &materials) {
-  std::ifstream inFile(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
-  if (!inFile.is_open()) {
-    std::cerr << "Failed to open file for loading: " << UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME << std::endl;
-    return;
-  };
-
-  materials.clear();
-
-  size_t materialCount = 0;
-  if (!(inFile >> materialCount)) return;
-  inFile.ignore();
-
-  for (size_t i = 0; i < materialCount; ++i) {
-    UW::MaterialsRecord record;
-    if (inFile >> record) {
-      Material material;
-      material.albedo = record.albedo;
-      material.metallic = record.metallic;
-      material.roughness = record.roughness;
-      material.emission_color = record.emission_color;
-      material.emission_strength = record.emission_strength;
-      material.ambient_occlusion = record.ambient_occlusion;
-
-      materials.emplace_back(record.name, std::move(material));
-    } else {
-      std::cerr << "Error: File format corrupted at object index " << i << std::endl;
-      break;
+  try{
+    auto fs = cmrc::GameData::get_filesystem();
+    std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME;
+    
+    if (!fs.exists(resourcePath)) {
+      std::cerr << "CMRC Error: File not found in resources: " << resourcePath << std::endl;
+      return;
     };
-  };
 
-  inFile.close();
+    auto embeddedFile = fs.open(resourcePath);
+    std::string dataStr(embeddedFile.begin(), embeddedFile.end());
+    std::stringstream inFile(dataStr);
+
+    materials.clear();
+
+    size_t materialCount = 0;
+    if (!(inFile >> materialCount)) return;
+    inFile.ignore();
+
+    for (size_t i = 0; i < materialCount; ++i) {
+      UW::MaterialsRecord record;
+      if (inFile >> record) {
+        Material material;
+        material.albedo = record.albedo;
+        material.metallic = record.metallic;
+        material.roughness = record.roughness;
+        material.emission_color = record.emission_color;
+        material.emission_strength = record.emission_strength;
+        material.ambient_occlusion = record.ambient_occlusion;
+
+        materials.emplace_back(record.name, std::move(material));
+      } else {
+        std::cerr << "Error: File format corrupted at object index " << i << std::endl;
+        break;
+      };
+    };
+
+  } catch(const std::exception& e){
+    std::cerr << "Exception caught during CMRC GameObject load: " << e.what() << std::endl;
+  }
 };
