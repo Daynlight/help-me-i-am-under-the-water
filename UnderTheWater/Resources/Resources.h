@@ -28,7 +28,6 @@ public:
   UW::Materials materials;
   std::unordered_map<std::string, UW::Lights> lights;
 
-
 public:
   static Resources& get();
 
@@ -47,7 +46,6 @@ private:
   void initMeshes();
   void initTextures();
   void initShaders();
-  void initMaterials();
   void initLights();
 };
 };
