@@ -4,6 +4,116 @@
 CMRC_DECLARE(assets);
 
 
+std::ostream& UW::operator<<(std::ostream& os, const UW::MaterialsRecord& record) {
+  os << record.name << "\n" 
+     << record.albedo.x << " " << record.albedo.y << " " << record.albedo.z << "\n"
+     << record.metallic << "\n"
+     << record.roughness << "\n" 
+     << record.emission_color.x << " " << record.emission_color.y << " " << record.emission_color.z << "\n"
+     << record.emission_strength << "\n"
+     << record.ambient_occlusion << "\n";
+
+  return os;
+};
+
+
+
+std::istream& UW::operator>>(std::istream& is, UW::MaterialsRecord& record) {
+  if (!std::getline(is, record.name)) return is;
+
+  if (!(is >> record.albedo.x >> record.albedo.y >> record.albedo.z
+           >> record.metallic
+           >> record.roughness
+           >> record.emission_color.x >> record.emission_color.y >> record.emission_color.z
+           >> record.emission_strength
+           >> record.ambient_occlusion)) {
+    return is;
+  }
+  
+  is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+  return is;
+};
+
+
+
+void UW::Resources::save(const std::string& filepath) {
+  try {
+    std::filesystem::path p(filepath);
+    if (p.has_parent_path())
+      std::filesystem::create_directories(p.parent_path());
+  } catch (const std::filesystem::filesystem_error& e) {
+    std::cerr << "Filesystem error while creating directories: " << e.what() << std::endl;
+    return;
+  };
+
+  std::ofstream outFile(filepath);
+  if (!outFile.is_open()) {
+    std::cerr << "Failed to open file for saving: " << filepath << std::endl;
+    return;
+  };
+
+  outFile << materials.size() << "\n";
+
+  for (auto& el : materials.getMaterialReg()) {
+    UW::MaterialsRecord record; 
+    UW::Material material = el.second;
+
+    record.name = el.first;
+    record.albedo = material.albedo;
+    record.metallic = material.metallic;
+    record.roughness = material.roughness;
+    record.emission_color = material.emission_color;
+    record.emission_strength = material.emission_strength;
+    record.ambient_occlusion = material.ambient_occlusion;
+
+    outFile << record;
+  };
+  
+  outFile.close();
+};
+
+
+
+void UW::Resources::load(const std::string& filepath) {
+  std::ifstream inFile(filepath);
+  if (!inFile.is_open()) {
+    std::cerr << "Failed to open file for loading: " << filepath << std::endl;
+    return;
+  };
+
+  materials.clear();
+
+  size_t materialCount = 0;
+  if (!(inFile >> materialCount)) return;
+  inFile.ignore();
+
+  for (size_t i = 0; i < materialCount; ++i) {
+    UW::MaterialsRecord record;
+    if (inFile >> record) {
+      Material material;
+      material.albedo = record.albedo;
+      material.metallic = record.metallic;
+      material.roughness = record.roughness;
+      material.emission_color = record.emission_color;
+      material.emission_strength = record.emission_strength;
+      material.ambient_occlusion = record.ambient_occlusion;
+
+      materials.emplace_back(record.name, std::move(material));
+    } else {
+      std::cerr << "Error: File format corrupted at object index " << i << std::endl;
+      break;
+    };
+  };
+
+  inFile.close();
+};
+
+
+
+
+
+
 
 UW::Resources& UW::Resources::get(){
   static Resources instance; 
@@ -18,11 +128,13 @@ UW::Resources::Resources(){
   initShaders();
   initMaterials();
   initLights();
+  load();
 };
 
 
 
 UW::Resources::~Resources(){
+  save();
   destroy();
 };
 
