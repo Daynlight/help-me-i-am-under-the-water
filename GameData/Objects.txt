@@ -1,0 +1,12 @@
+1
+Cube
+testing
+testing
+0 1000 0
+0 0 0
+200 200 200
+1
+sky_box
+2
+cube
+cube
