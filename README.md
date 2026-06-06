@@ -123,7 +123,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] Base Object UI
 - [x] Base Example for Object with all parts.
 - [x] Base Material UI (names)
-- [ ] Base Shader UI
+- [x] Base Shader UI
 - [ ] Resource refactor as controller of files
 </details>
 

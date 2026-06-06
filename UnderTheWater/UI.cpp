@@ -390,11 +390,12 @@ void UW::UI::guiShaderEditor(){
 
   auto it = Resources::get().shaders.find(guiSettings.shader_name);
   if(it == Resources::get().shaders.end()) return;
-  auto& reg = Resources::get().shaders[guiSettings.shader_name].getRegisterShader();
   
+  auto& reg = Resources::get().shaders[guiSettings.shader_name].getRegisterShader();
   auto it2 = reg.find(guiSettings.shader_type);
   if(it2 == reg.end()) return;
-  if(strcmp(buffer, reg.at(guiSettings.shader_type).getSource().c_str()) == 0) shader_is_updated = true;
+
+  if(strcmp(buffer, reg.at(guiSettings.shader_type).getSource().c_str()) != 0) shader_is_updated = true;
 
   if(shader_is_updated){
     shader_is_updated = false;
