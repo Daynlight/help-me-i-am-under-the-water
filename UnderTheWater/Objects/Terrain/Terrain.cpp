@@ -42,7 +42,7 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
 
   Resources::get().shaders["terrain"].getUniforms().emplace_back(&uniform);
 
-  Resources::get().textures["heightmap"].bind(0);
+  Resources::get().getTexture("Terrain/heightmap.png").bind(0);
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   
   for (auto& c : chunks){
@@ -58,7 +58,7 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
   };
 
   Resources::get().shaders["terrain"].unbind();
-  Resources::get().textures["heightmap"].unbind();
+  Resources::get().getTexture("Terrain/heightmap.png").unbind();
 
   Resources::get().shaders["terrain"].getUniforms().clear();
 };

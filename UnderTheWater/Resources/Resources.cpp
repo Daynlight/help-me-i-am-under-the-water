@@ -14,7 +14,7 @@ UW::Resources& UW::Resources::get(){
 
 UW::Resources::Resources(){
   initMeshes();
-  initTextures();
+  // initTextures();
   initShaders();
 };
 
@@ -130,33 +130,64 @@ void UW::Resources::initMeshes(){
 
 
 
-void UW::Resources::initTextures(){
-  auto fs = cmrc::assets::get_filesystem();
+#include <iostream>
 
-  // ======================= //
-  // ======= Terrain ======= //
-  // ======================= //
-  {
-    auto file = fs.open("Assets/Terrain/Terrain.png");
+CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asset){
+  auto it = textures.find(path_to_asset);
+  
+  if (it != textures.end()) {
+    return it->second;
+  }
+
+  try {
+    auto fs = cmrc::assets::get_filesystem();
+    
+    auto file = fs.open("Assets/" + path_to_asset); 
+    
     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
-
     CW::Renderer::TextureLoader loader(data_ptr, file.size());
-    textures["heightmap"].compile(loader.data);
-  };
+
+    it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
+    it->second.compile(loader.data);
+    
+    return it->second;
+
+  } catch (const std::runtime_error& e) {
+    std::cerr << "[ERROR][Resources]: Failed to find/load texture asset: \"Assets/" 
+              << path_to_asset << "\". Reason: " << e.what() << std::endl;
+    
+    return textures["default_fallback"]; 
+  }
+}
+
+
+// void UW::Resources::initTextures(){
+//   auto fs = cmrc::assets::get_filesystem();
+
+//   // ======================= //
+//   // ======= Terrain ======= //
+//   // ======================= //
+//   {
+//     auto file = fs.open("Assets/Terrain/Terrain.png");
+//     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
+
+//     CW::Renderer::TextureLoader loader(data_ptr, file.size());
+//     textures["heightmap"].compile(loader.data);
+//   };
 
 
   
-  // ====================== //
-  // ======= SkyBox ======= //
-  // ====================== //
-  {
-    auto file = fs.open("Assets/Skybox/Skybox.png");
-    const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
+//   // ====================== //
+//   // ======= SkyBox ======= //
+//   // ====================== //
+//   {
+//     auto file = fs.open("Assets/Skybox/Skybox.png");
+//     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
     
-    CW::Renderer::TextureLoader loader(data_ptr, file.size());
-    textures["sky_box"].compile(loader.data);
-  };
-};
+//     CW::Renderer::TextureLoader loader(data_ptr, file.size());
+//     textures["sky_box"].compile(loader.data);
+//   };
+// };
 
 
 

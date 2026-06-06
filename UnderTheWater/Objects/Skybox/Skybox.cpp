@@ -35,13 +35,13 @@ void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera
 
   Resources::get().shaders["sky_box"].getUniforms().emplace_back(&uniform);
 
-  Resources::get().textures["sky_box"].bind(0); 
+  Resources::get().getTexture("Skybox/Skybox.png").bind(0); 
   Resources::get().shaders["sky_box"].bind();
   
   Resources::get().meshes["sky_box"].render();
   
   Resources::get().shaders["sky_box"].unbind();
-  Resources::get().textures["sky_box"].unbind();
+  Resources::get().getTexture("Skybox/Skybox.png").unbind();
   
   Resources::get().shaders["sky_box"].getUniforms().clear();
   

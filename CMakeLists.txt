@@ -7,16 +7,11 @@ execute_process(
 add_subdirectory(vendor/cmrc)
 add_subdirectory(vendor/CWindow)
 
-cmrc_add_resource_library(assets
-  "Assets/Skybox/Skybox.png"
-  "Assets/Terrain/Terrain.png"
-)
+file(GLOB_RECURSE AssetsSet CONFIGURE_DEPENDS "Assets/**")
+cmrc_add_resource_library(assets ${AssetsSet})
 
 file(GLOB_RECURSE GameDataSet CONFIGURE_DEPENDS "GameData/**")
-
-cmrc_add_resource_library(GameData
-  ${GameDataSet}
-)
+cmrc_add_resource_library(GameData ${GameDataSet})
 
 
 add_subdirectory(UnderTheWater)

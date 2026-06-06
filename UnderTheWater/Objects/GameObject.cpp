@@ -31,7 +31,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     uniform["model"]->set<glm::mat4>(model);
 
     for(unsigned int i = 0; i < textures.size(); i++){
-      Resources::get().textures[this->textures[i]].bind(i);
+      Resources::get().getTexture(this->textures[i]).bind(i);
       uniform[this->textures[i]]->set<int>(i);
     };
     
@@ -52,7 +52,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     Resources::get().shaders[this->shader].unbind();
 
     for(unsigned int i = 0; i < textures.size(); i++) 
-      Resources::get().textures[this->textures[i]].unbind();
+      Resources::get().getTexture(this->textures[i]).unbind();
 
     Resources::get().shaders[this->shader].getUniforms().clear();
   };
