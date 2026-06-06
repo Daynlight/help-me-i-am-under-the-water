@@ -130,8 +130,6 @@ void UW::Resources::initMeshes(){
 
 
 
-#include <iostream>
-
 CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asset){
   auto it = textures.find(path_to_asset);
   
@@ -139,10 +137,11 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     return it->second;
   }
 
+  std::string local_path = "Assets/" + path_to_asset;
+
   try {
     auto fs = cmrc::assets::get_filesystem();
-    
-    auto file = fs.open("Assets/" + path_to_asset); 
+    auto file = fs.open(local_path); 
     
     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
     CW::Renderer::TextureLoader loader(data_ptr, file.size());
@@ -151,13 +150,28 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     it->second.compile(loader.data);
     
     return it->second;
-
   } catch (const std::runtime_error& e) {
-    std::cerr << "[ERROR][Resources]: Failed to find/load texture asset: \"Assets/" 
-              << path_to_asset << "\". Reason: " << e.what() << std::endl;
-    
-    return textures["default_fallback"]; 
   }
+
+  if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
+    std::ifstream file(local_path, std::ios::binary | std::ios::ate);
+    if (file.is_open()) {
+      std::streamsize size = file.tellg();
+      file.seekg(0, std::ios::beg);
+
+      std::vector<unsigned char> buffer(size);
+      if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+        CW::Renderer::TextureLoader loader(buffer.data(), size);
+        
+        it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
+        it->second.compile(loader.data);
+        return it->second;
+      }
+    }
+  }
+
+  std::cerr << "[ERROR][Resources]: Failed to find texture asset anywhere: " << local_path << std::endl;
+  return textures["default_fallback"]; 
 }
 
 
