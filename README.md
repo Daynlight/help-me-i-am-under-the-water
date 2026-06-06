@@ -126,7 +126,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] Base Shader UI
 - [x] Pbr serialization
 - [x] lights serialization
-- [ ] texture movement to ```GameData```
+- [x] texture load via cmrc backup from disk
 - [ ] mesh movement to ```GameData```
 - [ ] shader movement to ```GameData```
 - [ ] Resource refactor as controller of files
