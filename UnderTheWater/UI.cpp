@@ -259,7 +259,7 @@ return [this](CW::Renderer::iRenderer *window){
 
 
 // ------------------ //
-// materials Explorer //
+// Materials Explorer //
 // ------------------ //
 inline void UW::UI::guiMaterialList(){
   ImGui::SeparatorText("Materials List");
@@ -338,7 +338,15 @@ void UW::UI::guiShaderLoad(std::string name, GLenum type){
   guiSettings.shader_name = name;
   guiSettings.shader_type = type;
   memset(buffer, '\0', UW::Config::SHADER_EDITOR_BUFFER_SIZE);
-  std::string source = Resources::get().shaders[name].getRegisterShader().at(type).getSource();
+  
+  auto it = Resources::get().shaders.find(name);
+  if(it == Resources::get().shaders.end()) return;
+
+  const std::unordered_map<GLenum, CW::Renderer::ShaderData>& reg = Resources::get().shaders[name].getRegisterShader();
+  auto ita = reg.find(type);
+  if(ita == reg.end()) return;
+
+  std::string source = reg.at(type).getSource();
   memcpy(buffer, source.data(), source.size());
 };
 
@@ -451,7 +459,7 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectExplorerGui()
 void UW::UI::guiObjectEditor(){
   ImGui::SeparatorText("Object Editor");
   if(guiSettings.object_id >= object_manager.objects.size()) return;
-
+  
   UW::GameObject& object = object_manager.objects[guiSettings.object_id];
 
   char name_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
