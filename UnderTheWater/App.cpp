@@ -45,11 +45,13 @@ void UW::App::onLoad(){
   debug_camera.direction = {-0.57, -0.76, -0.28};
 
   object_manager.load();
+  Resources::get().load();
 };
 
 
 
 void UW::App::onDestroy() {
+  Resources::get().save();
   object_manager.save();
   object_manager.objects.clear();
   Resources::get().destroy();

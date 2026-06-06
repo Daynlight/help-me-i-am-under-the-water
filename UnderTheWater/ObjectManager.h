@@ -35,7 +35,7 @@ private:
 public:
   std::vector<UW::GameObject> objects;
 
-  void save(const std::string& filepath = "GameData/Objects.txt");
-  void load(const std::string& filepath = "GameData/Objects.txt");
+  void save();
+  void load();
 };
 }; // namespace UW

@@ -4,6 +4,7 @@
 CMRC_DECLARE(assets);
 
 
+
 std::ostream& UW::operator<<(std::ostream& os, const UW::MaterialsRecord& record) {
   os << record.name << "\n" 
      << record.albedo.x << " " << record.albedo.y << " " << record.albedo.z << "\n"
@@ -37,9 +38,9 @@ std::istream& UW::operator>>(std::istream& is, UW::MaterialsRecord& record) {
 
 
 
-void UW::Resources::save(const std::string& filepath) {
+void UW::Resources::save() {
   try {
-    std::filesystem::path p(filepath);
+    std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
     if (p.has_parent_path())
       std::filesystem::create_directories(p.parent_path());
   } catch (const std::filesystem::filesystem_error& e) {
@@ -47,9 +48,9 @@ void UW::Resources::save(const std::string& filepath) {
     return;
   };
 
-  std::ofstream outFile(filepath);
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
   if (!outFile.is_open()) {
-    std::cerr << "Failed to open file for saving: " << filepath << std::endl;
+    std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME << std::endl;
     return;
   };
 
@@ -75,10 +76,10 @@ void UW::Resources::save(const std::string& filepath) {
 
 
 
-void UW::Resources::load(const std::string& filepath) {
-  std::ifstream inFile(filepath);
+void UW::Resources::load() {
+  std::ifstream inFile(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
   if (!inFile.is_open()) {
-    std::cerr << "Failed to open file for loading: " << filepath << std::endl;
+    std::cerr << "Failed to open file for loading: " << UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME << std::endl;
     return;
   };
 
@@ -128,13 +129,11 @@ UW::Resources::Resources(){
   initShaders();
   initMaterials();
   initLights();
-  load();
 };
 
 
 
 UW::Resources::~Resources(){
-  save();
   destroy();
 };
 

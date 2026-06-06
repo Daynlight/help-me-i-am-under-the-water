@@ -60,9 +60,9 @@ std::istream& UW::operator>>(std::istream& is, UW::GameObjectRecord& record) {
 
 
 
-void UW::ObjectManager::save(const std::string& filepath) {
+void UW::ObjectManager::save() {
   try {
-    std::filesystem::path p(filepath);
+    std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
     if (p.has_parent_path())
       std::filesystem::create_directories(p.parent_path());
   } catch (const std::filesystem::filesystem_error& e) {
@@ -70,9 +70,9 @@ void UW::ObjectManager::save(const std::string& filepath) {
     return;
   };
 
-  std::ofstream outFile(filepath);
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
   if (!outFile.is_open()) {
-    std::cerr << "Failed to open file for saving: " << filepath << std::endl;
+    std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME << std::endl;
     return;
   };
 
@@ -98,10 +98,10 @@ void UW::ObjectManager::save(const std::string& filepath) {
 
 
 
-void UW::ObjectManager::load(const std::string& filepath) {
-  std::ifstream inFile(filepath);
+void UW::ObjectManager::load() {
+  std::ifstream inFile(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
   if (!inFile.is_open()) {
-    std::cerr << "Failed to open file for loading: " << filepath << std::endl;
+    std::cerr << "Failed to open file for loading: " << UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME << std::endl;
     return;
   };
 

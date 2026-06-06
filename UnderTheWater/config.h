@@ -18,6 +18,9 @@ namespace UW::Config{
   inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;
   inline const unsigned int OBJECT_NAME_BUFFER_SIZE = 1024;
   inline const float SAVE_TIMESTAMP = 350;
+  inline const std::string GAME_DATA_FOLDER = "GameData/";
+  inline const std::string MATERIALS_FILENAME = "Materials.pbr";
+  inline const std::string OBJECTS_FILENAME = "Objects.obj";
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;

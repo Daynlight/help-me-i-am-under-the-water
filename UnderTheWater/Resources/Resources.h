@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "../utils.h"
+#include "config.h"
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
 #include "Shaders/Terrain.h"
@@ -35,6 +36,8 @@ struct MaterialsRecord{
 
 
 
+
+
 class Resources{
 public:
   std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
@@ -53,14 +56,14 @@ public:
   Resources& operator=(Resources&&) = delete;
 
   void destroy();
+  void save();
+  void load();
 
 private:
   Resources();
   ~Resources();
 
 private:
-  void save(const std::string& filepath = "GameData/materials.pbr");
-  void load(const std::string& filepath = "GameData/materials.pbr");
   void initMeshes();
   void initTextures();
   void initShaders();
