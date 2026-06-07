@@ -117,7 +117,7 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 </details>
 
 <details open>
-<summary>🌟 Iteration 2 🌟</summary>
+<summary>🌟 Iteration 2 🌟 (7.06.2026)</summary>
 
 - [x] Unified Object system
 - [x] Base Object UI
@@ -127,18 +127,20 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] Pbr serialization
 - [x] lights serialization
 - [x] texture load via cmrc backup from disk
-- [ ] mesh movement to ```GameData```
+- [x] Resource refactor as controller of files
 - [ ] shader movement to ```GameData```
-- [ ] Resource refactor as controller of files
-- [ ] Compile flag for end product
+- [ ] mesh movement to ```GameData```
 </details>
 
 <details>
-<summary>Iteration 3</summary>
-<!-- - [ ] Mesh UI  -->
-<!-- - [ ] Lights UI -->
+<summary>Iteration 3 (10.06.2026)</summary>
+- [ ] Last Time Write sync
+- [ ] Backup Plan
+- [ ] Mesh UI 
+- [ ] Lights UI
 - [ ] Asset loader UI
 - [ ] Texture UI
+- [ ] Compile flag for end product
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder
@@ -146,10 +148,13 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
     - [ ] Auto load update on folder change
     - [ ] Explorers
     - [ ] Editor
+- [ ] Full clean up
+- [ ] Full optimization
+- [ ] Optimization for Compile version (avoid maps)
 </details>
 
 <details>
-<summary>Iteration 4</summary>
+<summary>Iteration 4 (14.06.2026)</summary>
 
 - [ ] Water surface shader
 - [ ] FBO Render to texture

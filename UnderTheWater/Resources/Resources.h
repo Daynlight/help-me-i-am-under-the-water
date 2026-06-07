@@ -46,7 +46,6 @@ private:
 
 private:
   void initMeshes();
-  // void initTextures();
   void initShaders();
 };
 };

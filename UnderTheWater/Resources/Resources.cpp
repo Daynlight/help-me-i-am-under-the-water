@@ -14,7 +14,6 @@ UW::Resources& UW::Resources::get(){
 
 UW::Resources::Resources(){
   initMeshes();
-  // initTextures();
   initShaders();
 };
 
@@ -173,35 +172,6 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
   std::cerr << "[ERROR][Resources]: Failed to find texture asset anywhere: " << local_path << std::endl;
   return textures["default_fallback"]; 
 }
-
-
-// void UW::Resources::initTextures(){
-//   auto fs = cmrc::assets::get_filesystem();
-
-//   // ======================= //
-//   // ======= Terrain ======= //
-//   // ======================= //
-//   {
-//     auto file = fs.open("Assets/Terrain/Terrain.png");
-//     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
-
-//     CW::Renderer::TextureLoader loader(data_ptr, file.size());
-//     textures["heightmap"].compile(loader.data);
-//   };
-
-
-  
-//   // ====================== //
-//   // ======= SkyBox ======= //
-//   // ====================== //
-//   {
-//     auto file = fs.open("Assets/Skybox/Skybox.png");
-//     const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
-    
-//     CW::Renderer::TextureLoader loader(data_ptr, file.size());
-//     textures["sky_box"].compile(loader.data);
-//   };
-// };
 
 
 
