@@ -12,21 +12,17 @@
 #include "config.h"
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
-#include "Shaders/Terrain.h"
-#include "Shaders/SkyBox.h"
-#include "Shaders/Water.h"
-#include "Shaders/Cube.h"
 
 
 
 namespace UW{
 class Resources{
 public:
-  std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
   std::unordered_map<std::string, CW::Renderer::Texture> textures;
   std::unordered_map<std::string, CW::Renderer::Shader> shaders;
   UW::Materials materials;
   std::unordered_map<std::string, UW::Lights> lights;
+  std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
 
 public:
   static Resources& get();
@@ -37,6 +33,9 @@ public:
   Resources& operator=(Resources&&) = delete;
 
   void destroy();
+  
+  CW::Renderer::Texture& getTexture(const std::string& path_to_asset);
+  CW::Renderer::Shader& getShader(const std::string& path_to_asset);
 
 private:
   Resources();
@@ -44,8 +43,5 @@ private:
 
 private:
   void initMeshes();
-  void initTextures();
-  void initShaders();
-  void initLights();
 };
 };

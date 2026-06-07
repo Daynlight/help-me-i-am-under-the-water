@@ -8,6 +8,7 @@
 
 #include "config.h"
 #include "Objects/Object.h"
+#include "Resources/Resources.h"
 #include "Objects/GameObject.h"
 #include "Resources/Materials/Materials.h"
 
@@ -41,6 +42,16 @@ struct MaterialsRecord{
   friend std::istream& operator>>(std::istream& is, MaterialsRecord& record);
 };
 
+struct LightsRecord{
+  std::string name = "";
+  glm::vec3 position;
+  glm::vec3 color;
+  float strength;
+
+  friend std::ostream& operator<<(std::ostream& os, const LightsRecord& record);
+  friend std::istream& operator>>(std::istream& is, LightsRecord& record);
+};
+
   
 
 
@@ -51,5 +62,11 @@ public:
 
   void save(UW::Materials &materials);
   void load(UW::Materials &materials);
+
+  void save(std::unordered_map<std::string, UW::Lights> &lights);
+  void load(std::unordered_map<std::string, UW::Lights> &lights);
+
+
+  void save(const std::string& path_to_asset, GLuint type);
 };
 }; // namespace UW

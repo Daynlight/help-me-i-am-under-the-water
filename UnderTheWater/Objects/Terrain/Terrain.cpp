@@ -40,9 +40,9 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
   uniform["material_id"]-> set<int>(Resources::get().materials.translate_material("terrain"));
 
 
-  Resources::get().shaders["terrain"].getUniforms().emplace_back(&uniform);
+  Resources::get().getShader("Shaders/Terrain").getUniforms().emplace_back(&uniform);
 
-  Resources::get().textures["heightmap"].bind(0);
+  Resources::get().getTexture("Terrain/heightmap.png").bind(0);
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   
   for (auto& c : chunks){
@@ -52,15 +52,15 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
     if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes["terrain_chunk"])){
       uniform["model"]->set<glm::mat4>(model);
       
-      Resources::get().shaders["terrain"].bind();
+      Resources::get().getShader("Shaders/Terrain").bind();
       Resources::get().meshes["terrain_chunk"].render(GL_PATCHES);
     };
   };
 
-  Resources::get().shaders["terrain"].unbind();
-  Resources::get().textures["heightmap"].unbind();
+  Resources::get().getShader("Shaders/Terrain").unbind();
+  Resources::get().getTexture("Terrain/heightmap.png").unbind();
 
-  Resources::get().shaders["terrain"].getUniforms().clear();
+  Resources::get().getShader("Shaders/Terrain").getUniforms().clear();
 };
 
 

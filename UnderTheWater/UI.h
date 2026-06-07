@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "ObjectManager.h"
+#include "DataSerializer.h"
 #include "Objects/GameObject.h"
 #include "Camera/Camera.h"
 
@@ -19,6 +20,7 @@ struct GuiSettings{
   bool shaderEditorWindowOn = false;
   bool objectExplorerWindowOn = false;
   bool objectEditorWindowOn = false;
+  bool mesh_mode_on = false;
   std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
   unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
   GLenum shader_type = UW::Config::DEFAULT_GUI_SHADER_TYPE;
@@ -41,13 +43,15 @@ private:
   UW::Camera &camera;
   UW::Camera &debug_camera;
   UW::ObjectManager& object_manager;
+  UW::DataSerializer& serializer;
 
   bool material_is_updated = false;
   bool shader_is_updated = false;
+  bool mesh_mode_is_updated = false;
   char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
+  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer);
   ~UI();
   void onLoad();
   void render();

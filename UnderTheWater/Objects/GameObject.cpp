@@ -31,30 +31,30 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     uniform["model"]->set<glm::mat4>(model);
 
     for(unsigned int i = 0; i < textures.size(); i++){
-      Resources::get().textures[this->textures[i]].bind(i);
+      Resources::get().getTexture(this->textures[i]).bind(i);
       uniform[this->textures[i]]->set<int>(i);
     };
     
-    Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
+    Resources::get().getShader(this->shader).getUniforms().emplace_back(&uniform);
     
-    Resources::get().shaders[this->shader].bind();
+    Resources::get().getShader(this->shader).bind();
     
     std::vector<int> translation;
     for(std::string el : materials){
       translation.emplace_back(Resources::get().materials.translate_material(el));
     };
 
-    GLint loc = glGetUniformLocation(Resources::get().shaders[shader].getShaderProgram(), "mat_translate");
+    GLint loc = glGetUniformLocation(Resources::get().getShader(shader).getShaderProgram(), "mat_translate");
     glUniform1iv(loc, translation.size(), translation.data());
     
     Resources::get().meshes[this->mesh].render();
     
-    Resources::get().shaders[this->shader].unbind();
+    Resources::get().getShader(this->shader).unbind();
 
     for(unsigned int i = 0; i < textures.size(); i++) 
-      Resources::get().textures[this->textures[i]].unbind();
+      Resources::get().getTexture(this->textures[i]).unbind();
 
-    Resources::get().shaders[this->shader].getUniforms().clear();
+    Resources::get().getShader(this->shader).getUniforms().clear();
   };
 };
 

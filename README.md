@@ -69,7 +69,7 @@ All assets are baked into executable with ```cmrc``` this secures them for **mod
 Resources is singleton class where we initialize all our assets. We use them in other objects like ```terrain```. Resources contains data about ```materials```, ```textures```, ```meshes```, ```shaders```, ```lights```.
 
 ### Shaders
-Shaders are ```inline std::string``` we avoid reading them from file for **safety** and **baking into executable**.
+Shaders are loaded via cmrc or from folder as fallback are **private** and **safety**.
 
 ### Terrain
 
@@ -116,8 +116,8 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] cmrc for baking assets
 </details>
 
-<details open>
-<summary>🌟 Iteration 2 🌟</summary>
+<details>
+<summary>Iteration 2 (7.06.2026)</summary>
 
 - [x] Unified Object system
 - [x] Base Object UI
@@ -125,19 +125,25 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
 - [x] Base Material UI (names)
 - [x] Base Shader UI
 - [x] Pbr serialization
-- [ ] mesh serialization
-- [ ] shader serialization
-- [ ] texture movement to gamedata
-- [ ] Resource refactor as controller of files
+- [x] lights serialization
+- [x] texture load via cmrc backup from disk
+- [x] Resource refactor as controller of files
+- [x] Backup Plan when loading
+- [x] shader movement to ```Assets```
+- [x] shader reset btn
+- [x] shader save on edit
+- [x] Fix bug on delete material
 </details>
 
-<details>
-<summary>Iteration 3</summary>
-<!-- - [ ] Mesh UI  -->
-<!-- - [ ] Lights UI -->
-- [ ] Compile flag for end product
+<details open>
+<summary>🌟 Iteration 3 🌟 (10.06.2026)</summary>
+- [ ] mesh movement to ```GameData```
+- [ ] Last Time Write sync
+- [ ] Mesh UI 
+- [ ] Lights UI
 - [ ] Asset loader UI
 - [ ] Texture UI
+- [ ] Compile flag for end product
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder
@@ -145,10 +151,13 @@ Shaders are ```inline std::string``` we avoid reading them from file for **safet
     - [ ] Auto load update on folder change
     - [ ] Explorers
     - [ ] Editor
+- [ ] Full clean up
+- [ ] Full optimization
+- [ ] Optimization for Compile version (avoid maps)
 </details>
 
 <details>
-<summary>Iteration 4</summary>
+<summary>Iteration 4 (14.06.2026)</summary>
 
 - [ ] Water surface shader
 - [ ] FBO Render to texture

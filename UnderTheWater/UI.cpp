@@ -2,8 +2,8 @@
 
 
 
-UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager)
-  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager){
+UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer)
+  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager), serializer(serializer){
   gui.setWorkspace(appWorkspace());
 };
 
@@ -34,8 +34,8 @@ void UW::UI::uiLoad(){
   configControl();
   ImGui::LoadIniSettingsFromDisk(ImGui::GetIO().IniFilename);
 
-  uiControl();
   guiShaderLoad(guiSettings.shader_name, guiSettings.shader_type);
+  uiControl();
 };
 
 
@@ -62,6 +62,7 @@ void UW::UI::configControl(){
     if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
     if (sscanf(line, "Object_ID=%d", &value) == 1) s->object_id = value;
     if (sscanf(line, "Shader_Type=%d", &value) == 1) s->shader_type = value;
+    if (sscanf(line, "Mesh_Mode_On=%d", &value) == 1) s->mesh_mode_on = value;
     if (sscanf(line, "Window_Width=%d", &value) == 1) s->window_width = value;
     if (sscanf(line, "Window_Height=%d", &value) == 1) s->window_height = value;
     
@@ -81,6 +82,7 @@ void UW::UI::configControl(){
     out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
     out_buf->appendf("Object_ID=%d\n", guiSettings.object_id);
     out_buf->appendf("Shader_Type=%d\n", guiSettings.shader_type);
+    out_buf->appendf("Mesh_Mode_On=%d\n", guiSettings.mesh_mode_on);
     out_buf->appendf("Window_Width=%d\n", guiSettings.window_width);
     out_buf->appendf("Window_Height=%d\n", guiSettings.window_height);
     out_buf->appendf("Shader_Name=%s\n", guiSettings.shader_name.c_str());
@@ -230,6 +232,19 @@ inline void UW::UI::guiInfo(){
   ImGui::Text("Debug Camera:");
   ImGui::InputFloat3("Debug POS: [%f, %f, %f]", &debug_camera.position[0]);
   ImGui::SliderFloat3("Debug DIR: [%f, %f, %f]", &debug_camera.direction[0], -1, 1);
+
+  if(ImGui::Checkbox("Mesh mode", &guiSettings.mesh_mode_on)) mesh_mode_is_updated = false;
+  if(!mesh_mode_is_updated){
+    mesh_mode_is_updated = true;
+    if(guiSettings.mesh_mode_on){
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else{
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    };
+  };
+
+  
 };
 
 
@@ -259,7 +274,7 @@ return [this](CW::Renderer::iRenderer *window){
 
 
 // ------------------ //
-// materials Explorer //
+// Materials Explorer //
 // ------------------ //
 inline void UW::UI::guiMaterialList(){
   ImGui::SeparatorText("Materials List");
@@ -268,9 +283,12 @@ inline void UW::UI::guiMaterialList(){
     std::string button_label = "- " + el.first;
     if (ImGui::Button(button_label.c_str())) guiSettings.material_name = el.first;
 
-    button_label = "Delete " + el.first;
+    button_label = "Delete ##" + el.first;
     ImGui::SameLine();
-    if (ImGui::Button(button_label.c_str())) Resources::get().materials.erase(el.first);
+    if (ImGui::Button(button_label.c_str())) {
+      Resources::get().materials.erase(el.first);
+      break;
+    }
   };
 
   std::string button_label = "Add " + std::to_string(Resources::get().materials.size());
@@ -331,6 +349,7 @@ return [this](CW::Renderer::iRenderer *window){
 };
 
 
+
 // --------------- //
 // Shader Explorer //
 // --------------- //
@@ -338,7 +357,15 @@ void UW::UI::guiShaderLoad(std::string name, GLenum type){
   guiSettings.shader_name = name;
   guiSettings.shader_type = type;
   memset(buffer, '\0', UW::Config::SHADER_EDITOR_BUFFER_SIZE);
-  std::string source = Resources::get().shaders[name].getRegisterShader().at(type).getSource();
+  
+  auto it = Resources::get().shaders.find(name);
+  if(it == Resources::get().shaders.end()) return;
+
+  const std::unordered_map<GLenum, CW::Renderer::ShaderData>& reg = Resources::get().getShader(name).getRegisterShader();
+  auto ita = reg.find(type);
+  if(ita == reg.end()) return;
+
+  std::string source = reg.at(type).getSource();
   memcpy(buffer, source.data(), source.size());
 };
 
@@ -357,6 +384,10 @@ std::string UW::UI::getShaderTypeName(GLenum type){
 
 void UW::UI::guiShaderList(){
   ImGui::SeparatorText("Shader List");
+
+  if(ImGui::Button("reset")){
+    Resources::get().shaders.clear();
+  }
 
   for (const auto& [ key, values ] : Resources::get().shaders) {
     for (const auto& [key_s, values_s] : values.getRegisterShader()){
@@ -391,7 +422,7 @@ void UW::UI::guiShaderEditor(){
   auto it = Resources::get().shaders.find(guiSettings.shader_name);
   if(it == Resources::get().shaders.end()) return;
   
-  auto& reg = Resources::get().shaders[guiSettings.shader_name].getRegisterShader();
+  auto& reg = Resources::get().getShader(guiSettings.shader_name).getRegisterShader();
   auto it2 = reg.find(guiSettings.shader_type);
   if(it2 == reg.end()) return;
 
@@ -400,10 +431,11 @@ void UW::UI::guiShaderEditor(){
   if(shader_is_updated){
     shader_is_updated = false;
     
-    Resources::get().shaders[guiSettings.shader_name].destroy();
-    Resources::get().shaders[guiSettings.shader_name].removeShaders(guiSettings.shader_type);
-    Resources::get().shaders[guiSettings.shader_name].setShader(buffer, guiSettings.shader_type);
-    Resources::get().shaders[guiSettings.shader_name].compile();
+    Resources::get().getShader(guiSettings.shader_name).destroy();
+    Resources::get().getShader(guiSettings.shader_name).removeShaders(guiSettings.shader_type);
+    Resources::get().getShader(guiSettings.shader_name).setShader(buffer, guiSettings.shader_type);
+    Resources::get().getShader(guiSettings.shader_name).compile();
+    serializer.save(guiSettings.shader_name, guiSettings.shader_type);
   };
 };
 
@@ -411,6 +443,7 @@ void UW::UI::guiShaderEditor(){
 
 inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI::shaderEditorGui(){
   return [this](CW::Renderer::iRenderer *window){
+    guiShaderLoad(guiSettings.shader_name, guiSettings.shader_type);
     guiShaderEditor();
   };
 };
@@ -424,10 +457,10 @@ void UW::UI::guiObjectList(){
   ImGui::SeparatorText("Object List");
 
   for(unsigned int id = 0; id < object_manager.objects.size(); id++){
-    std::string label = "- " + object_manager.objects[id].name + " (" + std::to_string(id) + ")";
+    std::string label = "- " + object_manager.objects[id].name + "##(" + std::to_string(id) + ")";
     if(ImGui::Button(label.c_str())) guiSettings.object_id = id;
     
-    label = "Delete " + std::to_string(id);
+    label = "Delete##" + std::to_string(id);
     ImGui::SameLine();
     if(ImGui::Button(label.c_str())) object_manager.objects.erase(object_manager.objects.begin() + id);
   };
@@ -451,7 +484,7 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectExplorerGui()
 void UW::UI::guiObjectEditor(){
   ImGui::SeparatorText("Object Editor");
   if(guiSettings.object_id >= object_manager.objects.size()) return;
-
+  
   UW::GameObject& object = object_manager.objects[guiSettings.object_id];
 
   char name_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
@@ -498,7 +531,8 @@ void UW::UI::guiObjectEditor(){
     ImGui::InputText(label.c_str(), texture_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
     object.textures[i] = std::string(texture_buffer + '\0');
     
-    label = "Delete texture (" + std::to_string(i) + ")";
+    ImGui::SameLine();
+    label = "Delete texture##(" + std::to_string(i) + ")";
     if(ImGui::Button(label.c_str())) object.textures.erase(object.textures.begin() + i);
   };
 
@@ -516,7 +550,8 @@ void UW::UI::guiObjectEditor(){
     ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
     object.materials[i] = std::string(material_buffer + '\0');
     
-    label = "Delete material (" + std::to_string(i) + ")";
+    ImGui::SameLine();
+    label = "Delete material##(" + std::to_string(i) + ")";
     if(ImGui::Button(label.c_str())) object.materials.erase(object.materials.begin() + i);
   };
 

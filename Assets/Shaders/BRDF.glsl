@@ -1,9 +1,3 @@
-#pragma once 
-#include <string>
-
-
-
-inline std::string BRDF_Include = R"(
 const float PI = 3.14159265359;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness){
@@ -111,4 +105,3 @@ vec3 BRDF(
 
   return lighting + ambient + emissiveColor;
 };
-)";

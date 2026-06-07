@@ -6,7 +6,7 @@
 // ========== APP ========== //
 // ========================= //
 UW::App::App()
-  :camera(&window), debug_camera(&window), ui(window, fps, debug_camera_on, camera, debug_camera, object_manager){
+  :camera(&window), debug_camera(&window), ui(window, fps, debug_camera_on, camera, debug_camera, object_manager, serializer){
   initWindow();
 
   onLoad();
@@ -46,12 +46,14 @@ void UW::App::onLoad(){
 
   serializer.load(object_manager.objects);
   serializer.load(Resources::get().materials);
+  serializer.load(Resources::get().lights);
 };
 
 
 
 void UW::App::onDestroy() {
   serializer.save(Resources::get().materials);
+  serializer.save(Resources::get().lights);
   serializer.save(object_manager.objects);
   object_manager.objects.clear();
   Resources::get().destroy();
@@ -111,6 +113,7 @@ void UW::App::fixedUpdate(){
     if(save_acc >= UW::Config::SAVE_TIMESTAMP){
       save_acc -= UW::Config::SAVE_TIMESTAMP;
       serializer.save(Resources::get().materials);
+      serializer.save(Resources::get().lights);
       serializer.save(object_manager.objects);
     }
     else{
