@@ -137,6 +137,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 
 <details open>
 <summary>🌟 Iteration 3 🌟 (10.06.2026)</summary>
+  
 - [ ] mesh movement to ```GameData```
 - [ ] Last Time Write sync
 - [ ] Mesh UI 
