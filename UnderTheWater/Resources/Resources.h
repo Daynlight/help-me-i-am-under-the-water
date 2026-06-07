@@ -39,6 +39,7 @@ public:
   void destroy();
   
   CW::Renderer::Texture& getTexture(const std::string& path_to_asset);
+  CW::Renderer::Shader& getShader(const std::string& path_to_asset);
 
 private:
   Resources();
@@ -46,6 +47,6 @@ private:
 
 private:
   void initMeshes();
-  void initShaders();
+  // void initShaders();
 };
 };

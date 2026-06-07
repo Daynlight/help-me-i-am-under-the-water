@@ -35,9 +35,9 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
       uniform[this->textures[i]]->set<int>(i);
     };
     
-    Resources::get().shaders[this->shader].getUniforms().emplace_back(&uniform);
+    Resources::get().getShader(this->shader).getUniforms().emplace_back(&uniform);
     
-    Resources::get().shaders[this->shader].bind();
+    Resources::get().getShader(this->shader).bind();
     
     std::vector<int> translation;
     for(std::string el : materials){
@@ -49,12 +49,12 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     
     Resources::get().meshes[this->mesh].render();
     
-    Resources::get().shaders[this->shader].unbind();
+    Resources::get().getShader(this->shader).unbind();
 
     for(unsigned int i = 0; i < textures.size(); i++) 
       Resources::get().getTexture(this->textures[i]).unbind();
 
-    Resources::get().shaders[this->shader].getUniforms().clear();
+    Resources::get().getShader(this->shader).getUniforms().clear();
   };
 };
 

@@ -14,7 +14,7 @@ UW::Resources& UW::Resources::get(){
 
 UW::Resources::Resources(){
   initMeshes();
-  initShaders();
+  // initShaders();
 };
 
 
@@ -171,43 +171,106 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
 
   std::cerr << "[ERROR][Resources]: Failed to find texture asset anywhere: " << local_path << std::endl;
   return textures["default_fallback"]; 
-}
-
-
-
-void UW::Resources::initShaders(){
-  // ======================= //
-  // ======= Terrain ======= //
-  // ======================= //
-  shaders["terrain"].setVertexShader(TerrainShader::vertex);
-  shaders["terrain"].setFragmentShader(TerrainShader::fragment);
-  shaders["terrain"].setShader(TerrainShader::tessellation, GL_TESS_CONTROL_SHADER);
-  shaders["terrain"].setShader(TerrainShader::tessellation_evaluation, GL_TESS_EVALUATION_SHADER);
-
-
-
-  // ===================== //
-  // ======= Water ======= //
-  // ===================== //
-  shaders["water"].setVertexShader(WaterShader::vertex);
-  shaders["water"].setFragmentShader(WaterShader::fragment);
-  shaders["water"].setShader(WaterShader::tessellation, GL_TESS_CONTROL_SHADER);
-  shaders["water"].setShader(WaterShader::tessellation_evaluation, GL_TESS_EVALUATION_SHADER);
-
-
-
-  // ====================== //
-  // ======= SkyBox ======= //
-  // ====================== //
-  shaders["sky_box"].setVertexShader(SkyBoxShader::vertex);
-  shaders["sky_box"].setFragmentShader(SkyBoxShader::fragment);
-
-
-
-  // ============================ //
-  // ======= Testing Cube ======= //
-  // ============================ //
-  shaders["testing"].setVertexShader(TestingCubeShader::vertex);
-  shaders["testing"].setFragmentShader(TestingCubeShader::fragment);
 };
+
+
+
+
+
+
+
+std::unordered_map<std::string, GLuint> shader_name_map = {
+  {"vertex.glsl", GL_VERTEX_SHADER},
+  {"fragment.glsl", GL_FRAGMENT_SHADER},
+  {"geometry.glsl", GL_GEOMETRY_SHADER},
+  {"tess_control.glsl", GL_TESS_CONTROL_SHADER},
+  {"tess_evaluation.glsl", GL_TESS_EVALUATION_SHADER},
+};
+
+
+
+CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset){
+  auto it = shaders.find(path_to_asset);
+  
+  if (it != shaders.end()) {
+    return it->second;
+  }
+
+  std::string local_path = "Assets/" + path_to_asset;
+  CW::Renderer::Shader shader;
+
+  for(auto& shader_name : shader_name_map){
+    try {
+      auto fs = cmrc::assets::get_filesystem();
+      auto file = fs.open(local_path + "/" + shader_name.first); 
+      
+      const char* data_ptr = reinterpret_cast<const char*>(file.begin());
+      const GLuint type = shader_name.second;
+      shader.setShader(std::string(data_ptr), type);
+    } catch (const std::runtime_error& e) {
+    }
+
+    // if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
+    //   std::ifstream file(local_path, std::ios::binary | std::ios::ate);
+    //   if (file.is_open()) {
+    //     std::streamsize size = file.tellg();
+    //     file.seekg(0, std::ios::beg);
+        
+    //     std::vector<unsigned char> buffer(size);
+    //     if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+    //       CW::Renderer::TextureLoader loader(buffer.data(), size);
+          
+    //       it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
+    //       it->second.compile(loader.data);
+    //       return it->second;
+    //     }
+      // }
+    // }
+  };
+  if(shader.getRegisterShader().size() != 0){
+    shaders[path_to_asset] = std::move(shader);
+    return shaders[path_to_asset];
+  };
+  
+  std::cerr << "[ERROR][Resources]: Failed to find texture asset anywhere: " << local_path << std::endl;
+  return shaders["default_fallback"];
+};
+
+
+
+// void UW::Resources::initShaders(){
+//   // ======================= //
+//   // ======= Terrain ======= //
+//   // ======================= //
+//   shaders["terrain"].setVertexShader(TerrainShader::vertex);
+//   shaders["terrain"].setFragmentShader(TerrainShader::fragment);
+//   shaders["terrain"].setShader(TerrainShader::tessellation, GL_TESS_CONTROL_SHADER);
+//   shaders["terrain"].setShader(TerrainShader::tessellation_evaluation, GL_TESS_EVALUATION_SHADER);
+
+
+
+//   // ===================== //
+//   // ======= Water ======= //
+//   // ===================== //
+//   shaders["water"].setVertexShader(WaterShader::vertex);
+//   shaders["water"].setFragmentShader(WaterShader::fragment);
+//   shaders["water"].setShader(WaterShader::tessellation, GL_TESS_CONTROL_SHADER);
+//   shaders["water"].setShader(WaterShader::tessellation_evaluation, GL_TESS_EVALUATION_SHADER);
+
+
+
+//   // ====================== //
+//   // ======= SkyBox ======= //
+//   // ====================== //
+//   shaders["sky_box"].setVertexShader(SkyBoxShader::vertex);
+//   shaders["sky_box"].setFragmentShader(SkyBoxShader::fragment);
+
+
+
+//   // ============================ //
+//   // ======= Testing Cube ======= //
+//   // ============================ //
+//   shaders["testing"].setVertexShader(TestingCubeShader::vertex);
+//   shaders["testing"].setFragmentShader(TestingCubeShader::fragment);
+// };
 
