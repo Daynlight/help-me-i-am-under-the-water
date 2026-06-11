@@ -43,5 +43,6 @@ private:
 
 private:
   void initMeshes();
+  void initLights();
 };
 };

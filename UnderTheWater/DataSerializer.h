@@ -52,7 +52,27 @@ struct LightsRecord{
   friend std::istream& operator>>(std::istream& is, LightsRecord& record);
 };
 
+struct MeshRecord{
+  std::string name = "";
+  struct MeshDataRecord{
+    unsigned int key = 0;
+    std::vector<std::uint8_t> data;
+    unsigned int dimension = 0;
+    unsigned int size_of_element = 0;
+    unsigned int size = 0;
+    GLenum type = GL_FLOAT;
+  };
+
+  std::vector<GLuint> indices;
+  std::vector<MeshDataRecord> mesh_data;
+
+  friend std::ostream& operator<<(std::ostream& os, const MeshRecord& record);
+  friend std::istream& operator>>(std::istream& is, MeshRecord& record);
+};
+
   
+
+
 
 
 class DataSerializer{
@@ -66,6 +86,8 @@ public:
   void save(std::unordered_map<std::string, UW::Lights> &lights);
   void load(std::unordered_map<std::string, UW::Lights> &lights);
 
+  void save(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
+  void load(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
 
   void save(const std::string& path_to_asset, GLuint type);
 };

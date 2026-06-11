@@ -7,9 +7,6 @@ execute_process(
 add_subdirectory(vendor/cmrc)
 add_subdirectory(vendor/CWindow)
 
-file(GLOB_RECURSE AssetsSet CONFIGURE_DEPENDS "Assets/**")
-cmrc_add_resource_library(assets ${AssetsSet})
-
 file(GLOB_RECURSE GameDataSet CONFIGURE_DEPENDS "GameData/**")
 cmrc_add_resource_library(GameData ${GameDataSet})
 

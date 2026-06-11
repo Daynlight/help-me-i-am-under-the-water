@@ -18,5 +18,5 @@ set(src
 
 
 add_executable(UnderTheWater ${src})
-target_link_libraries(UnderTheWater CWindow assets GameData)
+target_link_libraries(UnderTheWater CWindow GameData)
 target_include_directories(UnderTheWater PUBLIC .)
