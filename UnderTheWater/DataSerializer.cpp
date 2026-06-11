@@ -369,9 +369,9 @@ void UW::DataSerializer::load(std::unordered_map<std::string, UW::Lights> &light
 
 
 
-void UW::DataSerializer::save(const std::string &path_to_asset, GLuint type){
-  std::string local_path = "Assets/" + path_to_asset + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
-  std::string source = Resources::get().getShader(path_to_asset).getRegisterShader().at(type).getSource();
+void UW::DataSerializer::save(const std::string &path_to_shader, GLuint type){
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_shader + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
+  std::string source = Resources::get().getShader(path_to_shader).getRegisterShader().at(type).getSource();
   
   try {
     std::filesystem::path p(local_path);

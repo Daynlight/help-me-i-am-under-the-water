@@ -135,7 +135,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     return it->second;
   }
 
-  std::string local_path = "Assets/" + path_to_asset;
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_asset;
 
   try {
     auto fs = cmrc::assets::get_filesystem();
@@ -180,7 +180,7 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
     return it->second;
   }
 
-  std::string local_path = "Assets/" + path_to_asset;
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_asset;
   CW::Renderer::Shader shader;
 
   for(auto& shader_name : UW::Config::SHADER_NAME_TO_TYPE){
