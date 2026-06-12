@@ -23,17 +23,25 @@ class App{
 private:
   // app
   CW::Renderer::Renderer window;
+  #ifndef END_GAME
   UW::UI ui;
+  #endif
   UW::DataSerializer serializer;
 
   UW::Camera camera;
+  #ifndef END_GAME
   UW::Camera debug_camera;
-
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
+  #endif
+
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
+
+  #ifndef END_GAME
   float camera_swap_cooldown_acc = 0.0f;
+  #endif
+
   float fixed_update_time_acc = 0.0f;
   float save_acc = 0.0f;
 

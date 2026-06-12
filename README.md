@@ -139,14 +139,14 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 <summary>🌟 Iteration 3 🌟 (10.06.2026)</summary>
   
 - [x] Mesh serialization.
+- [x] Compile flag for end product ```END_GAME```
 - [ ] Last Time Write sync
 - [ ] Mesh UI 
 - [ ] Lights UI
 - [ ] Asset loader UI
 - [ ] Texture UI
-- [ ] Compile flag for end product
 - [ ] Engine like Shaders, Assets, Textures:
-    - [ ] Bake into exe
+    - [x] Bake into exe
     - [ ] When edit save to folder
     - [ ] Create new once
     - [ ] Auto load update on folder change
