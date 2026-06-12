@@ -12,14 +12,32 @@
 #include "config.h"
 #include "DataRecords.h"
 #include "Objects/Object.h"
-#include "Resources/Resources.h"
 #include "Objects/GameObject.h"
+#include "Resources/Resources.h"
 #include "Resources/Materials/Materials.h"
+
+
+
+namespace UW {
+  class GameObject; 
+}
 
 
 
 namespace UW{
 class DataSerializer{
+private:
+  DataSerializer() = default;
+  ~DataSerializer() = default;
+
+public:
+  static DataSerializer& get();
+
+  DataSerializer(const DataSerializer&) = delete;
+  DataSerializer& operator=(const DataSerializer&) = delete;
+  DataSerializer(DataSerializer&&) = delete;
+  DataSerializer& operator=(DataSerializer&&) = delete;
+
 private:
   void scanCmrcDirectory(const cmrc::embedded_filesystem& fs, const std::string& current_path, const std::string& pattern_str, std::vector<std::string>& out_mesh_files);
 
@@ -39,8 +57,8 @@ public:
   void saveAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
   void loadAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
 
-  void saveShaders(const std::string& path_to_asset, GLuint type);
-  // void loadShaders(std::unordered_map<std::string, CW::Renderer::Shader>& shaders);
+  void saveShaders(const std::string& shader_name, GLuint type);
+  void loadShader(const std::string& shader_name);
 
   // void loadTextures(std::unordered_map<std::string, CW::Renderer::Texture>& textures);
 

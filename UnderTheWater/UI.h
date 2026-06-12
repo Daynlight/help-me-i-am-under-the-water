@@ -19,14 +19,13 @@ namespace UW{
 class ShaderEditor{
 private:
   CW::Gui::Gui& gui;
-  UW::DataSerializer& serializer;
   bool shader_is_updated = false;
   char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
   std::string shader_name = "";
   GLenum shader_type = 0;
 
 public:
-  ShaderEditor(CW::Gui::Gui& gui, UW::DataSerializer& serializer, std::string name, GLenum type);
+  ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type);
   ~ShaderEditor();
 
   void guiShaderLoad(std::string name, GLenum type);
@@ -75,14 +74,13 @@ private:
   UW::Camera &camera;
   UW::Camera &debug_camera;
   UW::ObjectManager& object_manager;
-  UW::DataSerializer& serializer;
 
   bool material_is_updated = false;
   bool mesh_mode_is_updated = false;
   std::vector<std::unique_ptr<ShaderEditor>> shader_editors;
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer);
+  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
   ~UI();
   void onLoad();
   void render();

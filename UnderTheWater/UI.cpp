@@ -2,8 +2,8 @@
 
 
 
-UW::ShaderEditor::ShaderEditor(CW::Gui::Gui& gui, UW::DataSerializer& serializer, std::string name, GLenum type)
-  :gui(gui), serializer(serializer), shader_name(name), shader_type(type){
+UW::ShaderEditor::ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type)
+  :gui(gui), shader_name(name), shader_type(type){
   gui.addWindow("Shader Editor " + shader_name + " : " + UW::Config::SHADER_TYPE_TO_NAME[shader_type], shaderEditorGui());
 };
 
@@ -58,7 +58,7 @@ void UW::ShaderEditor::guiShaderEditor(){
     Resources::get().getShader(shader_name).removeShaders(shader_type);
     Resources::get().getShader(shader_name).setShader(buffer, shader_type);
     Resources::get().getShader(shader_name).compile();
-    serializer.saveShaders(shader_name, shader_type);
+    DataSerializer::get().saveShaders(shader_name, shader_type);
   };
 };
 
@@ -87,8 +87,8 @@ GLenum UW::ShaderEditor::getType(){
 
 
 
-UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer)
-  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager), serializer(serializer){
+UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager)
+  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager){
   shader_editors.reserve(20);
   gui.setWorkspace(appWorkspace());
 };
@@ -239,7 +239,7 @@ void UW::UI::loadShaderEditors(){
   shader_editors.clear();
   
   for(std::pair<std::string, GLenum> el : guiSettings.shader_editors_reg){
-    shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, serializer, el.first, el.second));
+    shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, el.first, el.second));
   };
 };
 
@@ -485,7 +485,7 @@ void UW::UI::guiShaderList(){
               shader_editors.end()
             );
           }
-          else shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, serializer, key, key_s));
+          else shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, key, key_s));
         };
       };
     };

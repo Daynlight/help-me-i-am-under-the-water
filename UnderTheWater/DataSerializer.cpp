@@ -8,6 +8,13 @@ CMRC_DECLARE(GameData);
 
 
 
+UW::DataSerializer &UW::DataSerializer::get(){
+  static DataSerializer instance;
+  return instance;
+};
+
+
+
 void UW::DataSerializer::scanCmrcDirectory(
   const cmrc::embedded_filesystem& fs,
   const std::string& current_path,
@@ -377,9 +384,9 @@ void UW::DataSerializer::loadAllMeshes(std::unordered_map<std::string, CW::Rende
 
 
 
-void UW::DataSerializer::saveShaders(const std::string &path_to_shader, GLuint type){
-  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_shader + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
-  std::string source = Resources::get().getShader(path_to_shader).getRegisterShader().at(type).getSource();
+void UW::DataSerializer::saveShaders(const std::string &shader_name, GLuint type){
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::SHADERS_FOLDER + shader_name + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
+  std::string source = Resources::get().getShader(shader_name).getRegisterShader().at(type).getSource();
   
   try {
     std::filesystem::path p(local_path);
@@ -399,6 +406,47 @@ void UW::DataSerializer::saveShaders(const std::string &path_to_shader, GLuint t
   outFile << source << "\n";
   
   outFile.close();
+};
+
+
+
+void UW::DataSerializer::loadShader(const std::string& shader_name){
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::SHADERS_FOLDER + shader_name;
+  CW::Renderer::Shader shader;
+
+  for(auto& shader_name : UW::Config::SHADER_NAME_TO_TYPE){
+    try {
+      auto fs = cmrc::GameData::get_filesystem();
+      auto file = fs.open(local_path + "/" + shader_name.first); 
+      
+      const char* data_ptr = reinterpret_cast<const char*>(file.begin());
+      const GLuint type = shader_name.second;
+      shader.setShader(std::string(data_ptr), type);
+      continue;
+    } catch (const std::runtime_error& e) {
+      std::cerr << "[LoadShader] CMRC Exception: " << e.what() << "\n";
+    };
+
+    // if (std::filesystem::exists(local_path + "/" + shader_name.first) && !std::filesystem::is_directory(local_path + "/" + shader_name.first)) {
+    //   std::ifstream file(local_path + "/" + shader_name.first, std::ios::binary | std::ios::ate);
+    //   if (file.is_open()) {
+    //     std::streamsize size = file.tellg();
+    //     file.seekg(0, std::ios::beg);
+        
+    //     std::vector<char> buffer(size);
+    //     if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+    //       const GLuint type = shader_name.second;
+    //       std::string data_ptr = "";
+    //       for(const char el : buffer) data_ptr += el;
+    //       shader.setShader(data_ptr, type);
+    //     };
+    //   };
+    // };
+  };
+
+  if(shader.getRegisterShader().size() != 0){
+    Resources::get().shaders[shader_name] = std::move(shader);
+  };
 };
 
 

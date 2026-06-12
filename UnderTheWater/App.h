@@ -26,7 +26,6 @@ private:
   #ifndef PRODUCTION
   UW::UI ui;
   #endif
-  UW::DataSerializer serializer;
 
   UW::Camera camera;
   #ifndef PRODUCTION

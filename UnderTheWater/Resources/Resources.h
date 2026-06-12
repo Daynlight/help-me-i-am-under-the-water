@@ -12,6 +12,7 @@
 #include "config.h"
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
+#include "../DataSerializer.h"
 
 
 
@@ -23,6 +24,7 @@ public:
   UW::Materials materials;
   std::unordered_map<std::string, UW::Lights> lights;
   std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
+
 
 public:
   static Resources& get();

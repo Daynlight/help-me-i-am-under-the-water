@@ -42,7 +42,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     return it->second;
   }
 
-  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_asset;
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::TEXTURES_FOLDER + path_to_asset;
 
   try {
     auto fs = cmrc::GameData::get_filesystem();
@@ -87,39 +87,12 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
     return it->second;
   }
 
-  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + path_to_asset;
-  CW::Renderer::Shader shader;
-
-  for(auto& shader_name : UW::Config::SHADER_NAME_TO_TYPE){
-    try {
-      auto fs = cmrc::GameData::get_filesystem();
-      auto file = fs.open(local_path + "/" + shader_name.first); 
-      
-      const char* data_ptr = reinterpret_cast<const char*>(file.begin());
-      const GLuint type = shader_name.second;
-      shader.setShader(std::string(data_ptr), type);
-      continue;
-    } catch (const std::runtime_error& e) {};
-
-    if (std::filesystem::exists(local_path + "/" + shader_name.first) && !std::filesystem::is_directory(local_path + "/" + shader_name.first)) {
-      std::ifstream file(local_path + "/" + shader_name.first, std::ios::binary | std::ios::ate);
-      if (file.is_open()) {
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        
-        std::vector<char> buffer(size);
-        if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
-          const GLuint type = shader_name.second;
-          std::string data_ptr = "";
-          for(const char el : buffer) data_ptr += el;
-          shader.setShader(data_ptr, type);
-        };
-      };
-    };
-  };
-  if(shader.getRegisterShader().size() != 0){
-    shaders[path_to_asset] = std::move(shader);
-    return shaders[path_to_asset];
+  DataSerializer::get().loadShader(path_to_asset);
+  
+  auto ita = shaders.find(path_to_asset);
+  
+  if (ita != shaders.end()) {
+    return ita->second;
   };
   
   return shaders["default_fallback"];
