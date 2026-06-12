@@ -58,7 +58,7 @@ void UW::ShaderEditor::guiShaderEditor(){
     Resources::get().getShader(shader_name).removeShaders(shader_type);
     Resources::get().getShader(shader_name).setShader(buffer, shader_type);
     Resources::get().getShader(shader_name).compile();
-    serializer.save(shader_name, shader_type);
+    serializer.saveShaders(shader_name, shader_type);
   };
 };
 

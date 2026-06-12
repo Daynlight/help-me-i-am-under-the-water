@@ -52,20 +52,14 @@ void UW::App::onLoad(){
   debug_camera.direction = {-0.57, -0.76, -0.28};
   #endif
 
-  serializer.load(Resources::get().meshes);
-  serializer.load(object_manager.objects);
-  serializer.load(Resources::get().materials);
-  serializer.load(Resources::get().lights);
+  serializer.loadAll(object_manager.objects);
 };
 
 
 
 void UW::App::onDestroy() {
   #ifndef PRODUCTION
-  serializer.save(Resources::get().meshes);
-  serializer.save(Resources::get().materials);
-  serializer.save(Resources::get().lights);
-  serializer.save(object_manager.objects);
+  serializer.saveAll(object_manager.objects);
   #endif
   object_manager.objects.clear();
   Resources::get().destroy();
@@ -134,10 +128,7 @@ void UW::App::fixedUpdate(){
     #ifndef PRODUCTION
     if(save_acc >= UW::Config::SAVE_TIMESTAMP){
       save_acc -= UW::Config::SAVE_TIMESTAMP;
-      serializer.save(Resources::get().meshes);
-      serializer.save(Resources::get().materials);
-      serializer.save(Resources::get().lights);
-      serializer.save(object_manager.objects);
+      serializer.saveAll(object_manager.objects);
     }
     else{
       save_acc += fixed_update_time_acc;

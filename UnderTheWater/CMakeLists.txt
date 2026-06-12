@@ -8,6 +8,7 @@ set(src
   "UI.cpp"
   "ObjectManager.cpp"
   "DataSerializer.cpp"
+  "DataRecords.cpp"
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"

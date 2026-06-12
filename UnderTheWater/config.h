@@ -19,6 +19,8 @@ namespace UW::Config{
   inline const float SAVE_TIMESTAMP = 350;
   inline const std::string GAME_DATA_FOLDER = "GameData/";
   inline const std::string ASSETS_FOLDER = "Assets/";
+  inline const std::string MESHES_FOLDER = "Meshes/";
+  inline const std::string MESH_EXTENSION = ".msh";
   inline const std::string MATERIALS_FILENAME = "Materials.pbr";
   inline const std::string OBJECTS_FILENAME = "Objects.obj";
   inline const std::string LIGHTS_FILENAME = "Lights.lit";

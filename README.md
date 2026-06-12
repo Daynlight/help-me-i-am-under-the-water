@@ -55,7 +55,7 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 
 
 ## Compiling End Product
-Use cmake command with PRODUCTION FLAG
+Use cmake command with ```PRODUCTION``` FLAG
 
 
 
