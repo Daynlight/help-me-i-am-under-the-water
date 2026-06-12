@@ -8,6 +8,7 @@ set(src
   "UI.cpp"
   "ObjectManager.cpp"
   "DataSerializer.cpp"
+  "DataRecords.cpp"
   "Resources/Resources.cpp"
   "Camera/Camera.cpp"
   "Objects/Terrain/Terrain.cpp"
@@ -18,5 +19,5 @@ set(src
 
 
 add_executable(UnderTheWater ${src})
-target_link_libraries(UnderTheWater CWindow assets GameData)
+target_link_libraries(UnderTheWater CWindow GameData)
 target_include_directories(UnderTheWater PUBLIC .)

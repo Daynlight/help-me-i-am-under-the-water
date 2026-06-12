@@ -1,7 +1,7 @@
 #include "Resources.h"
 
 #include <cmrc/cmrc.hpp>
-CMRC_DECLARE(assets);
+CMRC_DECLARE(GameData);
 
 
 
@@ -14,6 +14,7 @@ UW::Resources& UW::Resources::get(){
 
 UW::Resources::Resources(){
   initMeshes();
+  initLights();
 };
 
 
@@ -30,6 +31,71 @@ void UW::Resources::destroy(){
   shaders.clear();
   materials.destroy();
   lights.clear();
+};
+
+
+
+CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asset){
+  auto it = textures.find(path_to_asset);
+  
+  if (it != textures.end()) {
+    return it->second;
+  }
+
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::TEXTURES_FOLDER + path_to_asset;
+
+  try {
+    auto fs = cmrc::GameData::get_filesystem();
+    auto file = fs.open(local_path); 
+    
+    const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
+    CW::Renderer::TextureLoader loader(data_ptr, file.size());
+
+    it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
+    it->second.compile(loader.data);
+    
+    return it->second;
+  } catch (const std::runtime_error& e) {
+  }
+
+  if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
+    std::ifstream file(local_path, std::ios::binary | std::ios::ate);
+    if (file.is_open()) {
+      std::streamsize size = file.tellg();
+      file.seekg(0, std::ios::beg);
+
+      std::vector<unsigned char> buffer(size);
+      if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+        CW::Renderer::TextureLoader loader(buffer.data(), size);
+        
+        it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
+        it->second.compile(loader.data);
+        return it->second;
+      }
+    }
+  }
+
+  return textures["default_fallback"]; 
+};
+
+
+
+CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset){
+  auto it = shaders.find(path_to_asset);
+  
+  if (it != shaders.end()) {
+    return it->second;
+  }
+
+  DataSerializer::get().loadShader(path_to_asset);
+  
+  auto ita = shaders.find(path_to_asset);
+  
+  if (ita != shaders.end()) {
+    return ita->second;
+  };
+  
+  return shaders["default_fallback"];
 };
 
 
@@ -128,92 +194,8 @@ void UW::Resources::initMeshes(){
 
 
 
-CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asset){
-  auto it = textures.find(path_to_asset);
-  
-  if (it != textures.end()) {
-    return it->second;
-  }
-
-  std::string local_path = "Assets/" + path_to_asset;
-
-  try {
-    auto fs = cmrc::assets::get_filesystem();
-    auto file = fs.open(local_path); 
-    
-    const unsigned char* data_ptr = reinterpret_cast<const unsigned char*>(file.begin());
-    CW::Renderer::TextureLoader loader(data_ptr, file.size());
-
-    it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
-    it->second.compile(loader.data);
-    
-    return it->second;
-  } catch (const std::runtime_error& e) {
-  }
-
-  if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
-    std::ifstream file(local_path, std::ios::binary | std::ios::ate);
-    if (file.is_open()) {
-      std::streamsize size = file.tellg();
-      file.seekg(0, std::ios::beg);
-
-      std::vector<unsigned char> buffer(size);
-      if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
-        CW::Renderer::TextureLoader loader(buffer.data(), size);
-        
-        it = textures.emplace(path_to_asset, CW::Renderer::Texture()).first;
-        it->second.compile(loader.data);
-        return it->second;
-      }
-    }
-  }
-
-  return textures["default_fallback"]; 
-};
-
-
-
-CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset){
-  auto it = shaders.find(path_to_asset);
-  
-  if (it != shaders.end()) {
-    return it->second;
-  }
-
-  std::string local_path = "Assets/" + path_to_asset;
-  CW::Renderer::Shader shader;
-
-  for(auto& shader_name : UW::Config::SHADER_NAME_TO_TYPE){
-    try {
-      auto fs = cmrc::assets::get_filesystem();
-      auto file = fs.open(local_path + "/" + shader_name.first); 
-      
-      const char* data_ptr = reinterpret_cast<const char*>(file.begin());
-      const GLuint type = shader_name.second;
-      shader.setShader(std::string(data_ptr), type);
-      continue;
-    } catch (const std::runtime_error& e) {};
-
-    if (std::filesystem::exists(local_path + "/" + shader_name.first) && !std::filesystem::is_directory(local_path + "/" + shader_name.first)) {
-      std::ifstream file(local_path + "/" + shader_name.first, std::ios::binary | std::ios::ate);
-      if (file.is_open()) {
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        
-        std::vector<char> buffer(size);
-        if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
-          const GLuint type = shader_name.second;
-          std::string data_ptr = "";
-          for(const char el : buffer) data_ptr += el;
-          shader.setShader(data_ptr, type);
-        };
-      };
-    };
-  };
-  if(shader.getRegisterShader().size() != 0){
-    shaders[path_to_asset] = std::move(shader);
-    return shaders[path_to_asset];
-  };
-  
-  return shaders["default_fallback"];
+void UW::Resources::initLights(){
+  UW::Light light(glm::vec3(0, 1000, 0), glm::vec3(1.0f, 1.0f,1.0f), 2.0f);
+  lights["static"] = {light};
+  lights["static"].compile();
 };

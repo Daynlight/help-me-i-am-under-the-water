@@ -40,7 +40,7 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
   uniform["material_id"]->set<int>(Resources::get().materials.translate_material("water"));
 
 
-  Resources::get().getShader("Shaders/Water").getUniforms().emplace_back(&uniform);
+  Resources::get().getShader("Water").getUniforms().emplace_back(&uniform);
 
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   glEnable(GL_BLEND);
@@ -54,13 +54,13 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
     if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes["terrain_chunk"])){
       uniform["model"]->set<glm::mat4>(model);
       
-      Resources::get().getShader("Shaders/Water").bind();
+      Resources::get().getShader("Water").bind();
       Resources::get().meshes["terrain_chunk"].render(GL_PATCHES);
     };
   };
 
-  Resources::get().getShader("Shaders/Water").unbind();
-  Resources::get().getShader("Shaders/Water").getUniforms().clear();
+  Resources::get().getShader("Water").unbind();
+  Resources::get().getShader("Water").getUniforms().clear();
 
   glDepthMask(GL_TRUE);
   glDisable(GL_BLEND);

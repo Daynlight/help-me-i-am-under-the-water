@@ -13,13 +13,16 @@ namespace UW::Config{
   inline constexpr unsigned int FPS_SAMPLES = 200;
   inline constexpr unsigned int VSYNC = 0;
   inline const std::string DEFAULT_GUI_MATERIAL = "Terrain";
-  inline const std::string DEFAULT_GUI_SHADER = "terrain";
-  inline const GLenum DEFAULT_GUI_SHADER_TYPE = 0;
   inline const unsigned int DEFAULT_GUI_OBJECT = 0;
   inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;
   inline const unsigned int OBJECT_NAME_BUFFER_SIZE = 1024;
   inline const float SAVE_TIMESTAMP = 350;
   inline const std::string GAME_DATA_FOLDER = "GameData/";
+  inline const std::string ASSETS_FOLDER = "Assets/";
+  inline const std::string SHADERS_FOLDER = "Shaders/";
+  inline const std::string TEXTURES_FOLDER = "Textures/";
+  inline const std::string MESHES_FOLDER = "Meshes/";
+  inline const std::string MESH_EXTENSION = ".msh";
   inline const std::string MATERIALS_FILENAME = "Materials.pbr";
   inline const std::string OBJECTS_FILENAME = "Objects.obj";
   inline const std::string LIGHTS_FILENAME = "Lights.lit";
@@ -35,7 +38,7 @@ namespace UW::Config{
   inline constexpr float CHUNK_SIZE = 512.0f;
   inline constexpr unsigned int CHUNK_RADIUS = 5;
   inline constexpr glm::vec2 TESS_BOUND = glm::vec2(8.0f, 512.0f);
-  inline constexpr float TESS_DISTANCE_COFF = 0.0000001f;
+  inline constexpr float TESS_DISTANCE_COFF = 0.0000003f;
   
   inline const std::string SWAP_CAMERA_BTN = "P";
   inline const std::string CAMERA_SWAP_MODE_BTN = "ESC";

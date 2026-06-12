@@ -5,126 +5,34 @@ CMRC_DECLARE(GameData);
 
 
 
-std::ostream& UW::operator<<(std::ostream& os, const UW::GameObjectRecord& record) {
-  os << record.name << "\n" 
-     << record.mesh << "\n" 
-     << record.shader << "\n"
-     << record.position.x << " " << record.position.y << " " << record.position.z << "\n"
-     << record.rotation.x << " " << record.rotation.y << " " << record.rotation.z << "\n"
-     << record.scale.x << " " << record.scale.y << " " << record.scale.z << "\n";
 
-  os << record.textures.size() << "\n";
-  for (const auto& tex : record.textures) os << tex << "\n";
 
-  os << record.materials.size() << "\n";
-  for (const auto& mat : record.materials) os << mat << "\n";
 
-  return os;
+UW::DataSerializer &UW::DataSerializer::get(){
+  static DataSerializer instance;
+  return instance;
 };
 
 
 
-std::istream& UW::operator>>(std::istream& is, UW::GameObjectRecord& record) {
-  if (!std::getline(is, record.name) || 
-      !std::getline(is, record.mesh) || 
-      !std::getline(is, record.shader)) return is;
+void UW::DataSerializer::scanCmrcDirectory(
+  const cmrc::embedded_filesystem& fs,
+  const std::string& current_path,
+  const std::string& pattern_str,
+  std::vector<std::string>& out_mesh_files){
+  std::regex pattern(pattern_str);
 
-  if (!(is >> record.position.x >> record.position.y >> record.position.z >>
-              record.rotation.x >> record.rotation.y >> record.rotation.z >>
-              record.scale.x >> record.scale.y >> record.scale.z)) return is;
-
-  size_t texSize = 0;
-  if (!(is >> texSize)) return is;
-  is.ignore();
-  
-  if (texSize > 10000) { 
-    is.setstate(std::ios::failbit);
-    return is;
+  for (const auto& entry : fs.iterate_directory(current_path)) {
+    std::string entry_path = current_path + (current_path.back() == '/' ? "" : "/") + entry.filename();
+    
+    if (entry.is_directory()) scanCmrcDirectory(fs, entry_path, pattern_str, out_mesh_files);
+    else if (entry.is_file() && std::regex_search(entry.filename(), pattern)) out_mesh_files.emplace_back(entry_path);
   };
-
-  record.textures.resize(texSize);
-  for (size_t i = 0; i < texSize; ++i) std::getline(is, record.textures[i]);
-
-  size_t matSize = 0;
-  if (!(is >> matSize)) return is;
-  is.ignore();
-  
-  if (matSize > 10000) {
-    is.setstate(std::ios::failbit);
-    return is;
-  };
-
-  record.materials.resize(matSize);
-  for (size_t i = 0; i < matSize; ++i) std::getline(is, record.materials[i]);
-
-  return is;
 };
 
 
 
-std::ostream& UW::operator<<(std::ostream& os, const UW::MaterialsRecord& record) {
-  os << record.name << "\n" 
-     << record.albedo.x << " " << record.albedo.y << " " << record.albedo.z << "\n"
-     << record.metallic << "\n"
-     << record.roughness << "\n" 
-     << record.emission_color.x << " " << record.emission_color.y << " " << record.emission_color.z << "\n"
-     << record.emission_strength << "\n"
-     << record.ambient_occlusion << "\n";
-
-  return os;
-};
-
-
-
-std::istream& UW::operator>>(std::istream& is, UW::MaterialsRecord& record) {
-  if (!std::getline(is, record.name)) return is;
-
-  if (!(is >> record.albedo.x >> record.albedo.y >> record.albedo.z
-           >> record.metallic
-           >> record.roughness
-           >> record.emission_color.x >> record.emission_color.y >> record.emission_color.z
-           >> record.emission_strength
-           >> record.ambient_occlusion)) {
-    return is;
-  }
-  
-  is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-  return is;
-};
-
-
-std::ostream& UW::operator<<(std::ostream& os, const UW::LightsRecord& record) {
-  os << record.name << "\n" 
-     << record.position.x << " " << record.position.y << " " << record.position.z << "\n"
-     << record.color.x << " " << record.color.y << " " << record.color.z << "\n"
-     << record.strength << "\n";
-
-  return os;
-};
-
-
-
-std::istream& UW::operator>>(std::istream& is, UW::LightsRecord& record) {
-  if (!std::getline(is, record.name)) return is;
-
-  if (!(is >> record.position.x >> record.position.y >> record.position.z
-           >> record.color.x >> record.color.y >> record.color.z
-           >> record.strength)) {
-    return is;
-  }
-  
-  is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-  return is;
-};
-
-
-
-
-
-
-void UW::DataSerializer::save(std::vector<UW::GameObject> &objects) {
+void UW::DataSerializer::saveAllObjects(std::vector<UW::GameObject> &objects) {
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
     if (p.has_parent_path())
@@ -134,13 +42,14 @@ void UW::DataSerializer::save(std::vector<UW::GameObject> &objects) {
     return;
   };
 
-  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME, std::ios::binary);
   if (!outFile.is_open()) {
     std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME << std::endl;
     return;
   };
 
-  outFile << objects.size() << "\n";
+  size_t obj_size = objects.size();
+  outFile.write(reinterpret_cast<const char*>(&obj_size), sizeof(obj_size));
 
   for (const auto& object : objects) {
     UW::GameObjectRecord record; 
@@ -162,7 +71,7 @@ void UW::DataSerializer::save(std::vector<UW::GameObject> &objects) {
 
 
 
-void UW::DataSerializer::load(std::vector<UW::GameObject> &objects) {
+void UW::DataSerializer::loadAllObjects(std::vector<UW::GameObject> &objects) {
   try{
     auto fs = cmrc::GameData::get_filesystem();
     std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME;
@@ -179,8 +88,8 @@ void UW::DataSerializer::load(std::vector<UW::GameObject> &objects) {
     objects.clear();
 
     size_t objectCount = 0;
-    if (!(inFile >> objectCount)) return;
-    inFile.ignore();
+    inFile.read(reinterpret_cast<char*>(&objectCount), sizeof(objectCount));
+
 
     for (size_t i = 0; i < objectCount; ++i) {
       UW::GameObjectRecord record;
@@ -204,7 +113,8 @@ void UW::DataSerializer::load(std::vector<UW::GameObject> &objects) {
 };
 
 
-void UW::DataSerializer::save(UW::Materials &materials) {
+
+void UW::DataSerializer::saveAllMaterials(UW::Materials &materials) {
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
     if (p.has_parent_path())
@@ -214,13 +124,14 @@ void UW::DataSerializer::save(UW::Materials &materials) {
     return;
   };
 
-  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME);
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME, std::ios::binary);
   if (!outFile.is_open()) {
     std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME << std::endl;
     return;
   };
 
-  outFile << materials.size() << "\n";
+  size_t mat_size = materials.size();
+  outFile.write(reinterpret_cast<const char*>(&mat_size), sizeof(mat_size));
 
   for (auto& el : materials.getMaterialReg()) {
     UW::MaterialsRecord record; 
@@ -242,7 +153,7 @@ void UW::DataSerializer::save(UW::Materials &materials) {
 
 
 
-void UW::DataSerializer::load(UW::Materials &materials) {
+void UW::DataSerializer::loadAllMaterials(UW::Materials &materials) {
   try{
     auto fs = cmrc::GameData::get_filesystem();
     std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::MATERIALS_FILENAME;
@@ -259,8 +170,7 @@ void UW::DataSerializer::load(UW::Materials &materials) {
     materials.clear();
 
     size_t materialCount = 0;
-    if (!(inFile >> materialCount)) return;
-    inFile.ignore();
+    inFile.read(reinterpret_cast<char*>(&materialCount), sizeof(materialCount));
 
     for (size_t i = 0; i < materialCount; ++i) {
       UW::MaterialsRecord record;
@@ -287,7 +197,7 @@ void UW::DataSerializer::load(UW::Materials &materials) {
 
 
 
-void UW::DataSerializer::save(std::unordered_map<std::string, UW::Lights> &lights) {
+void UW::DataSerializer::saveAllLights(std::unordered_map<std::string, UW::Lights> &lights) {
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME);
     if (p.has_parent_path())
@@ -297,7 +207,7 @@ void UW::DataSerializer::save(std::unordered_map<std::string, UW::Lights> &light
     return;
   };
 
-  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME);
+  std::ofstream outFile(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME, std::ios::binary);
   if (!outFile.is_open()) {
     std::cerr << "Failed to open file for saving: " << UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME << std::endl;
     return;
@@ -306,7 +216,7 @@ void UW::DataSerializer::save(std::unordered_map<std::string, UW::Lights> &light
   unsigned int size = 0;
   for (const auto& el : lights) size += el.second.size();
 
-  outFile << size << "\n";
+  outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
   for (const auto& el : lights) {
     const UW::Lights& lights_data = el.second;
@@ -328,7 +238,7 @@ void UW::DataSerializer::save(std::unordered_map<std::string, UW::Lights> &light
 
 
 
-void UW::DataSerializer::load(std::unordered_map<std::string, UW::Lights> &lights) {
+void UW::DataSerializer::loadAllLights(std::unordered_map<std::string, UW::Lights> &lights) {
   try{
     auto fs = cmrc::GameData::get_filesystem();
     std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME;
@@ -342,17 +252,15 @@ void UW::DataSerializer::load(std::unordered_map<std::string, UW::Lights> &light
     std::string dataStr(embeddedFile.begin(), embeddedFile.end());
     std::stringstream inFile(dataStr);
 
-    lights.clear();
-
     size_t lightCount = 0;
-    if (!(inFile >> lightCount)) return;
-    inFile.ignore();
+    inFile.read(reinterpret_cast<char*>(&lightCount), sizeof(lightCount));
 
     for (size_t i = 0; i < lightCount; ++i) {
       UW::LightsRecord record;
       if (inFile >> record) {
         UW::Light light(record.position, record.color, record.strength);
         lights[record.name].emplace_back(light);
+        lights[record.name].compile();
       } else {
         std::cerr << "Error: File format corrupted at object index " << i << std::endl;
         break;
@@ -365,13 +273,120 @@ void UW::DataSerializer::load(std::unordered_map<std::string, UW::Lights> &light
 
 
 
+void UW::DataSerializer::saveMesh(const std::string &name, const CW::Renderer::Mesh &mesh){
+  std::string folder_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::MESHES_FOLDER;
+  std::string file_path   = folder_path + name + UW::Config::MESH_EXTENSION;
+
+  std::filesystem::create_directories(folder_path);
+
+  std::ofstream outFile(file_path, std::ios::binary);
+  if (!outFile.is_open()) return;
+
+  UW::MeshRecord record;
+  record.name = name;
+  record.indices = mesh.getIndices();
+
+  auto reg = mesh.getDataRegister();
+
+  record.mesh_data.clear();
+  record.mesh_data.reserve(reg.size());
+
+  for (const auto& [location, mesh_data_instance] : reg){
+    UW::MeshRecord::MeshDataRecord e;
+    e.key             = location;
+    e.dimension       = mesh_data_instance.getDimension();
+    e.size_of_element = mesh_data_instance.getSizeOfElement();
+    e.size            = mesh_data_instance.getSize();
+    e.type            = mesh_data_instance.getType();
+
+    size_t byte_count = e.size;
+
+    const uint8_t* raw = reinterpret_cast<const uint8_t*>(mesh_data_instance.getRawData());
+    e.data.assign(raw, raw + byte_count);
+
+    record.mesh_data.emplace_back(std::move(e));
+  };
+
+  outFile << record;
+};
 
 
 
+void UW::DataSerializer::loadMesh(const std::string& path_to_mesh, std::unordered_map<std::string, CW::Renderer::Mesh> &meshes){
+  try{
+    auto fs = cmrc::GameData::get_filesystem();
+    auto embedded_file = fs.open(path_to_mesh);
+    std::string data_str(embedded_file.begin(), embedded_file.end());
+    std::stringstream inFile(data_str);
 
-void UW::DataSerializer::save(const std::string &path_to_asset, GLuint type){
-  std::string local_path = "Assets/" + path_to_asset + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
-  std::string source = Resources::get().getShader(path_to_asset).getRegisterShader().at(type).getSource();
+    UW::MeshRecord record;
+    if (!(inFile >> record)) return;
+
+    meshes.erase(record.name);
+    
+    CW::Renderer::Mesh engine_mesh;
+    
+    engine_mesh.addIndices(record.indices);
+
+    std::unordered_set<unsigned int> loaded_layouts;
+
+    for (const auto& e : record.mesh_data){
+      if (e.data.empty()) continue;
+
+      if (loaded_layouts.count(e.key)) continue;
+      loaded_layouts.insert(e.key);
+
+      if (e.key == 0 && e.type == GL_FLOAT) {
+        std::vector<float> vertices(e.data.size() / sizeof(float));
+        std::memcpy(vertices.data(), e.data.data(), e.data.size());
+        engine_mesh.addVertices(vertices, e.dimension, e.key);
+      } 
+      else {
+        UW::Utils::uploadBufferByType(engine_mesh, e.type, e.data, e.dimension, e.key);
+      };
+    };
+
+    meshes[record.name] = std::move(engine_mesh);
+  }
+  catch (const std::exception& e) {
+    std::cerr << "[MeshLoad] CMRC EXCEPTION: " << e.what() << "\n";
+  };
+};
+
+
+
+void UW::DataSerializer::saveAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh> &meshes){
+  for (const auto& [mesh_name, mesh_instance] : meshes){
+    saveMesh(mesh_name, mesh_instance);
+  };
+};
+
+
+
+void UW::DataSerializer::loadAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh> &meshes){
+  try {
+    auto fs = cmrc::GameData::get_filesystem();
+    std::string meshes_root = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::MESHES_FOLDER;
+
+    if (!fs.exists(meshes_root)) return;
+
+    std::vector<std::string> mesh_files;
+    scanCmrcDirectory(fs, meshes_root, "\.msh$", mesh_files);
+
+    for (const auto& file_path : mesh_files){
+      loadMesh(file_path, meshes);
+    };
+  }
+  catch (const std::exception& e) {
+    std::cerr << "[MeshLoad] CMRC EXCEPTION: " << e.what() << "\n";
+  };
+};
+
+
+
+void UW::DataSerializer::saveShaders(const std::string &shader_name, GLuint type){
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::SHADERS_FOLDER + shader_name + "/" + UW::Config::SHADER_TYPE_TO_NAME[type];
+  std::string source = Resources::get().getShader(shader_name).getRegisterShader().at(type).getSource();
   
   try {
     std::filesystem::path p(local_path);
@@ -393,3 +408,64 @@ void UW::DataSerializer::save(const std::string &path_to_asset, GLuint type){
   outFile.close();
 };
 
+
+
+void UW::DataSerializer::loadShader(const std::string& shader_name){
+  std::string local_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::SHADERS_FOLDER + shader_name;
+  CW::Renderer::Shader shader;
+
+  for(auto& shader_name : UW::Config::SHADER_NAME_TO_TYPE){
+    try {
+      auto fs = cmrc::GameData::get_filesystem();
+      auto file = fs.open(local_path + "/" + shader_name.first); 
+      
+      const char* data_ptr = reinterpret_cast<const char*>(file.begin());
+      const GLuint type = shader_name.second;
+      shader.setShader(std::string(data_ptr), type);
+      continue;
+    } catch (const std::runtime_error& e) {
+      std::cerr << "[LoadShader] CMRC Exception: " << e.what() << "\n";
+    };
+
+    // if (std::filesystem::exists(local_path + "/" + shader_name.first) && !std::filesystem::is_directory(local_path + "/" + shader_name.first)) {
+    //   std::ifstream file(local_path + "/" + shader_name.first, std::ios::binary | std::ios::ate);
+    //   if (file.is_open()) {
+    //     std::streamsize size = file.tellg();
+    //     file.seekg(0, std::ios::beg);
+        
+    //     std::vector<char> buffer(size);
+    //     if (file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+    //       const GLuint type = shader_name.second;
+    //       std::string data_ptr = "";
+    //       for(const char el : buffer) data_ptr += el;
+    //       shader.setShader(data_ptr, type);
+    //     };
+    //   };
+    // };
+  };
+
+  if(shader.getRegisterShader().size() != 0){
+    Resources::get().shaders[shader_name] = std::move(shader);
+  };
+};
+
+
+
+
+
+
+void UW::DataSerializer::saveAll(std::vector<UW::GameObject> &objects){
+  saveAllObjects(objects);
+  saveAllMaterials(Resources::get().materials);
+  saveAllLights(Resources::get().lights);
+  saveAllMeshes(Resources::get().meshes);
+};
+
+
+
+void UW::DataSerializer::loadAll(std::vector<UW::GameObject> &objects){
+  loadAllMeshes(Resources::get().meshes);
+  loadAllLights(Resources::get().lights);
+  loadAllMaterials(Resources::get().materials);
+  loadAllObjects(objects);
+};

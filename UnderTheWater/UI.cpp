@@ -2,15 +2,101 @@
 
 
 
-UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer)
-  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager), serializer(serializer){
+UW::ShaderEditor::ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type)
+  :gui(gui), shader_name(name), shader_type(type){
+  gui.addWindow("Shader Editor " + shader_name + " : " + UW::Config::SHADER_TYPE_TO_NAME[shader_type], shaderEditorGui());
+};
+
+
+
+UW::ShaderEditor::~ShaderEditor(){
+  gui.deleteWindow("Shader Editor " + shader_name + " : " + UW::Config::SHADER_TYPE_TO_NAME[shader_type]);
+};
+
+
+
+void UW::ShaderEditor::guiShaderLoad(std::string name, GLenum type){
+  shader_name = name;
+  shader_type = type;
+  memset(buffer, '\0', UW::Config::SHADER_EDITOR_BUFFER_SIZE);
+  
+  auto it = Resources::get().shaders.find(name);
+  if(it == Resources::get().shaders.end()) return;
+
+  const std::unordered_map<GLenum, CW::Renderer::ShaderData>& reg = Resources::get().getShader(name).getRegisterShader();
+  auto ita = reg.find(type);
+  if(ita == reg.end()) return;
+
+  std::string source = reg.at(type).getSource();
+  memcpy(buffer, source.data(), source.size());
+};
+
+
+
+void UW::ShaderEditor::guiShaderEditor(){
+  float width = ImGui::GetContentRegionAvail().x;
+  float height = ImGui::GetContentRegionAvail().y - 50.0f;
+  
+  ImGui::SeparatorText("Shader Editor");
+  ImGui::Text("Shader: %s : %s", shader_name.c_str(), UW::Config::SHADER_TYPE_TO_NAME[shader_type].c_str());
+  
+  ImGui::InputTextMultiline("##Shader Content", buffer, UW::Config::SHADER_EDITOR_BUFFER_SIZE, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
+
+  auto it = Resources::get().shaders.find(shader_name);
+  if(it == Resources::get().shaders.end()) return;
+  
+  auto& reg = Resources::get().getShader(shader_name).getRegisterShader();
+  auto it2 = reg.find(shader_type);
+  if(it2 == reg.end()) return;
+
+  if(strcmp(buffer, reg.at(shader_type).getSource().c_str()) != 0) shader_is_updated = true;
+
+  if(shader_is_updated){
+    shader_is_updated = false;
+    
+    Resources::get().getShader(shader_name).destroy();
+    Resources::get().getShader(shader_name).removeShaders(shader_type);
+    Resources::get().getShader(shader_name).setShader(buffer, shader_type);
+    Resources::get().getShader(shader_name).compile();
+    DataSerializer::get().saveShaders(shader_name, shader_type);
+  };
+};
+
+
+
+inline std::function<void(CW::Renderer::iRenderer *window)> UW::ShaderEditor::shaderEditorGui(){
+  return [this](CW::Renderer::iRenderer *window){
+    guiShaderLoad(shader_name, shader_type);
+    guiShaderEditor();
+  };
+};
+
+
+
+std::string UW::ShaderEditor::getName(){
+  return shader_name;
+};
+
+
+GLenum UW::ShaderEditor::getType(){
+  return shader_type;
+};
+
+
+
+
+
+
+UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager)
+  :window(window), gui(&window), fps(fps), debug_camera_on(debug_camera_on), camera(camera), debug_camera(debug_camera), object_manager(object_manager){
+  shader_editors.reserve(20);
   gui.setWorkspace(appWorkspace());
 };
 
 
 
 UW::UI::~UI(){
-
+  saveShaderEditors();
 };
 
 
@@ -33,8 +119,7 @@ void UW::UI::render(){
 void UW::UI::uiLoad(){
   configControl();
   ImGui::LoadIniSettingsFromDisk(ImGui::GetIO().IniFilename);
-
-  guiShaderLoad(guiSettings.shader_name, guiSettings.shader_type);
+  loadShaderEditors();
   uiControl();
 };
 
@@ -61,14 +146,19 @@ void UW::UI::configControl(){
     if (sscanf(line, "ObjectExplorerWindowOn=%d", &value) == 1) s->objectExplorerWindowOn = value;
     if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
     if (sscanf(line, "Object_ID=%d", &value) == 1) s->object_id = value;
-    if (sscanf(line, "Shader_Type=%d", &value) == 1) s->shader_type = value;
     if (sscanf(line, "Mesh_Mode_On=%d", &value) == 1) s->mesh_mode_on = value;
     if (sscanf(line, "Window_Width=%d", &value) == 1) s->window_width = value;
     if (sscanf(line, "Window_Height=%d", &value) == 1) s->window_height = value;
     
     char value_str[256];
-    if (sscanf(line, "Shader_Name=%256s", &value_str) == 1) s->shader_name = std::string(value_str);
     if (sscanf(line, "Material_ID=%256s", &value_str) == 1) s->material_name = std::string(value_str);
+    
+    char name[256];
+    unsigned int type;
+
+    if (sscanf(line, "ShaderEditor=%255[^,],%u", name, &type) == 2){
+      s->shader_editors_reg.emplace_back(name, type);
+    };
   };
 
   handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf){
@@ -81,12 +171,21 @@ void UW::UI::configControl(){
     out_buf->appendf("ObjectExplorerWindowOn=%d\n", guiSettings.objectExplorerWindowOn);
     out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
     out_buf->appendf("Object_ID=%d\n", guiSettings.object_id);
-    out_buf->appendf("Shader_Type=%d\n", guiSettings.shader_type);
     out_buf->appendf("Mesh_Mode_On=%d\n", guiSettings.mesh_mode_on);
     out_buf->appendf("Window_Width=%d\n", guiSettings.window_width);
     out_buf->appendf("Window_Height=%d\n", guiSettings.window_height);
-    out_buf->appendf("Shader_Name=%s\n", guiSettings.shader_name.c_str());
     out_buf->appendf("Material_ID=%s\n", guiSettings.material_name.c_str());
+    
+    out_buf->appendf("ShaderEditorCount=%zu\n", guiSettings.shader_editors_reg.size());
+
+    for (size_t i = 0; i < guiSettings.shader_editors_reg.size(); ++i){
+      out_buf->appendf(
+        "ShaderEditor=%s,%u\n",
+        guiSettings.shader_editors_reg[i].first.c_str(),
+        guiSettings.shader_editors_reg[i].second
+      );
+    };
+
     out_buf->append("\n");
   };
 
@@ -120,12 +219,6 @@ void UW::UI::uiControl(){
   else{
     gui.deleteWindow("Shader Explorer");
   };
-  if(guiSettings.shaderEditorWindowOn){
-    gui.addWindow("Shader Editor", shaderEditorGui());
-  }
-  else{
-    gui.deleteWindow("Shader Editor");
-  };
   if(guiSettings.objectExplorerWindowOn){
     gui.addWindow("Object Explorer", objectExplorerGui());
   }
@@ -137,6 +230,25 @@ void UW::UI::uiControl(){
   }
   else{
     gui.deleteWindow("Object Editor");
+  };
+};
+
+
+
+void UW::UI::loadShaderEditors(){
+  shader_editors.clear();
+  
+  for(std::pair<std::string, GLenum> el : guiSettings.shader_editors_reg){
+    shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, el.first, el.second));
+  };
+};
+
+
+
+void UW::UI::saveShaderEditors(){
+  guiSettings.shader_editors_reg.clear();
+  for(const auto& el : shader_editors){
+    guiSettings.shader_editors_reg.emplace_back(el->getName(), el->getType());
   };
 };
 
@@ -159,10 +271,6 @@ void UW::UI::menuBarGui(){
       };
       if(ImGui::MenuItem("Shader Explorer")){
         guiSettings.shaderExplorerWindowOn = !guiSettings.shaderExplorerWindowOn;
-        uiControl();
-      };
-      if(ImGui::MenuItem("Shader Editor")){
-        guiSettings.shaderEditorWindowOn = !guiSettings.shaderEditorWindowOn;
         uiControl();
       };
       if(ImGui::MenuItem("Object Explorer")){
@@ -243,8 +351,6 @@ inline void UW::UI::guiInfo(){
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     };
   };
-
-  
 };
 
 
@@ -353,46 +459,35 @@ return [this](CW::Renderer::iRenderer *window){
 // --------------- //
 // Shader Explorer //
 // --------------- //
-void UW::UI::guiShaderLoad(std::string name, GLenum type){
-  guiSettings.shader_name = name;
-  guiSettings.shader_type = type;
-  memset(buffer, '\0', UW::Config::SHADER_EDITOR_BUFFER_SIZE);
-  
-  auto it = Resources::get().shaders.find(name);
-  if(it == Resources::get().shaders.end()) return;
-
-  const std::unordered_map<GLenum, CW::Renderer::ShaderData>& reg = Resources::get().getShader(name).getRegisterShader();
-  auto ita = reg.find(type);
-  if(ita == reg.end()) return;
-
-  std::string source = reg.at(type).getSource();
-  memcpy(buffer, source.data(), source.size());
-};
-
-
-
-std::string UW::UI::getShaderTypeName(GLenum type){
-  if(type == GL_VERTEX_SHADER) return "Vertex Shader";
-  if(type == GL_FRAGMENT_SHADER) return "Fragment Shader";
-  if(type == GL_GEOMETRY_SHADER) return "Geometry Shader";
-  if(type == GL_TESS_CONTROL_SHADER) return "Tess Control Shader";
-  if(type == GL_TESS_EVALUATION_SHADER) return "Tess Evaluation Shader";
-  return std::to_string(type);
-};
-
-
-
 void UW::UI::guiShaderList(){
   ImGui::SeparatorText("Shader List");
 
-  if(ImGui::Button("reset")){
-    Resources::get().shaders.clear();
-  }
+  if(ImGui::Button("reset")) Resources::get().shaders.clear();
 
   for (const auto& [ key, values ] : Resources::get().shaders) {
-    for (const auto& [key_s, values_s] : values.getRegisterShader()){
-      std::string button_label = "- " + key + ": " + getShaderTypeName(key_s);
-      if (ImGui::Button(button_label.c_str())) guiShaderLoad(key, key_s);
+    if(ImGui::CollapsingHeader(key.c_str())){
+      for (const auto& [key_s, values_s] : values.getRegisterShader()){
+        std::string button_label = UW::Config::SHADER_TYPE_TO_NAME[key_s] +  "##-" + key;
+        if (ImGui::Button(button_label.c_str())){
+          bool exists = std::any_of(
+            shader_editors.begin(),
+            shader_editors.end(),
+            [&](const auto& editor) { return editor->getName() == key && editor->getType() == key_s; }
+          );
+
+          if (exists){
+            shader_editors.erase(
+              std::remove_if(
+                shader_editors.begin(),
+                shader_editors.end(),
+                [&](const auto& editor) { return editor->getName() == key && editor->getType() == key_s; }
+              ),
+              shader_editors.end()
+            );
+          }
+          else shader_editors.emplace_back(std::make_unique<ShaderEditor>(gui, key, key_s));
+        };
+      };
     };
   };
 };
@@ -402,49 +497,6 @@ void UW::UI::guiShaderList(){
 inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI::shaderExplorerGui(){
   return [this](CW::Renderer::iRenderer *window){
     guiShaderList();
-  };
-};
-
-
-
-// ------------- //
-// Shader Editor //
-// ------------- //
-void UW::UI::guiShaderEditor(){
-  float width = ImGui::GetContentRegionAvail().x;
-  float height = ImGui::GetContentRegionAvail().y - 50.0f;
-  
-  ImGui::SeparatorText("Shader Editor");
-  ImGui::Text("Shader: %s : %s", guiSettings.shader_name.c_str(), getShaderTypeName(guiSettings.shader_type).c_str());
-  
-  ImGui::InputTextMultiline("##Shader Content", buffer, UW::Config::SHADER_EDITOR_BUFFER_SIZE, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
-
-  auto it = Resources::get().shaders.find(guiSettings.shader_name);
-  if(it == Resources::get().shaders.end()) return;
-  
-  auto& reg = Resources::get().getShader(guiSettings.shader_name).getRegisterShader();
-  auto it2 = reg.find(guiSettings.shader_type);
-  if(it2 == reg.end()) return;
-
-  if(strcmp(buffer, reg.at(guiSettings.shader_type).getSource().c_str()) != 0) shader_is_updated = true;
-
-  if(shader_is_updated){
-    shader_is_updated = false;
-    
-    Resources::get().getShader(guiSettings.shader_name).destroy();
-    Resources::get().getShader(guiSettings.shader_name).removeShaders(guiSettings.shader_type);
-    Resources::get().getShader(guiSettings.shader_name).setShader(buffer, guiSettings.shader_type);
-    Resources::get().getShader(guiSettings.shader_name).compile();
-    serializer.save(guiSettings.shader_name, guiSettings.shader_type);
-  };
-};
-
-
-
-inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI::shaderEditorGui(){
-  return [this](CW::Renderer::iRenderer *window){
-    guiShaderLoad(guiSettings.shader_name, guiSettings.shader_type);
-    guiShaderEditor();
   };
 };
 

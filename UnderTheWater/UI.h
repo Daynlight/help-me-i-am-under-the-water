@@ -1,4 +1,8 @@
 #pragma once
+#include <memory>
+#include <vector>
+#include <algorithm>
+
 #include "Gui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -12,6 +16,31 @@
 
 
 namespace UW{
+class ShaderEditor{
+private:
+  CW::Gui::Gui& gui;
+  bool shader_is_updated = false;
+  char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
+  std::string shader_name = "";
+  GLenum shader_type = 0;
+
+public:
+  ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type);
+  ~ShaderEditor();
+
+  void guiShaderLoad(std::string name, GLenum type);
+  void guiShaderEditor();
+  std::function<void(CW::Renderer::iRenderer *window)> shaderEditorGui();
+
+  std::string getName();
+  GLenum getType();
+};
+
+
+
+
+
+
 struct GuiSettings{
   bool infoWindowOn = false;
   bool materialExplorerOn = false;
@@ -23,13 +52,15 @@ struct GuiSettings{
   bool mesh_mode_on = false;
   std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
   unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
-  GLenum shader_type = UW::Config::DEFAULT_GUI_SHADER_TYPE;
-  std::string shader_name = UW::Config::DEFAULT_GUI_SHADER;
+  std::vector<std::pair<std::string, GLenum>> shader_editors_reg;
   int window_width = 800;
   int window_height = 600;
 };
 
 static GuiSettings guiSettings;
+
+
+
 
 
 
@@ -43,15 +74,13 @@ private:
   UW::Camera &camera;
   UW::Camera &debug_camera;
   UW::ObjectManager& object_manager;
-  UW::DataSerializer& serializer;
 
   bool material_is_updated = false;
-  bool shader_is_updated = false;
   bool mesh_mode_is_updated = false;
-  char buffer[UW::Config::SHADER_EDITOR_BUFFER_SIZE] = {0};
+  std::vector<std::unique_ptr<ShaderEditor>> shader_editors;
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager, UW::DataSerializer& serializer);
+  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
   ~UI();
   void onLoad();
   void render();
@@ -62,14 +91,13 @@ private:
   void uiLoad();
   void configControl();
   void uiControl();
+  void loadShaderEditors();
+  void saveShaderEditors();
 
   void guiInfo();
   void guiControlsInfo();
   void guiMaterialParameters();
   void guiMaterialList();
-  void guiShaderLoad(std::string name, GLenum type);
-  std::string getShaderTypeName(GLenum type);
-  void guiShaderEditor();
   void guiShaderList();
   void guiObjectEditor();
   void guiObjectList();
@@ -82,7 +110,6 @@ private:
   std::function<void(CW::Renderer::iRenderer *window)> materialExplorerGui();
   std::function<void(CW::Renderer::iRenderer *window)> materialEditorGui();
   std::function<void(CW::Renderer::iRenderer *window)> shaderExplorerGui();
-  std::function<void(CW::Renderer::iRenderer *window)> shaderEditorGui();
   std::function<void(CW::Renderer::iRenderer *window)> objectExplorerGui();
   std::function<void(CW::Renderer::iRenderer *window)> objectEditorGui();
 };

@@ -5,68 +5,65 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <regex>
+
+#include <cmrc/cmrc.hpp>
 
 #include "config.h"
+#include "DataRecords.h"
 #include "Objects/Object.h"
-#include "Resources/Resources.h"
 #include "Objects/GameObject.h"
+#include "Resources/Resources.h"
 #include "Resources/Materials/Materials.h"
 
 
 
+namespace UW {
+  class GameObject; 
+}
+
+
+
 namespace UW{
-struct GameObjectRecord{
-  std::string name = "";
-  std::string mesh = "";
-  std::string shader = "";
-  glm::vec3 position = glm::vec3(0.0f);
-  glm::vec3 rotation = glm::vec3(0.0f);
-  glm::vec3 scale = glm::vec3(1.0f);
-  std::vector<std::string> textures;
-  std::vector<std::string> materials;
-
-  friend std::ostream& operator<<(std::ostream& os, const GameObjectRecord& record);
-  friend std::istream& operator>>(std::istream& is, GameObjectRecord& record);
-};
-
-struct MaterialsRecord{
-  std::string name = "";
-  glm::vec3 albedo = glm::vec3(1.0f);
-  float metallic = 0.0f;
-  float roughness = 1.0f;
-  glm::vec3 emission_color = glm::vec3(0.0f);
-  float emission_strength = 0.0f;
-  float ambient_occlusion = 1.0f;
-
-  friend std::ostream& operator<<(std::ostream& os, const MaterialsRecord& record);
-  friend std::istream& operator>>(std::istream& is, MaterialsRecord& record);
-};
-
-struct LightsRecord{
-  std::string name = "";
-  glm::vec3 position;
-  glm::vec3 color;
-  float strength;
-
-  friend std::ostream& operator<<(std::ostream& os, const LightsRecord& record);
-  friend std::istream& operator>>(std::istream& is, LightsRecord& record);
-};
-
-  
-
-
 class DataSerializer{
+private:
+  DataSerializer() = default;
+  ~DataSerializer() = default;
+
 public:
-  void save(std::vector<UW::GameObject> &objects);
-  void load(std::vector<UW::GameObject> &objects);
+  static DataSerializer& get();
 
-  void save(UW::Materials &materials);
-  void load(UW::Materials &materials);
+  DataSerializer(const DataSerializer&) = delete;
+  DataSerializer& operator=(const DataSerializer&) = delete;
+  DataSerializer(DataSerializer&&) = delete;
+  DataSerializer& operator=(DataSerializer&&) = delete;
 
-  void save(std::unordered_map<std::string, UW::Lights> &lights);
-  void load(std::unordered_map<std::string, UW::Lights> &lights);
+private:
+  void scanCmrcDirectory(const cmrc::embedded_filesystem& fs, const std::string& current_path, const std::string& pattern_str, std::vector<std::string>& out_mesh_files);
 
+public:
+  void saveAllObjects(std::vector<UW::GameObject> &objects);
+  void loadAllObjects(std::vector<UW::GameObject> &objects);
 
-  void save(const std::string& path_to_asset, GLuint type);
+  void saveAllMaterials(UW::Materials &materials);
+  void loadAllMaterials(UW::Materials &materials);
+
+  void saveAllLights(std::unordered_map<std::string, UW::Lights> &lights);
+  void loadAllLights(std::unordered_map<std::string, UW::Lights> &lights);
+
+  void saveMesh(const std::string& name, const CW::Renderer::Mesh& mesh);
+  void loadMesh(const std::string& path_to_mesh, std::unordered_map<std::string, CW::Renderer::Mesh> &meshes);
+
+  void saveAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
+  void loadAllMeshes(std::unordered_map<std::string, CW::Renderer::Mesh>& meshes);
+
+  void saveShaders(const std::string& shader_name, GLuint type);
+  void loadShader(const std::string& shader_name);
+
+  // void loadTextures(std::unordered_map<std::string, CW::Renderer::Texture>& textures);
+
+  void saveAll(std::vector<UW::GameObject> &objects);
+
+  void loadAll(std::vector<UW::GameObject> &objects);
 };
 }; // namespace UW
