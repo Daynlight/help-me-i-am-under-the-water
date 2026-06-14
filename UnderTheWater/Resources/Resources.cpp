@@ -1,4 +1,5 @@
 #include "Resources.h"
+#include "DataSerializer/DataSerializer.h"
 
 #include <cmrc/cmrc.hpp>
 CMRC_DECLARE(GameData);

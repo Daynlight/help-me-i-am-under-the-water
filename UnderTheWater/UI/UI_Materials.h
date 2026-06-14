@@ -5,6 +5,7 @@
 #include "Gui.h"
 
 #include "Resources/Resources.h"
+#include "Utils/Logger.h"
 
 #include "UI/Settings.h"
 

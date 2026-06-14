@@ -23,7 +23,11 @@ set(src
   "Objects/GameObject.cpp"
   "Objects/ObjectManager.cpp"
   "DataSerializer/DataSerializer.cpp"
-  "DataSerializer/DataRecords.cpp"
+  "DataSerializer/MeshSerialization.cpp"
+  "DataSerializer/ObjectsSerialization.cpp"
+  "DataSerializer/MaterialsSerialization.cpp"
+  "DataSerializer/LightsSerialization.cpp"
+  "DataSerializer/ShaderSerialization.cpp"
 )
 
 

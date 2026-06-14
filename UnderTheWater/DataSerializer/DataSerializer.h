@@ -11,17 +11,21 @@
 
 #include "config.h"
 #include "Utils/Logger.h"
-#include "DataSerializer/DataRecords.h"
 #include "Objects/Object.h"
 #include "Objects/GameObject.h"
-#include "Resources/Resources.h"
 #include "Resources/Materials/Materials.h"
+
+#include "DataSerializer/MeshSerialization.h"
+#include "DataSerializer/ObjectsSerialization.h"
+#include "DataSerializer/MaterialsSerialization.h"
+#include "DataSerializer/LightsSerialization.h"
+#include "DataSerializer/ShaderSerialization.h"
 
 
 
 namespace UW {
   class GameObject; 
-}
+};
 
 
 
@@ -30,6 +34,12 @@ class DataSerializer{
 private:
   DataSerializer() = default;
   ~DataSerializer() = default;
+
+  MeshSerialization mesh_serializer;
+  ObjectsSerialization objects_serializer;
+  MaterialsSerialization materials_serializer;
+  LightsSerialization lights_serializer;
+  ShaderSerialization shader_serializer;
 
 public:
   static DataSerializer& get();
