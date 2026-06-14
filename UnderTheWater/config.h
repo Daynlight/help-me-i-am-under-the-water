@@ -27,6 +27,9 @@ namespace UW::Config{
   inline const std::string OBJECTS_FILENAME = "Objects.obj";
   inline const std::string LIGHTS_FILENAME = "Lights.lit";
   inline const std::string WINDOW_TITLE = "Under the Water (Daniel Stodulski)";
+  inline const std::string DEFAULT_SHADER = "Default";
+  inline const std::string DEFAULT_MESH = "Default";
+  inline const std::string DEFAULT_TEXTURE = "Default";
   
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;
   inline constexpr bool DEFAULT_DEBUG_CAMERA_ON = true;

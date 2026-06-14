@@ -75,7 +75,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     }
   }
 
-  return textures["default_fallback"]; 
+  return textures[UW::Config::DEFAULT_TEXTURE]; 
 };
 
 
@@ -95,7 +95,7 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
     return ita->second;
   };
   
-  return shaders["default_fallback"];
+  return shaders[UW::Config::DEFAULT_SHADER];
 };
 
 
@@ -185,11 +185,11 @@ void UW::Resources::initMeshes(){
   std::vector<GLint> mat_id = {
     0, 0, 0, 0, 1, 1, 1, 1
   };
-  meshes["testing"].addVertices(vertices, 3, 0);
-  meshes["testing"].setData<GLfloat>(normals, 3, 1);
-  meshes["testing"].setData<GLfloat>(uvs, 2, 2);
-  meshes["testing"].setData<GLint>(mat_id, 1, 3);
-  meshes["testing"].addIndices(indices);
+  meshes[UW::Config::DEFAULT_MESH].addVertices(vertices, 3, 0);
+  meshes[UW::Config::DEFAULT_MESH].setData<GLfloat>(normals, 3, 1);
+  meshes[UW::Config::DEFAULT_MESH].setData<GLfloat>(uvs, 2, 2);
+  meshes[UW::Config::DEFAULT_MESH].setData<GLint>(mat_id, 1, 3);
+  meshes[UW::Config::DEFAULT_MESH].addIndices(indices);
 };
 
 

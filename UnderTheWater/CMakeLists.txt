@@ -7,6 +7,7 @@ set(src
   "App.cpp"
   "UI.cpp"
   "Logger.cpp"
+  "AssetLoader.cpp"
   "ObjectManager.cpp"
   "DataSerializer.cpp"
   "DataRecords.cpp"

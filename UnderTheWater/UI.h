@@ -13,6 +13,7 @@
 #include "DataSerializer.h"
 #include "Objects/GameObject.h"
 #include "Camera/Camera.h"
+#include "AssetLoader.h"
 
 
 
@@ -53,6 +54,7 @@ struct GuiSettings{
   bool objectExplorerWindowOn = false;
   bool objectEditorWindowOn = false;
   bool mesh_mode_on = false;
+  bool assetLoaderWindowOn = false;
   std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
   unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
   std::vector<std::pair<std::string, GLenum>> shader_editors_reg;
@@ -81,6 +83,7 @@ private:
   bool material_is_updated = false;
   bool mesh_mode_is_updated = false;
   std::vector<std::unique_ptr<ShaderEditor>> shader_editors;
+  std::unique_ptr<AssetLoader> asset_loader;
 
 public:
   UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
@@ -117,5 +120,6 @@ private:
   std::function<void(CW::Renderer::iRenderer *window)> shaderExplorerGui();
   std::function<void(CW::Renderer::iRenderer *window)> objectExplorerGui();
   std::function<void(CW::Renderer::iRenderer *window)> objectEditorGui();
+  std::function<void(CW::Renderer::iRenderer *window)> assetLoaderWindowGui();
 };
 };

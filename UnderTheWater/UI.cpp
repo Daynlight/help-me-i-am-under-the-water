@@ -104,6 +104,7 @@ UW::UI::UI(CW::Renderer::Renderer &window,  float &fps, bool &debug_camera_on, U
   
   shader_editors.reserve(20);
   gui.setWorkspace(appWorkspace());
+  asset_loader = std::make_unique<AssetLoader>(gui, object_manager);
 };
 
 
@@ -159,6 +160,7 @@ void UW::UI::configControl(){
     int value;
     if (sscanf(line, "InfoWindowOn=%d", &value) == 1) s->infoWindowOn = value;
     if (sscanf(line, "LogWindowOn=%d", &value) == 1) s->logWindowOn = value;
+    if (sscanf(line, "AssetLoaderWindowOn=%d", &value) == 1) s->assetLoaderWindowOn = value;
     if (sscanf(line, "MaterialExplorerOn=%d", &value) == 1) s->materialExplorerOn = value;
     if (sscanf(line, "MaterialEditorOn=%d", &value) == 1) s->materialEditorOn = value;
     if (sscanf(line, "ShaderExplorerWindowOn=%d", &value) == 1) s->shaderExplorerWindowOn = value;
@@ -185,6 +187,7 @@ void UW::UI::configControl(){
     out_buf->appendf("[%s][Main]\n", handler->TypeName);
     out_buf->appendf("InfoWindowOn=%d\n", guiSettings.infoWindowOn);
     out_buf->appendf("LogWindowOn=%d\n", guiSettings.logWindowOn);
+    out_buf->appendf("AssetLoaderWindowOn=%d\n", guiSettings.assetLoaderWindowOn);
     out_buf->appendf("MaterialExplorerOn=%d\n", guiSettings.materialExplorerOn);
     out_buf->appendf("MaterialEditorOn=%d\n", guiSettings.materialEditorOn);
     out_buf->appendf("ShaderExplorerWindowOn=%d\n", guiSettings.shaderExplorerWindowOn);
@@ -272,6 +275,12 @@ void UW::UI::uiControl(){
     Logger::get().info("UI", "Closing Object Explorer GUI");
     gui.deleteWindow("Object Editor");
   };
+  if(guiSettings.assetLoaderWindowOn){
+    Logger::get().info("UI", "Opening Asset Loader GUI");
+    gui.addWindow("Asset Loader", assetLoaderWindowGui());
+  } else {
+    gui.deleteWindow("Asset Loader");
+  };
 };
 
 
@@ -328,6 +337,10 @@ void UW::UI::menuBarGui(){
       };
       if(ImGui::MenuItem("Object Editor")){
         guiSettings.objectEditorWindowOn = !guiSettings.objectEditorWindowOn;
+        uiControl();
+      };
+      if(ImGui::MenuItem("Asset Loader")){
+        guiSettings.assetLoaderWindowOn = !guiSettings.assetLoaderWindowOn;
         uiControl();
       };
       ImGui::EndMenu();
@@ -641,17 +654,21 @@ void UW::UI::guiObjectEditor(){
   name_buffer[object.name.size()] = '\0';
   ImGui::InputText("name", name_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
   object.name = std::string(name_buffer + '\0');
-
+  
   char mesh_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
   memcpy(mesh_buffer, object.mesh.data(), object.mesh.size());
   mesh_buffer[object.mesh.size()] = '\0';
   ImGui::InputText("mesh", mesh_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+  auto itm = Resources::get().meshes.find(mesh_buffer);
+  if(itm == Resources::get().meshes.end()) return;
   object.mesh = std::string(mesh_buffer + '\0');
 
   char shader_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
   memcpy(shader_buffer, object.shader.data(), object.shader.size());
   shader_buffer[object.shader.size()] = '\0';
   ImGui::InputText("shader", shader_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+  auto its = Resources::get().shaders.find(shader_buffer);
+  if(its == Resources::get().shaders.end()) return;
   object.shader = std::string(shader_buffer + '\0');
 
 
@@ -678,6 +695,8 @@ void UW::UI::guiObjectEditor(){
     memcpy(texture_buffer, object.textures[i].data(), object.textures[i].size());
     texture_buffer[object.textures[i].size()] = '\0';
     ImGui::InputText(label.c_str(), texture_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    // auto itt = Resources::get().textures.find(texture_buffer);
+    // if(itt == Resources::get().textures.end()) return;
     object.textures[i] = std::string(texture_buffer + '\0');
     
     ImGui::SameLine();
@@ -697,6 +716,7 @@ void UW::UI::guiObjectEditor(){
     memcpy(material_buffer, object.materials[i].data(), object.materials[i].size());
     material_buffer[object.materials[i].size()] = '\0';
     ImGui::InputText(label.c_str(), material_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
+    if(!Resources::get().materials.find(material_buffer)) return;
     object.materials[i] = std::string(material_buffer + '\0');
     
     ImGui::SameLine();
@@ -714,4 +734,10 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectEditorGui(){
   return [this](CW::Renderer::iRenderer *window){
     guiObjectEditor();
   };
+};
+
+
+
+std::function<void(CW::Renderer::iRenderer *window)> UW::UI::assetLoaderWindowGui(){
+  return asset_loader->assetLoaderGui();
 };
