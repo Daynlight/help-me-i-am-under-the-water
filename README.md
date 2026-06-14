@@ -149,7 +149,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Compile flag for end product ```PRODUCTION```
 - [x] Logger UI
 - [x] Asset loader UI
-- [ ] Lights UI
+- [x] Lights UI
 - [ ] Full clean up
 - [ ] Full optimization
 </details>

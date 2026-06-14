@@ -55,6 +55,7 @@ struct GuiSettings{
   bool objectEditorWindowOn = false;
   bool mesh_mode_on = false;
   bool assetLoaderWindowOn = false;
+  bool lightsExplorerOn = false;
   std::string material_name = UW::Config::DEFAULT_GUI_MATERIAL;
   unsigned int object_id = UW::Config::DEFAULT_GUI_OBJECT;
   std::vector<std::pair<std::string, GLenum>> shader_editors_reg;
@@ -105,6 +106,7 @@ private:
   void guiLogs();
   void guiMaterialParameters();
   void guiMaterialList();
+  void guiLights();
   void guiShaderList();
   void guiObjectEditor();
   void guiObjectList();
@@ -121,5 +123,6 @@ private:
   std::function<void(CW::Renderer::iRenderer *window)> objectExplorerGui();
   std::function<void(CW::Renderer::iRenderer *window)> objectEditorGui();
   std::function<void(CW::Renderer::iRenderer *window)> assetLoaderWindowGui();
+  std::function<void(CW::Renderer::iRenderer *window)> lightsExplorerGui();
 };
 };

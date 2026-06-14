@@ -256,7 +256,7 @@ void UW::DataSerializer::saveAllLights(std::unordered_map<std::string, UW::Light
 
 void UW::DataSerializer::loadAllLights(std::unordered_map<std::string, UW::Lights> &lights) {
   Logger::get().info("DataSerializer", "Loading all lights...");
-  try{
+  try {
     auto fs = cmrc::GameData::get_filesystem();
     std::string resourcePath = UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME;
     
@@ -269,25 +269,29 @@ void UW::DataSerializer::loadAllLights(std::unordered_map<std::string, UW::Light
     std::string dataStr(embeddedFile.begin(), embeddedFile.end());
     std::stringstream inFile(dataStr);
 
-    size_t lightCount = 0;
+    unsigned int lightCount = 0;
     inFile.read(reinterpret_cast<char*>(&lightCount), sizeof(lightCount));
 
-    for (size_t i = 0; i < lightCount; ++i) {
+    lights.clear();
+
+    for (unsigned int i = 0; i < lightCount; ++i) {
       UW::LightsRecord record;
       if (inFile >> record) {
         UW::Light light(record.position, record.color, record.strength);
         lights[record.name].emplace_back(light);
-        lights[record.name].compile();
       } else {
-        Logger::get().erro("DataSerializer", "File format corrupted at object index " + std::to_string(i));
+        Logger::get().erro("DataSerializer", "File format corrupted at light index " + std::to_string(i));
         break;
       };
     };
+
+    for (auto& [name, lightGroup] : lights) lightGroup.compile();
+
     Logger::get().info("DataSerializer", "All lights have been loaded");
-  } catch(const std::exception& e){
-    Logger::get().erro("DataSerializer", "Exception caught during CMRC GameObject load - " + std::string(e.what()));
+  } catch(const std::exception& e) {
+    Logger::get().erro("DataSerializer", "Exception caught during CMRC Lights load - " + std::string(e.what()));
   }
-};
+}
 
 
 

@@ -160,8 +160,8 @@ void UW::UI::configControl(){
     int value;
     if (sscanf(line, "InfoWindowOn=%d", &value) == 1) s->infoWindowOn = value;
     if (sscanf(line, "LogWindowOn=%d", &value) == 1) s->logWindowOn = value;
-    if (sscanf(line, "AssetLoaderWindowOn=%d", &value) == 1) s->assetLoaderWindowOn = value;
     if (sscanf(line, "MaterialExplorerOn=%d", &value) == 1) s->materialExplorerOn = value;
+    if (sscanf(line, "LightsExplorerOn=%d", &value) == 1) s->lightsExplorerOn = value;
     if (sscanf(line, "MaterialEditorOn=%d", &value) == 1) s->materialEditorOn = value;
     if (sscanf(line, "ShaderExplorerWindowOn=%d", &value) == 1) s->shaderExplorerWindowOn = value;
     if (sscanf(line, "ShaderEditorWindowOn=%d", &value) == 1) s->shaderEditorWindowOn = value;
@@ -187,8 +187,8 @@ void UW::UI::configControl(){
     out_buf->appendf("[%s][Main]\n", handler->TypeName);
     out_buf->appendf("InfoWindowOn=%d\n", guiSettings.infoWindowOn);
     out_buf->appendf("LogWindowOn=%d\n", guiSettings.logWindowOn);
-    out_buf->appendf("AssetLoaderWindowOn=%d\n", guiSettings.assetLoaderWindowOn);
     out_buf->appendf("MaterialExplorerOn=%d\n", guiSettings.materialExplorerOn);
+    out_buf->appendf("LightsExplorerOn=%d\n", guiSettings.lightsExplorerOn);
     out_buf->appendf("MaterialEditorOn=%d\n", guiSettings.materialEditorOn);
     out_buf->appendf("ShaderExplorerWindowOn=%d\n", guiSettings.shaderExplorerWindowOn);
     out_buf->appendf("ShaderEditorWindowOn=%d\n", guiSettings.shaderEditorWindowOn);
@@ -275,6 +275,14 @@ void UW::UI::uiControl(){
     Logger::get().info("UI", "Closing Object Explorer GUI");
     gui.deleteWindow("Object Editor");
   };
+  if(guiSettings.lightsExplorerOn){
+    Logger::get().info("UI", "Opening Lights Explorer GUI");
+    gui.addWindow("Lights Editor", lightsExplorerGui());
+  }
+  else{
+    Logger::get().info("UI", "Closing Lights Explorer GUI");
+    gui.deleteWindow("Lights Editor");
+  };
   if(guiSettings.assetLoaderWindowOn){
     Logger::get().info("UI", "Opening Asset Loader GUI");
     gui.addWindow("Asset Loader", assetLoaderWindowGui());
@@ -327,6 +335,10 @@ void UW::UI::menuBarGui(){
         guiSettings.materialEditorOn = !guiSettings.materialEditorOn;
         uiControl();
       };
+      if(ImGui::MenuItem("Lights Explorer")){
+        guiSettings.lightsExplorerOn = !guiSettings.lightsExplorerOn;
+        uiControl();
+      };
       if(ImGui::MenuItem("Shader Explorer")){
         guiSettings.shaderExplorerWindowOn = !guiSettings.shaderExplorerWindowOn;
         uiControl();
@@ -339,12 +351,16 @@ void UW::UI::menuBarGui(){
         guiSettings.objectEditorWindowOn = !guiSettings.objectEditorWindowOn;
         uiControl();
       };
+      ImGui::EndMenu();
+    };
+
+    if(ImGui::BeginMenu("Assets")){
       if(ImGui::MenuItem("Asset Loader")){
         guiSettings.assetLoaderWindowOn = !guiSettings.assetLoaderWindowOn;
         uiControl();
       };
       ImGui::EndMenu();
-    }
+    };
     ImGui::EndMenuBar();
   };
 };
@@ -641,6 +657,58 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectExplorerGui()
 
 
 // ------------- //
+// Lights Editor //
+// ------------- //
+void UW::UI::guiLights(){
+  ImGui::SeparatorText("Lights");
+  bool lights_updated = false;
+
+  for(auto& lights : Resources::get().lights){
+    ImGui::SeparatorText(lights.first.c_str());
+
+    for(unsigned int i = 0; i < lights.second.size(); i++){
+      UW::Light& light = lights.second[i];
+      std::string label = lights.first + " (" + std::to_string(i) + ")"; 
+      ImGui::Text(label.c_str());
+      if(ImGui::InputFloat3(("position: [%f, %f, %f] ##" + lights.first + std::to_string(i)).c_str(), &light.position[0])) lights_updated = true;
+      if(ImGui::ColorEdit3(("color:  ##" + lights.first + std::to_string(i)).c_str(), &light.color[0])) lights_updated = true;
+      if(ImGui::InputFloat(("strength: %f ##" + lights.first + std::to_string(i)).c_str(), &light.strength)) lights_updated = true;
+
+      std::string delete_light_label = "Delete ##(" + std::to_string(i) + ")";
+      if(ImGui::Button(delete_light_label.c_str())) {
+        lights.second.erase(i);
+        Logger::get().info("UI", "Deleted Light from {" + lights.first + "} at {" + std::to_string(i) + "}");
+        lights_updated = true;
+      };
+
+      ImGui::Separator();
+    };
+
+    std::string add_light_label = "Add Light ##(" + std::to_string(lights.second.size()) + ")";
+    if(ImGui::Button(add_light_label.c_str())) {
+      lights.second.emplace_back(UW::Light({0, 0, 0}, {1, 1, 1}, 1));
+      Logger::get().info("UI", "Added Light to {" + lights.first + "} at {" + std::to_string(lights.second.size()) + "}");
+      lights_updated = true;
+    };
+  };
+
+  if(lights_updated){
+    DataSerializer::get().saveAllLights(Resources::get().lights);
+    Logger::get().info("UI", "Lights saved");
+  };
+};
+
+
+
+std::function<void(CW::Renderer::iRenderer *window)> UW::UI::lightsExplorerGui(){
+  return [this](CW::Renderer::iRenderer *window){
+    guiLights();
+  };
+};
+
+
+
+// ------------- //
 // Object Editor //
 // ------------- //
 void UW::UI::guiObjectEditor(){
@@ -695,8 +763,6 @@ void UW::UI::guiObjectEditor(){
     memcpy(texture_buffer, object.textures[i].data(), object.textures[i].size());
     texture_buffer[object.textures[i].size()] = '\0';
     ImGui::InputText(label.c_str(), texture_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE);
-    // auto itt = Resources::get().textures.find(texture_buffer);
-    // if(itt == Resources::get().textures.end()) return;
     object.textures[i] = std::string(texture_buffer + '\0');
     
     ImGui::SameLine();
@@ -738,6 +804,9 @@ std::function<void(CW::Renderer::iRenderer *window)> UW::UI::objectEditorGui(){
 
 
 
+// ------------- //
+// Assets Loader //
+// ------------- //
 std::function<void(CW::Renderer::iRenderer *window)> UW::UI::assetLoaderWindowGui(){
   return asset_loader->assetLoaderGui();
 };
