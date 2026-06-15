@@ -15,7 +15,6 @@
 
 namespace UW {
 struct LightsRecord {
-  std::string name = "";
   glm::vec3 position;
   glm::vec3 color;
   float strength;
@@ -37,9 +36,9 @@ public:
   void load(const std::string& name, UW::Light& light);
 
 #ifndef PRODUCTION
-  void saveAll(std::unordered_map<std::string, UW::Lights>& lights);
+  void saveAll(UW::Lights& lights);
 #endif
-  void loadAll(std::unordered_map<std::string, UW::Lights>& lights);
+  void loadAll(UW::Lights& lights);
 
 private:
 #ifndef PRODUCTION

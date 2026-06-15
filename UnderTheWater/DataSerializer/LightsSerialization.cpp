@@ -20,7 +20,7 @@ void UW::LightsSerialization::load(const std::string& name, UW::Light& light) {
 
 
 #ifndef PRODUCTION
-void UW::LightsSerialization::saveAll(std::unordered_map<std::string, UW::Lights>& lights) {
+void UW::LightsSerialization::saveAll(UW::Lights& lights) {
   Logger::get().info("LightsSerialization", "Saving all lights...");
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::LIGHTS_FILENAME);
@@ -37,25 +37,20 @@ void UW::LightsSerialization::saveAll(std::unordered_map<std::string, UW::Lights
     return;
   }
 
-  unsigned int size = 0;
-  for (const auto& el : lights) size += el.second.size();
+  unsigned int size = lights.size();
 
   outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-  for (const auto& el : lights) {
-    const UW::Lights& lights_data = el.second;
-    for(int i = 0; i < lights_data.size(); i++){
-      UW::Light light = lights_data.get(i);
-      UW::LightsRecord record;
-       
-      record.name = el.first;
-      record.position = light.position;
-      record.color = light.color;
-      record.strength = light.strength;
+  for(int i = 0; i < lights.size(); i++){
+    UW::Light light = lights.get(i);
+    UW::LightsRecord record;
+      
+    record.position = light.position;
+    record.color = light.color;
+    record.strength = light.strength;
 
-      outFile << record;
-    }
-  }
+    outFile << record;
+  };
 
   outFile.close();
   Logger::get().info("LightsSerialization", "All lights have been saved");
@@ -64,7 +59,7 @@ void UW::LightsSerialization::saveAll(std::unordered_map<std::string, UW::Lights
 
 
 
-void UW::LightsSerialization::loadAll(std::unordered_map<std::string, UW::Lights>& lights) {
+void UW::LightsSerialization::loadAll(UW::Lights& lights) {
   Logger::get().info("LightsSerialization", "Loading all lights...");
   try {
     auto fs = cmrc::GameData::get_filesystem();
@@ -88,14 +83,14 @@ void UW::LightsSerialization::loadAll(std::unordered_map<std::string, UW::Lights
       UW::LightsRecord record;
       if (inFile >> record) {
         UW::Light light(record.position, record.color, record.strength);
-        lights[record.name].emplace_back(light);
+        lights.emplace_back(light);
       } else {
         Logger::get().erro("LightsSerialization", "File format corrupted at index " + std::to_string(i));
         break;
-      }
-    }
+      };
+    };
 
-    for (auto& [name, lightGroup] : lights) lightGroup.compile();
+    lights.compile();
 
     Logger::get().info("LightsSerialization", "All lights have been loaded");
   } catch(const std::exception& e) {
@@ -107,10 +102,6 @@ void UW::LightsSerialization::loadAll(std::unordered_map<std::string, UW::Lights
 
 #ifndef PRODUCTION
 std::ostream& UW::operator<<(std::ostream& os, const UW::LightsRecord& record) {
-  size_t name_sz = record.name.size();
-  os.write(reinterpret_cast<const char*>(&name_sz), sizeof(size_t));
-  if(name_sz > 0) os.write(reinterpret_cast<const char*>(record.name.data()), name_sz);
-
   os.write(reinterpret_cast<const char*>(&record.position), sizeof(glm::vec3));
   os.write(reinterpret_cast<const char*>(&record.color), sizeof(glm::vec3));
   os.write(reinterpret_cast<const char*>(&record.strength), sizeof(float));
@@ -122,11 +113,6 @@ std::ostream& UW::operator<<(std::ostream& os, const UW::LightsRecord& record) {
 
 
 std::istream& UW::operator>>(std::istream& is, UW::LightsRecord& record) {
-  size_t name_sz = 0;
-  if (!is.read(reinterpret_cast<char*>(&name_sz), sizeof(name_sz))) return is;
-  record.name.resize(name_sz);
-  if (name_sz > 0) is.read(&record.name[0], name_sz);
-
   is.read(reinterpret_cast<char*>(&record.position), sizeof(glm::vec3));
   is.read(reinterpret_cast<char*>(&record.color), sizeof(glm::vec3));
   is.read(reinterpret_cast<char*>(&record.strength), sizeof(float));

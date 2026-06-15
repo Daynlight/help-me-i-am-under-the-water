@@ -197,6 +197,6 @@ void UW::Resources::initMeshes(){
 
 void UW::Resources::initLights(){
   UW::Light light(glm::vec3(0, 1000, 0), glm::vec3(1.0f, 1.0f,1.0f), 2.0f);
-  lights["static"] = {light};
-  lights["static"].compile();
+  lights.emplace_back({light});
+  lights.compile();
 };

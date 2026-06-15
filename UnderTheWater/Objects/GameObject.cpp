@@ -17,7 +17,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   uniform["view"]->set<glm::mat4>(render_camera.view(renderer));
   
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
-  uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
+  uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);

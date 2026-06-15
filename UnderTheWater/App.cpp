@@ -76,7 +76,7 @@ void UW::App::onDestroy() {
 void UW::App::render(){
   window.beginFrame();  
 
-  Resources::get().lights["static"].bind(0);
+  Resources::get().lights.bind(0);
   Resources::get().materials.bind(1);
 
   #ifndef PRODUCTION
@@ -97,7 +97,7 @@ void UW::App::render(){
   #endif
   
   Resources::get().materials.unbind();
-  Resources::get().lights["static"].unbind();
+  Resources::get().lights.unbind();
   
   #ifndef PRODUCTION
   ui.render();

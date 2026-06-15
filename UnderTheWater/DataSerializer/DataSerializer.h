@@ -61,9 +61,9 @@ public:
   void loadAllMaterials(UW::Materials &materials);
 
 #ifndef PRODUCTION
-  void saveAllLights(std::unordered_map<std::string, UW::Lights> &lights);
+  void saveAllLights(UW::Lights &lights);
 #endif
-  void loadAllLights(std::unordered_map<std::string, UW::Lights> &lights);
+  void loadAllLights(UW::Lights &lights);
 
 #ifndef PRODUCTION
   void saveMesh(const std::string& name, const CW::Renderer::Mesh& mesh);

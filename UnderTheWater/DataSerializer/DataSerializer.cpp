@@ -43,14 +43,14 @@ void UW::DataSerializer::loadAllMaterials(UW::Materials &materials) {
 
 
 #ifndef PRODUCTION
-void UW::DataSerializer::saveAllLights(std::unordered_map<std::string, UW::Lights> &lights) {
+void UW::DataSerializer::saveAllLights(UW::Lights &lights) {
   lights_serializer.saveAll(lights);
 };
 #endif
 
 
 
-void UW::DataSerializer::loadAllLights(std::unordered_map<std::string, UW::Lights> &lights) {
+void UW::DataSerializer::loadAllLights(UW::Lights &lights) {
   lights_serializer.loadAll(lights);
 };
 

@@ -20,9 +20,9 @@ class Resources{
 public:
   std::unordered_map<std::string, CW::Renderer::Texture> textures;
   std::unordered_map<std::string, CW::Renderer::Shader> shaders;
-  UW::Materials materials;
-  std::unordered_map<std::string, UW::Lights> lights;
   std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
+  UW::Lights lights;
+  UW::Materials materials;
 
 
 public:

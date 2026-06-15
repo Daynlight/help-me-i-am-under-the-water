@@ -30,7 +30,7 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
   uniform["projection"]->set(render_camera.transformation(renderer));
   uniform["view"]->set(glm::mat4(1.0f));
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
-  uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
+  uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   uniform["tessBound"]->set<glm::vec2>(UW::Config::TESS_BOUND);
   uniform["mapSize"]->set<glm::vec2>(map_size);
