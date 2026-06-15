@@ -38,5 +38,7 @@ public:
 
   bool validateVersion(unsigned int version);
   unsigned int getLatestsVersion();
+
+  void compileAll();
 };
 };

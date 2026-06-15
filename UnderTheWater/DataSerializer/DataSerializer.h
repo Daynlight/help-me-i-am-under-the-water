@@ -80,7 +80,7 @@ public:
 #endif
   void loadShader(const std::string& shader_name);
 
-  // void loadTextures(std::unordered_map<std::string, CW::Renderer::Texture>& textures);
+  void loadAllTextures();
 
 #ifndef PRODUCTION
   void saveAll(std::vector<UW::GameObject> &objects);

@@ -76,8 +76,6 @@ void UW::MeshSerialization::load(const std::string& path_to_mesh, UW::Meshes& me
     };
 
     meshes.emplace_back(record.name, std::move(engine_mesh));
-    // unsigned int mesh_id = meshes.get_id(record.name);
-    // meshes[mesh_id].compile();
     
     Logger::get().info("MeshSerialization", "Mesh loaded: " + record.name);
   } catch (const std::exception& e) {
@@ -119,6 +117,9 @@ void UW::MeshSerialization::loadAll(UW::Meshes& meshes) {
     for (const auto& file_path : mesh_files) {
       load(file_path, meshes);
     }
+
+    meshes.compileAll();
+
     Logger::get().info("MeshSerialization", "All meshes have been loaded");
   } catch (const std::exception& e) {
     Logger::get().erro("MeshSerialization", "CMRC EXCEPTION: " + std::string(e.what()));

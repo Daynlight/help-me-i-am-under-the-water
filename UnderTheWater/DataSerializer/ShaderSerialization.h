@@ -24,5 +24,7 @@ public:
   void save(const std::string& shader_name, GLuint type);
 #endif
   void load(const std::string& shader_name);
+
+  void loadAll();
 };
 }; // namespace UW

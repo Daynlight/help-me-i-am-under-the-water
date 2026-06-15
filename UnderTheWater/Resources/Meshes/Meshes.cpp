@@ -104,3 +104,10 @@ bool UW::Meshes::validateVersion(unsigned int version){
 unsigned int UW::Meshes::getLatestsVersion(){
   return version;
 };
+
+
+
+void UW::Meshes::compileAll(){
+  for(CW::Renderer::Mesh& mesh : mesh_data)
+    mesh.compile();
+};
