@@ -6,10 +6,10 @@
 
 #ifndef PRODUCTION
 #include "UI/UI.h"
-#include "Utils/Logger.h"
 #endif
 
 #include "config.h"
+#include "Utils/Logger.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
 #include "Objects/ObjectManager.h"
@@ -30,23 +30,22 @@ private:
   #ifndef PRODUCTION
   UW::UI ui;
   #endif
-
+  
   UW::Camera camera;
+  
   #ifndef PRODUCTION
   UW::Camera debug_camera;
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
-  #endif
 
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
 
-  #ifndef PRODUCTION
   float camera_swap_cooldown_acc = 0.0f;
+  float save_acc = 0.0f;
   #endif
 
   float fixed_update_time_acc = 0.0f;
-  float save_acc = 0.0f;
 
   // objects
   UW::Terrain terrain;
@@ -72,7 +71,10 @@ private:
 
   // helpers
   void initWindow();
+  
+#ifndef PRODUCTION
   void swapCamera();
   void updateFps();
+#endif
 };
 };

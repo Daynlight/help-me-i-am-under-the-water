@@ -66,6 +66,7 @@ void UW::App::onDestroy() {
   #ifndef PRODUCTION
   DataSerializer::get().saveAll(object_manager.objects);
   #endif
+  
   object_manager.objects.clear();
   Resources::get().destroy();
 };
@@ -109,10 +110,10 @@ void UW::App::render(){
 
 
 void UW::App::update(){
+#ifndef PRODUCTION
   updateFps();
-  #ifndef PRODUCTION
   swapCamera();
-  #endif
+#endif
 
   camera.event(&window);
   
@@ -161,8 +162,8 @@ void UW::App::initWindow(){
 
 
 
+#ifndef PRODUCTION
 void UW::App::swapCamera(){
-  #ifndef PRODUCTION
   if(window.getInputData()->is_key_down(UW::Config::SWAP_CAMERA_BTN) && camera_swap_cooldown_acc <= 0.0f) {
     debug_camera_on = !debug_camera_on;
     camera_swap_cooldown_acc = UW::Config::CAMERA_SWAP_COOLDOWN;
@@ -171,11 +172,12 @@ void UW::App::swapCamera(){
   };
 
   if(camera_swap_cooldown_acc >= 0.0f) camera_swap_cooldown_acc -= window.getWindowData()->delta_time;
-  #endif
 };
+#endif
 
 
 
+#ifndef PRODUCTION
 void UW::App::updateFps(){
   if(fps_id > UW::Config::FPS_SAMPLES){
     fps = fps_id / fps_acc;
@@ -187,3 +189,4 @@ void UW::App::updateFps(){
     fps_id++;
   };
 };
+#endif

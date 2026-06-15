@@ -185,4 +185,6 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Editor mode load from folder instead of cmrc 
 - [ ] Last Time Write sync
 - [ ] Script system
+- [ ] Move terrain, water, skybox to object_register vector.
+- [ ] Window Data Serialization.
 </details>
