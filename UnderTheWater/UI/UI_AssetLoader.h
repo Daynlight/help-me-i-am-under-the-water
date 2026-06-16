@@ -8,6 +8,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <cfloat>
 
 #include <string>
 #include <vector>
@@ -41,6 +43,10 @@ private:
   bool is_loaded = false;
   std::string load_error_msg = "";
 
+  std::vector<bool> mesh_import_toggles;
+  std::vector<int> mesh_mat_indices;
+  std::vector<bool> material_import_toggles;
+
   std::vector<TempAssetData> temp_meshes;
   std::vector<TempAssetData> temp_materials;
 
@@ -56,9 +62,9 @@ public:
 private:
   void clearTemporaryData();
   void finalizeImport();
-  void finalizeMaterials();
-  void finalizeMesh(aiMesh* aMesh, const std::string& final_mesh_name);
-
+  std::vector<int> finalizeMaterials();
+  void finalizeMesh(aiMesh* aMesh, const std::string& final_mesh_name, int custom_mat_id);
+  void finalizeImportMerged(const std::string& final_merged_name);
 };
 }; // namespace UW
 
