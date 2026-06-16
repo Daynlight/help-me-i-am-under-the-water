@@ -24,10 +24,10 @@ private:
   GLenum shader_type = 0;
 
 public:
-  UI_ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type);
+  UI_ShaderEditor(CW::Gui::Gui& gui, const std::string& name, GLenum type);
   ~UI_ShaderEditor();
 
-  void guiShaderLoad(std::string name, GLenum type);
+  void guiShaderLoad(const std::string& name, GLenum type);
   void guiShaderEditor();
   std::function<void(CW::Renderer::iRenderer *window)> shaderEditorGui();
 

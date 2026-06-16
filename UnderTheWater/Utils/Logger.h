@@ -20,7 +20,7 @@ struct Log{
   std::string module;
   std::string text;
 
-  Log(LogType type, const std::string module, const std::string text);
+  Log(LogType type, const std::string& module, const std::string& text);
   std::string getText() const;
 
   std::string getTypeText() const;
@@ -46,9 +46,9 @@ private:
   ~Logger() = default;
   
 public:
-  void info(const std::string module, const std::string text);
-  void warn(const std::string module, const std::string text);
-  void erro(const std::string module, const std::string text);
+  void info(const std::string& module, const std::string& text);
+  void warn(const std::string& module, const std::string& text);
+  void erro(const std::string& module, const std::string& text);
 
   const std::vector<Log>& getLogs() const ;
 

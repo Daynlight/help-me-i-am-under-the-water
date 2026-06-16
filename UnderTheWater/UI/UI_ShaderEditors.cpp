@@ -3,7 +3,7 @@
 
 
 
-UW::UI_ShaderEditor::UI_ShaderEditor(CW::Gui::Gui& gui, std::string name, GLenum type)
+UW::UI_ShaderEditor::UI_ShaderEditor(CW::Gui::Gui& gui, const std::string& name, GLenum type)
   :gui(gui), shader_name(name), shader_type(type){
 
   Logger::get().info("UI_ShaderEditor", "Opened { " + shader_name + " : " + UW::Config::SHADER_TYPE_TO_NAME[shader_type] + " }");
@@ -19,7 +19,7 @@ UW::UI_ShaderEditor::~UI_ShaderEditor(){
 
 
 
-void UW::UI_ShaderEditor::guiShaderLoad(std::string name, GLenum type){
+void UW::UI_ShaderEditor::guiShaderLoad(const std::string& name, GLenum type){
   if(shader_is_loaded) return;
 
   shader_name = name;

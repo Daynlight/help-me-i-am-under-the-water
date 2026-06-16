@@ -68,13 +68,13 @@ void UW::Materials::unbind(){
 
 
 
-unsigned int UW::Materials::translate_material(std::string name){
+unsigned int UW::Materials::translate_material(const std::string& name){
   return material_translate[name];
 };
 
 
 
-UW::Material& UW::Materials::operator[](std::string name){
+UW::Material& UW::Materials::operator[](const std::string& name){
   is_compiled = false;
   return material_reg[name];
 };
@@ -87,7 +87,7 @@ const std::unordered_map<std::string, UW::Material>& UW::Materials::getMaterialR
 
 
 
-bool UW::Materials::find(std::string name){
+bool UW::Materials::find(const std::string& name){
   auto it = material_reg.find(name);
   if(it == material_reg.end()) return false;
   return true;
@@ -95,7 +95,7 @@ bool UW::Materials::find(std::string name){
 
 
 
-UW::Material UW::Materials::getMaterial(std::string name){
+UW::Material UW::Materials::getMaterial(const std::string& name){
   return material_reg[name];
 };
 
@@ -109,7 +109,7 @@ void UW::Materials::clear(){
 
 
 
-void UW::Materials::erase(std::string name){
+void UW::Materials::erase(const std::string& name){
   is_compiled = false;
   material_reg.erase(name);
 };
@@ -122,7 +122,7 @@ unsigned int UW::Materials::size() const {
 
 
 
-void UW::Materials::emplace_back(std::string name, Material material){
+void UW::Materials::emplace_back(const std::string& name, Material material){
   is_compiled = false;
   material_reg[name] = material;
 };

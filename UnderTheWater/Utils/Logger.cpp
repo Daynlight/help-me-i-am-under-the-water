@@ -2,7 +2,7 @@
 
 
 
-UW::Log::Log(UW::LogType type, const std::string module, const std::string text)
+UW::Log::Log(UW::LogType type, const std::string& module, const std::string& text)
   :type(type), module(module), text(text){};
 
 
@@ -61,7 +61,7 @@ UW::Logger &UW::Logger::get(){
 
 
 
-void UW::Logger::info(const std::string module, const std::string text){
+void UW::Logger::info(const std::string& module, const std::string& text){
   #ifndef PRODUCTION
   data.emplace_back(UW::LogType::INFO, module, text);
   #endif
@@ -69,7 +69,7 @@ void UW::Logger::info(const std::string module, const std::string text){
 
 
 
-void UW::Logger::warn(const std::string module, const std::string text){
+void UW::Logger::warn(const std::string& module, const std::string& text){
   #ifndef PRODUCTION
   data.emplace_back(UW::LogType::WARN, module, text);
   #endif
@@ -77,7 +77,7 @@ void UW::Logger::warn(const std::string module, const std::string text){
 
 
 
-void UW::Logger::erro(const std::string module, const std::string text){
+void UW::Logger::erro(const std::string& module, const std::string& text){
   #ifndef PRODUCTION
   data.emplace_back(UW::LogType::ERRO, module, text);
   #endif

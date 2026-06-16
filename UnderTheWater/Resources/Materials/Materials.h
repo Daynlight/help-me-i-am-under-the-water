@@ -46,21 +46,21 @@ public:
   void unbind();
   
   void genVectors();
-  unsigned int translate_material(std::string name);
-  Material& operator[](std::string name);
+  unsigned int translate_material(const std::string& name);
+  Material& operator[](const std::string& name);
   const std::unordered_map<std::string, Material>& getMaterialReg();
 
-  bool find(std::string name);
+  bool find(const std::string& name);
 
-  Material getMaterial(std::string name);
+  Material getMaterial(const std::string& name);
 
   void clear();
 
-  void erase(std::string name);
+  void erase(const std::string& name);
 
   unsigned int size() const;
 
-  void emplace_back(std::string name, Material material);
+  void emplace_back(const std::string& name, Material material);
   void emplace_back(std::initializer_list<std::pair<std::string, Material>> materials);
 
 };
