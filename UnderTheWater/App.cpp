@@ -45,10 +45,6 @@ void UW::App::run(){
 void UW::App::onLoad(){
   Logger::get().info("App", "Loading Scene");
 
-  int w, h;
-  glfwGetFramebufferSize(window.getWindow(), &w, &h);
-  fbo.rescale(w, h);
-
   #ifndef PRODUCTION
   ui.onLoad();
   #endif
