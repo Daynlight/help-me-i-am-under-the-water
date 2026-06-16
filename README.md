@@ -142,35 +142,20 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Fix bug on delete material
 </details>
 
-<details open>
-<summary>🌟 Iteration 3 🌟 (10.06.2026)</summary>
+<details>
+<summary>🌟 Iteration 3 (15.06.2026)</summary>
   
 - [x] Mesh serialization.
 - [x] Compile flag for end product ```PRODUCTION```
-- [ ] Editor mode load from folder instead of cmrc 
-- [ ] Last Time Write sync
-- [ ] Editor Camera with movement
-- [ ] Fix CMRC bad alloc
-- [ ] Fix cube data
-- [ ] Mesh UI 
-- [ ] Log UI
-- [ ] Lights UI
-- [ ] Asset loader UI
-- [ ] Texture UI
-- [ ] Engine like Shaders, Assets, Textures:
-    - [ ] Bake into exe
-    - [ ] When edit save to folder
-    - [ ] Create new once
-    - [ ] Auto load update on folder change
-    - [ ] Explorers
-    - [ ] Editor
-- [ ] Full clean up
-- [ ] Full optimization
-- [ ] Optimization for Compile version (avoid maps)
+- [x] Logger UI
+- [x] Asset loader UI
+- [x] Lights UI
+- [x] Full clean up
+- [x] Full optimization
 </details>
 
-<details>
-<summary>Iteration 4 (14.06.2026)</summary>
+<details open>
+<summary> 🌟 Iteration 4 🌟 (21.06.2026)</summary>
 
 - [ ] Water surface shader
 - [ ] FBO Render to texture
@@ -179,5 +164,27 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Parallel Transport Layer
 - [ ] SDF ray-marching
 - [ ] Shadow Mapping
+</details>
+
+<details>
+<summary>Iteration 5</summary>
+
+- [ ] Engine like Shaders, Assets, Textures:
+    - [ ] Bake into exe
+    - [ ] When edit save to folder
+    - [ ] Create new once
+    - [ ] Auto load update on folder change
+    - [ ] Explorers
+    - [ ] Editor
+- [ ] Texture UI
+- [ ] Mesh UI 
+- [ ] Optimization for Compile version (avoid maps)
+- [ ] Fix CMRC bad alloc
+- [ ] Fix cube data
+- [ ] Editor Camera with movement
+- [ ] Editor mode load from folder instead of cmrc 
+- [ ] Last Time Write sync
 - [ ] Script system
+- [ ] Move terrain, water, skybox to object_register vector.
+- [ ] Window Data Serialization.
 </details>

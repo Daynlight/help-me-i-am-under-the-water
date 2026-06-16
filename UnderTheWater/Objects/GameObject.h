@@ -23,12 +23,14 @@ public:
   std::string shader = "";
   std::vector<std::string> textures;
   std::vector<std::string> materials;
+  unsigned int mesh_id = -1;
+  unsigned int mesh_version = -1;
   glm::vec3 position = glm::vec3(0.0f);
   glm::vec3 rotation = glm::vec3(0.0f);
   glm::vec3 scale = glm::vec3(1.0f);
 
 public:
-  GameObject(std::string name, std::string mesh, std::string shader, const std::vector<std::string>& materials = {}, const std::vector<std::string>& textures = {}, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
+  GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials = {}, const std::vector<std::string>& textures = {}, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
   ~GameObject();
 
   void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera) override;

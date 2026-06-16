@@ -4,6 +4,7 @@
 
 UW::Water::Water(){
   generateChunks();
+  mesh_id = Resources::get().meshes.get_id("terrain_chunk");
 };
 
 
@@ -27,10 +28,15 @@ void UW::Water::onFixedUpdate(){
 
 
 void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
+  if(Resources::get().meshes.validateVersion(mesh_version)){
+    mesh_version = Resources::get().meshes.getLatestsVersion();
+    mesh_id = Resources::get().meshes.get_id("terrain_chunk");
+  };
+  
   uniform["projection"]->set(render_camera.transformation(renderer));
   uniform["view"]->set(glm::mat4(1.0f));
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
-  uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
+  uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   uniform["tessBound"]->set<glm::vec2>(UW::Config::TESS_BOUND);
   uniform["mapSize"]->set<glm::vec2>(map_size);
@@ -51,11 +57,11 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(c.x * UW::Config::CHUNK_SIZE, 0.0f, c.y * UW::Config::CHUNK_SIZE));
     model = glm::scale(model, glm::vec3(UW::Config::CHUNK_SIZE));
     
-    if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes["terrain_chunk"])){
+    if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[mesh_id])){
       uniform["model"]->set<glm::mat4>(model);
       
       Resources::get().getShader("Water").bind();
-      Resources::get().meshes["terrain_chunk"].render(GL_PATCHES);
+      Resources::get().meshes[mesh_id].render(GL_PATCHES);
     };
   };
 

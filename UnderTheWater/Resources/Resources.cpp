@@ -1,4 +1,5 @@
 #include "Resources.h"
+#include "DataSerializer/DataSerializer.h"
 
 #include <cmrc/cmrc.hpp>
 CMRC_DECLARE(GameData);
@@ -30,6 +31,7 @@ void UW::Resources::destroy(){
   textures.clear();
   shaders.clear();
   materials.destroy();
+  lights.destroy();
   lights.clear();
 };
 
@@ -75,7 +77,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     }
   }
 
-  return textures["default_fallback"]; 
+  return textures[UW::Config::DEFAULT_TEXTURE]; 
 };
 
 
@@ -95,7 +97,7 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
     return ita->second;
   };
   
-  return shaders["default_fallback"];
+  return shaders[UW::Config::DEFAULT_SHADER];
 };
 
 
@@ -110,8 +112,11 @@ void UW::Resources::initMeshes(){
     1.0f, 0.0f, -1.0f,
     1.0f, 0.0f, 1.0f
   };
-  meshes["terrain_chunk"].addVertices(vertices, 3);
-  meshes["terrain_chunk"].addIndices({0,1,2,3});
+
+  CW::Renderer::Mesh terrain_mesh;
+  terrain_mesh.addVertices(vertices, 3);
+  terrain_mesh.addIndices({0,1,2,3});
+  meshes.emplace_back("terrain_chunk", std::move(terrain_mesh));
 
 
 
@@ -136,8 +141,11 @@ void UW::Resources::initMeshes(){
     4, 5, 1, 1, 0, 4,
     3, 2, 6, 6, 7, 3
   };
-  meshes["sky_box"].addVertices(vertices, 3, 0);
-  meshes["sky_box"].addIndices(indices);
+
+  CW::Renderer::Mesh sky_box_mesh;
+  sky_box_mesh.addVertices(vertices, 3, 0);
+  sky_box_mesh.addIndices(indices);
+  meshes.emplace_back("sky_box", std::move(sky_box_mesh));
 
 
 
@@ -185,17 +193,20 @@ void UW::Resources::initMeshes(){
   std::vector<GLint> mat_id = {
     0, 0, 0, 0, 1, 1, 1, 1
   };
-  meshes["testing"].addVertices(vertices, 3, 0);
-  meshes["testing"].setData<GLfloat>(normals, 3, 1);
-  meshes["testing"].setData<GLfloat>(uvs, 2, 2);
-  meshes["testing"].setData<GLint>(mat_id, 1, 3);
-  meshes["testing"].addIndices(indices);
+  CW::Renderer::Mesh default_mesh;
+  default_mesh.addVertices(vertices, 3, 0);
+  default_mesh.setData<GLfloat>(normals, 3, 1);
+  default_mesh.setData<GLfloat>(uvs, 2, 2);
+  default_mesh.setData<GLint>(mat_id, 1, 3);
+  default_mesh.addIndices(indices);
+  meshes.emplace_back(UW::Config::DEFAULT_MESH, std::move(default_mesh));
+
 };
 
 
 
 void UW::Resources::initLights(){
   UW::Light light(glm::vec3(0, 1000, 0), glm::vec3(1.0f, 1.0f,1.0f), 2.0f);
-  lights["static"] = {light};
-  lights["static"].compile();
+  lights.emplace_back({light});
+  lights.compile();
 };

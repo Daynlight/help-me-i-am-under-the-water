@@ -4,11 +4,11 @@
 #include <string.h>
 #include <cmath>
 
-#include "../../Resources/Resources.h"
-#include "../../Camera/Camera.h"
-#include "../../utils.h"
-#include "../../config.h"
-#include "../Object.h"
+#include "Resources/Resources.h"
+#include "Camera/Camera.h"
+#include "Utils/utils.h"
+#include "config.h"
+#include "Objects/Object.h"
 
 
 
@@ -19,6 +19,8 @@ private:
   std::vector<glm::vec2> chunks;
   glm::vec2 map_size = glm::vec2(0.0f);
   float elapsed_time = 0.0f;
+  unsigned int mesh_id = -1;
+  unsigned int mesh_version = -1;
 
 public:
   Water();

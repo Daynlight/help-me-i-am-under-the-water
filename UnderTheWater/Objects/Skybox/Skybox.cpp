@@ -3,7 +3,7 @@
 
 
 UW::Skybox::Skybox(){
-
+  mesh_id = Resources::get().meshes.get_id("sky_box");
 };
 
 
@@ -27,6 +27,11 @@ void UW::Skybox::onFixedUpdate(){
 
 
 void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
+  if(Resources::get().meshes.validateVersion(mesh_version)){
+    mesh_version = Resources::get().meshes.getLatestsVersion();
+    mesh_id = Resources::get().meshes.get_id("sky_box");
+  };
+
   glDepthFunc(GL_LEQUAL);
 
   uniform["projection"]->set<glm::mat4>(render_camera.projection(renderer));
@@ -38,7 +43,7 @@ void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera
   Resources::get().getTexture("Skybox/Skybox.png").bind(0); 
   Resources::get().getShader("Skybox").bind();
   
-  Resources::get().meshes["sky_box"].render();
+  Resources::get().meshes[mesh_id].render();
   
   Resources::get().getShader("Skybox").unbind();
   Resources::get().getTexture("Skybox/Skybox.png").unbind();

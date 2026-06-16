@@ -2,8 +2,10 @@
 
 
 
-UW::GameObject::GameObject(std::string name, std::string mesh, std::string shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {};
+UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {
+    mesh_id = Resources::get().meshes.get_id(mesh);
+  };
 
 
 
@@ -13,11 +15,16 @@ UW::GameObject::~GameObject(){
 
 
 void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_camera, Camera &render_camera){
+  if(Resources::get().meshes.validateVersion(mesh_version)){
+    mesh_version = Resources::get().meshes.getLatestsVersion();
+    mesh_id = Resources::get().meshes.get_id(this->mesh);
+  };
+
   uniform["projection"]->set<glm::mat4>(render_camera.projection(renderer));
   uniform["view"]->set<glm::mat4>(render_camera.view(renderer));
   
   uniform["cameraPosition"]->set<glm::vec3>(culling_camera.position);
-  uniform["lightCount"]->set<int>(Resources::get().lights["static"].size());
+  uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
@@ -27,7 +34,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
   glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
 
-  if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[this->mesh])){
+  if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[mesh_id])){
     uniform["model"]->set<glm::mat4>(model);
 
     for(unsigned int i = 0; i < textures.size(); i++){
@@ -47,7 +54,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     GLint loc = glGetUniformLocation(Resources::get().getShader(shader).getShaderProgram(), "mat_translate");
     glUniform1iv(loc, translation.size(), translation.data());
     
-    Resources::get().meshes[this->mesh].render();
+    Resources::get().meshes[mesh_id].render();
     
     Resources::get().getShader(this->shader).unbind();
 

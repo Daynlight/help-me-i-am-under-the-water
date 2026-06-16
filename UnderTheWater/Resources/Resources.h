@@ -8,11 +8,11 @@
 #include <filesystem>
 #include <iostream>
 
-#include "../utils.h"
+#include "Utils/utils.h"
 #include "config.h"
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
-#include "../DataSerializer.h"
+#include "Resources/Meshes/Meshes.h"
 
 
 
@@ -21,9 +21,9 @@ class Resources{
 public:
   std::unordered_map<std::string, CW::Renderer::Texture> textures;
   std::unordered_map<std::string, CW::Renderer::Shader> shaders;
+  UW::Meshes meshes;
+  UW::Lights lights;
   UW::Materials materials;
-  std::unordered_map<std::string, UW::Lights> lights;
-  std::unordered_map<std::string, CW::Renderer::Mesh> meshes;
 
 
 public:
