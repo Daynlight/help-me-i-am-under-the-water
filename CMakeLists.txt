@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 execute_process(
   COMMAND git submodule update --init --recursive
 )
@@ -13,4 +17,7 @@ cmrc_add_resource_library(GameData ${GameDataSet})
 
 add_subdirectory(UnderTheWater)
 
-# target_compile_definitions(UnderTheWater PRIVATE PRODUCTION)
+option(PRODUCTION "Enable production build flags" OFF)
+if(PRODUCTION)
+  add_compile_definitions(PRODUCTION)
+endif()
