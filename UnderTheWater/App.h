@@ -38,6 +38,7 @@ private:
   #ifndef PRODUCTION
   UW::Camera debug_camera;
   bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
+  bool post_processing_on = UW::Config::DEFAULT_POST_PROCESSING_ON;
 
   float fps = 0.0f;
   float fps_acc = 0.0f;
@@ -73,6 +74,7 @@ private:
 
   // helpers
   void initWindow();
+  void postProcessing();
   
 #ifndef PRODUCTION
   void swapCamera();

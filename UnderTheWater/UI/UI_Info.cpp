@@ -4,8 +4,8 @@
 
 
 
-UW::UI_Info::UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on)
-  :gui(gui), camera(camera), debug_camera(debug_camera), fps(fps), debug_camera_on(debug_camera_on){};
+UW::UI_Info::UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on, bool &post_processing_on)
+  :gui(gui), camera(camera), debug_camera(debug_camera), fps(fps), debug_camera_on(debug_camera_on), post_processing_on(post_processing_on){};
 
 
 
@@ -52,6 +52,8 @@ inline void UW::UI_Info::guiInfo(){
       Logger::get().info("UI", "Changed Draw Mode To Normal");
     };
   };
+
+  if(ImGui::Checkbox("Post Processing", &post_processing_on));
 };
 
 

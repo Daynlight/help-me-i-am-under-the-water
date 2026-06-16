@@ -17,6 +17,7 @@ class UI_Info{
 private:
   float &fps;
   bool &debug_camera_on;
+  bool &post_processing_on;
   bool mesh_mode_is_updated = false;
   UW::Camera &camera;
   UW::Camera &debug_camera;
@@ -24,7 +25,7 @@ private:
   CW::Gui::Gui& gui;
 
 public:
-  UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on);
+  UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on, bool &post_processing_on);
   ~UI_Info();
   void uiControl();
 

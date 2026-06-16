@@ -45,7 +45,7 @@ private:
   UW::UI_Shaders shader_ui;
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
+  UI(CW::Renderer::Renderer &window, float &fps, bool& post_processing_on, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
   ~UI();
   void onLoad();
   void render();

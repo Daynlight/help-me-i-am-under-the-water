@@ -6,9 +6,9 @@
 // ========== APP ========== //
 // ========================= //
 UW::App::App()
-  :camera(&window)
+  :camera(&window), fbo(1920, 1080)
   #ifndef PRODUCTION
-  , debug_camera(&window), ui(window, fps, debug_camera_on, camera, debug_camera, object_manager), fbo(800, 600)
+  , debug_camera(&window), ui(window, fps, post_processing_on, debug_camera_on, camera, debug_camera, object_manager)
   #endif
   {
   Logger::get().info("App", "App Initialization");
@@ -110,7 +110,13 @@ void UW::App::render(){
   glfwGetFramebufferSize(window.getWindow(), &width, &height);
   glViewport(0, 0, width, height);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  fbo.blitToScreen(width, height);
+
+  #ifndef PRODUCTION
+  if(!post_processing_on)
+    fbo.blitToScreen(width, height);
+  else
+  #endif
+    postProcessing();
 
   #ifndef PRODUCTION
   ui.render();
@@ -171,6 +177,58 @@ void UW::App::initWindow(){
   window.setWindowTitle(UW::Config::WINDOW_TITLE);
   window.setCursorVisibility(UW::Config::DEFAULT_CURSOR_IS_VISIBLE);
   window.setVsync(UW::Config::VSYNC);
+};
+
+
+
+void UW::App::postProcessing(){
+  CW::Renderer::Uniform post_uniform; 
+
+  unsigned int quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
+
+  std::string shader_name = "PostProcessing";
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, fbo.getColorTexture());
+  post_uniform["u_SceneColorTexture"]->set<int>(0);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, fbo.getDepthTexture());
+  post_uniform["u_SceneDepthTexture"]->set<int>(1);
+
+  post_uniform["u_water_height"]->set<float>(UW::Config::WATER_HEIGHT);
+  post_uniform["u_Near"]->set<float>(0.1f);
+  post_uniform["u_Far"]->set<float>(4000.0f);
+  post_uniform["u_FogDensity"]->set<float>(0.003f);
+  glm::vec3 fog_color = {0.0f, 0.4f, 0.55f};
+  post_uniform["u_FogColor"]->set<glm::vec3>(fog_color);
+
+#ifndef PRODUCTION
+  if(debug_camera_on){
+    glm::mat4 invViewProj = glm::inverse(debug_camera.projection(&window) * debug_camera.view(&window));
+    post_uniform["u_InvViewProj"]->set<glm::mat4>(invViewProj);
+    post_uniform["u_CamPos"]->set<glm::vec3>(debug_camera.position);
+  }
+  else{
+#endif
+    glm::mat4 invViewProj = glm::inverse(camera.projection(&window) * camera.view(&window));
+    post_uniform["u_InvViewProj"]->set<glm::mat4>(invViewProj);
+    post_uniform["u_CamPos"]->set<glm::vec3>(camera.position);
+#ifndef PRODUCTION
+  }
+#endif
+
+  Resources::get().getShader(shader_name).getUniforms().emplace_back(&post_uniform);
+  
+  Resources::get().getShader(shader_name).bind();
+  
+  Resources::get().meshes[quad_mesh_id].render();
+  
+  Resources::get().getShader(shader_name).unbind();
+  Resources::get().getShader(shader_name).getUniforms().clear();
+
+  glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, 0);
 };
 
 

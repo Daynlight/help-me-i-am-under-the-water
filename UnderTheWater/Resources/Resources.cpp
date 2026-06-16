@@ -120,6 +120,36 @@ void UW::Resources::initMeshes(){
 
 
 
+  // =================================== //
+  // ========== Screen Quad ============ //
+  // =================================== //
+  std::vector<float> quad_vertices = {
+    -1.0f,  1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+    1.0f,  1.0f, 0.0f
+  };
+
+  std::vector<float> quad_uvs = {
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f
+  };
+
+  std::vector<unsigned int> quad_indices = {
+    0, 1, 2,
+    0, 2, 3 
+  };
+
+  CW::Renderer::Mesh screen_quad;
+  screen_quad.addVertices(quad_vertices, 3, 0);
+  screen_quad.setData<float>(quad_uvs, 2, 1);
+  screen_quad.addIndices(quad_indices);
+  meshes.emplace_back("screen_quad", std::move(screen_quad));
+
+
+  
   // ====================== //
   // ======= SkyBox ======= //
   // ====================== //

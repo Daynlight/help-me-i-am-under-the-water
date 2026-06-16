@@ -157,9 +157,8 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 <details open>
 <summary> 🌟 Iteration 4 🌟 (21.06.2026)</summary>
 
-- [ ] Water surface shader
-- [ ] FBO Render to texture
-- [ ] Under water fog
+- [x] FBO Render to texture
+- [x] Under water fog
 - [ ] Quaternion Camera
 - [ ] Parallel Transport Layer
 - [ ] SDF ray-marching
