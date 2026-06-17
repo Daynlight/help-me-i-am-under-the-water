@@ -80,7 +80,7 @@ void UW::App::render(){
   UW::Camera light_camera(&window);
   light_camera.fov = 110.0f;
   light_camera.position = Resources::get().lights[0].position;
-  light_camera.direction = - Resources::get().lights[0].position;
+  light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
   glm::mat4 light_space_matrix = light_camera.transformation(&window);
   
   CW::Renderer::Uniform shadows_uniform1;
