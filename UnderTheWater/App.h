@@ -35,6 +35,7 @@ private:
   #endif
   
   UW::Camera camera;
+  UW::Camera light_camera;
   
   #ifndef PRODUCTION
   UW::Camera debug_camera;

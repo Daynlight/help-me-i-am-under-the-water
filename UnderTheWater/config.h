@@ -65,7 +65,9 @@ namespace UW::Config{
   inline constexpr float CAMERA_ROLL_INTERPOLATION_SPEED = 10.0f;
   inline constexpr float CAMERA_FOV = 80.0f;
   inline constexpr float CAMERA_NEAR_PLANE = 0.1f;
-  inline constexpr float CAMERA_FAR_PLANE = 40000.0f;
+  inline constexpr float CAMERA_FAR_PLANE = 4000.0f;
+  inline constexpr float CAMERA_ORTHO_FAR_PLANE = 40000000.0f;
+  inline constexpr float CAMERA_ORTHO_SIZE = 10000.0f;
 
   inline std::unordered_map<std::string, GLuint> SHADER_NAME_TO_TYPE = {
     {"vertex.glsl", GL_VERTEX_SHADER},

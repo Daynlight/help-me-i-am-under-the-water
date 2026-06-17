@@ -48,10 +48,19 @@ glm::mat4 UW::Camera::view(CW::Renderer::Renderer* renderer){
 
 
 
-glm::mat4 UW::Camera::projection(CW::Renderer::Renderer* renderer){
+glm::mat4 UW::Camera::projection(CW::Renderer::Renderer* renderer) {
   float aspectRatio = renderer->getWindowData()->width / (float)renderer->getWindowData()->height;
-  return glm::perspective(glm::radians(fov), aspectRatio, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_FAR_PLANE);
-};
+
+  if (is_ortho) {
+    float orthoSize = UW::Config::CAMERA_ORTHO_SIZE; 
+    float halfWidth = (orthoSize * aspectRatio) * 0.5f;
+    float halfHeight = orthoSize * 0.5f;
+
+    return glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_ORTHO_FAR_PLANE);
+  } else {
+    return glm::perspective(glm::radians(UW::Config::CAMERA_FOV), aspectRatio, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_FAR_PLANE);
+  }
+}
 
 
 
@@ -119,6 +128,12 @@ void UW::Camera::event(CW::Renderer::Renderer* renderer) {
 
   rotate(mouse_is_active ? xoffset : 0.0f, mouse_is_active ? yoffset : 0.0f, zoffset);
   mouse_is_active = true;
+};
+
+
+
+void UW::Camera::setOrthographic(bool enable){
+  is_ortho = enable;
 };
 
 

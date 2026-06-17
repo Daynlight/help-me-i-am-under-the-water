@@ -20,6 +20,7 @@ public:
   
 private:
   glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f); 
+  bool is_ortho = false;
 
   float sensitivity = UW::Config::CAMERA_SENSITIVITY;
   float velocity = UW::Config::CAMERA_DEFAULT_VELOCITY;
@@ -44,6 +45,7 @@ public:
   glm::mat4 view(CW::Renderer::Renderer* renderer);
   void resetMouse();
   void event(CW::Renderer::Renderer* renderer);
+  void setOrthographic(bool enable);
 
 };
 };

@@ -6,7 +6,7 @@
 // ========== APP ========== //
 // ========================= //
 UW::App::App()
-  :camera(&window), fbo(1920, 1080), shadows_fbo(1920, 1080)
+  :camera(&window), light_camera(&window), fbo(1920, 1080), shadows_fbo(800, 600)
   #ifndef PRODUCTION
   , debug_camera(&window), ui(window, fps, post_processing_on, debug_camera_on, camera, debug_camera, object_manager)
   #endif
@@ -76,8 +76,7 @@ void UW::App::onDestroy() {
 
 void UW::App::render(){
   shadows_fbo.bind();
-
-  UW::Camera light_camera(&window);
+  light_camera.setOrthographic(true);
   light_camera.fov = 110.0f;
   light_camera.position = Resources::get().lights[0].position;
   light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
@@ -101,6 +100,15 @@ void UW::App::render(){
 
   shadows_fbo.unbind();
 
+  // int w, h;
+  // glfwGetFramebufferSize(window.getWindow(), &w, &h);
+  // shadows_fbo.blitToScreen(w, h);
+  // #ifndef PRODUCTION
+  // ui.render();
+  // #endif
+  // window.windowEvents();
+  // window.swapBuffer();
+  // return;
 
   fbo.bind();
 
@@ -111,6 +119,7 @@ void UW::App::render(){
   CW::Renderer::Uniform shadows_uniform;
   shadows_uniform["u_ShadowEnabled"]->set<int>(1);
   shadows_uniform["u_ShadowDepthTexture"]->set<int>(16);
+  // glm::mat4 light_space_matrix = light_camera.transformation(&window);
   shadows_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
 
   Resources::get().lights.bind(0);
