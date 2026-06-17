@@ -52,8 +52,8 @@ void UW::App::onLoad(){
   camera.position = {779.276f, 101.339f, 1218.920f};
   camera.direction = {-0.873f, -0.198f, -0.447f};
   #ifndef PRODUCTION
-  debug_camera.position = {1157, 2048, 1310};
-  debug_camera.direction = {-0.57, -0.76, -0.28};
+  debug_camera.position = {1468.995, 2074.450, 1875.771};
+  debug_camera.direction = {-0.327, -0.919, -0.220};
   #endif
 
   DataSerializer::get().loadAll(object_manager.objects);

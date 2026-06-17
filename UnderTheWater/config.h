@@ -35,8 +35,6 @@ namespace UW::Config{
   inline constexpr bool DEFAULT_CURSOR_IS_VISIBLE = true;
   inline constexpr bool DEFAULT_DEBUG_CAMERA_ON = true;
   inline constexpr bool DEFAULT_POST_PROCESSING_ON = true;
-  inline constexpr float CAMERA_SWAP_COOLDOWN = 0.5f;
-  inline constexpr float CAMERA_DEFAULT_VELOCITY = 200.0f;
 
   inline constexpr float MAX_HEIGHT = 1024.0f;
   inline constexpr float WATER_HEIGHT = 1000.0f;
@@ -53,6 +51,21 @@ namespace UW::Config{
   inline const std::string CAMERA_MOVE_BACK = "S";
   inline const std::string CAMERA_MOVE_RIGHT = "D";
   inline const std::string CAMERA_MOVE_LEFT = "A";
+  inline const std::string CAMERA_ROLL_LEFT = "Q";
+  inline const std::string CAMERA_ROLL_RIGHT = "E";
+
+  inline constexpr float CAMERA_SWAP_COOLDOWN = 0.5f;
+  inline constexpr float CAMERA_DEFAULT_VELOCITY = 200.0f;
+  inline constexpr float CAMERA_SENSITIVITY = 0.1f;
+  inline constexpr float CAMERA_ACCELERATION_RATE = 40.0f;
+  inline constexpr float CAMERA_MIN_VELOCITY = 1.1f;
+  inline constexpr float CAMERA_TILT_ACCELERATION = 8.0f;
+  inline constexpr float CAMERA_MAX_TILT = 30.0f;
+  inline constexpr float CAMERA_MANUAL_ROLL_SPEED = 60.0f;
+  inline constexpr float CAMERA_ROLL_INTERPOLATION_SPEED = 10.0f;
+  inline constexpr float CAMERA_FOV = 80.0f;
+  inline constexpr float CAMERA_NEAR_PLANE = 0.1f;
+  inline constexpr float CAMERA_FAR_PLANE = 4000.0f;
 
   inline std::unordered_map<std::string, GLuint> SHADER_NAME_TO_TYPE = {
     {"vertex.glsl", GL_VERTEX_SHADER},
