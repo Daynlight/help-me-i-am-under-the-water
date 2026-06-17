@@ -6,7 +6,7 @@
 // ========== APP ========== //
 // ========================= //
 UW::App::App()
-  :camera(&window), fbo(1920, 1080)
+  :camera(&window), fbo(1920, 1080), shadows_fbo(1920, 1080)
   #ifndef PRODUCTION
   , debug_camera(&window), ui(window, fps, post_processing_on, debug_camera_on, camera, debug_camera, object_manager)
   #endif
@@ -75,23 +75,57 @@ void UW::App::onDestroy() {
 
 
 void UW::App::render(){
+  shadows_fbo.bind();
+
+  UW::Camera light_camera(&window);
+  light_camera.fov = 110.0f;
+  light_camera.position = Resources::get().lights[0].position;
+  light_camera.direction = - Resources::get().lights[0].position;
+  glm::mat4 light_space_matrix = light_camera.transformation(&window);
+  
+  CW::Renderer::Uniform shadows_uniform1;
+  shadows_uniform1["u_ShadowEnabled"]->set<int>(0);
+  shadows_uniform1["u_ShadowDepthTexture"]->set<int>(16);
+  shadows_uniform1["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
+
+  window.beginFrame();
+
+  Resources::get().lights.bind(0);
+  Resources::get().materials.bind(1);
+
+  terrain.render(&window, light_camera, light_camera, shadows_uniform1);
+  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera);
+  
+  Resources::get().materials.unbind();
+  Resources::get().lights.unbind();
+
+  shadows_fbo.unbind();
+
+
   fbo.bind();
 
-  window.beginFrame();  
+  window.beginFrame();
+
+  glActiveTexture(GL_TEXTURE16);
+  glBindTexture(GL_TEXTURE_2D, shadows_fbo.getDepthTexture());
+  CW::Renderer::Uniform shadows_uniform;
+  shadows_uniform["u_ShadowEnabled"]->set<int>(1);
+  shadows_uniform["u_ShadowDepthTexture"]->set<int>(16);
+  shadows_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
 
   Resources::get().lights.bind(0);
   Resources::get().materials.bind(1);
 
   #ifndef PRODUCTION
   if(debug_camera_on){ 
-    terrain.render(&window, camera, debug_camera);
+    terrain.render(&window, camera, debug_camera, shadows_uniform);
     skybox.render(&window, camera, debug_camera); 
     water.render(&window, camera, debug_camera);
     for(UW::GameObject& object : object_manager.objects) object.render(&window, camera, debug_camera);
   }
   else {
   #endif
-    terrain.render(&window, camera, camera);
+    terrain.render(&window, camera, camera, shadows_uniform);
     skybox.render(&window, camera, camera);
     water.render(&window, camera, camera);
     for(UW::GameObject& object : object_manager.objects) object.render(&window, camera, camera);
@@ -101,6 +135,9 @@ void UW::App::render(){
   
   Resources::get().materials.unbind();
   Resources::get().lights.unbind();
+
+  glActiveTexture(GL_TEXTURE16);
+  glBindTexture(GL_TEXTURE_2D, 0);
   fbo.unbind();
   
   int width, height;

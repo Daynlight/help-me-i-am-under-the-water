@@ -46,9 +46,11 @@ glm::mat4 UW::Camera::view(CW::Renderer::Renderer* renderer){
   return glm::lookAt(position, position + direction, dynamicUp);
 };
 
+
+
 glm::mat4 UW::Camera::projection(CW::Renderer::Renderer* renderer){
   float aspectRatio = renderer->getWindowData()->width / (float)renderer->getWindowData()->height;
-  return glm::perspective(glm::radians(UW::Config::CAMERA_FOV), aspectRatio, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_FAR_PLANE);
+  return glm::perspective(glm::radians(fov), aspectRatio, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_FAR_PLANE);
 };
 
 

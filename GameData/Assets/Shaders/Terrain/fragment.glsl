@@ -4,10 +4,13 @@ out vec4 FragColor;
 
 in vec3 FragPosition;
 in vec3 Normal;
+in vec4 FragPosLightSpace;
 
 uniform int lightCount;
 uniform vec3 cameraPosition;
 uniform int material_id;
+uniform int u_ShadowEnabled;
+uniform sampler2D u_ShadowDepthTexture;
 
 struct Light {
   vec3 position;
@@ -32,61 +35,20 @@ layout(std430, binding = 1) buffer MaterialsBuffer {
   Material material[];
 };
 
-
 const float PI = 3.14159265359;
-
-float DistributionGGX(vec3 N, vec3 H, float roughness){
-  float a = roughness * roughness;
-  float a2 = a * a;
-
-  float NdotH = max(dot(N, H), 0.0);
-  float NdotH2 = NdotH * NdotH;
-
-  float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-  denom = PI * denom * denom;
-
-  return a2 / max(denom, 0.0001);
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness){
-  float r = roughness + 1.0;
-  float k = (r * r) / 8.0;
-
-  return NdotV / (NdotV * (1.0 - k) + k);
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness){
-  float NdotV = max(dot(N, V), 0.0);
-  float NdotL = max(dot(N, L), 0.0);
-
-  return GeometrySchlickGGX(NdotV, roughness) * GeometrySchlickGGX(NdotL, roughness);
-}
-
-vec3 FresnelSchlick(vec3 V, vec3 H, vec3 albedo, float metallic){
-  float cosTheta = max(dot(V, H), 0.0);  
-  vec3 F0 = vec3(0.04);
-  F0 = mix(F0, albedo, metallic);
-
-  return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
 
 float Calc_D(float NdotH, float roughness){
   float a = roughness * roughness;
   float a2 = a * a;
-
   float denom = NdotH * NdotH * (a2 - 1.0) + 1.0;
-  float D = a2 / (PI * denom * denom + 0.0001);
-  return D;
+  return a2 / (PI * denom * denom + 0.0001);
 }
 
 float GGX(float NdotV, float NdotL, float roughness){
-  float k = (roughness + 1.0);
-  k = (k * k) / 8.0;
-
+  float k = (roughness + 1.0); k = (k * k) / 8.0;
   float G1 = NdotL / (NdotL * (1.0 - k) + k);
   float G2 = NdotV / (NdotV * (1.0 - k) + k);
-  float G = G1 * G2;
-  return G;
+  return G1 * G2;
 }
 
 vec3 Specular(float NdotL, float NdotV, float D, float G, vec3 Fresnel){
@@ -94,27 +56,40 @@ vec3 Specular(float NdotL, float NdotV, float D, float G, vec3 Fresnel){
 }
 
 vec3 Diffuse(vec3 Fresnel, vec3 albedo, float metallic){
-  vec3 kS = Fresnel;
-  vec3 kD = (1.0 - kS) * (1.0 - metallic);
-
-  vec3 diffuse = kD * albedo / PI;
-  return diffuse;
+  vec3 kS = Fresnel; vec3 kD = (1.0 - kS) * (1.0 - metallic);
+  return kD * albedo / PI;
 }
 
+vec3 FresnelSchlick(vec3 V, vec3 H, vec3 albedo, float metallic){
+  float cosTheta = max(dot(V, H), 0.0); vec3 F0 = mix(vec3(0.04), albedo, metallic);
+  return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
 
+float CalculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
+  vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+  projCoords = projCoords * 0.5 + 0.5;
+
+  float currentDepth = projCoords.z;
+  float bias = max(0.002 * (1.0 - dot(normal, lightDir)), 0.0005);
+  vec2 texelSize = 1.0 / textureSize(u_ShadowDepthTexture, 0);
+  float shadow = 0.0;
+
+  for(int x = -1; x <= 1; ++x) {
+    for(int y = -1; y <= 1; ++y) {
+      float pcfDepth = texture(
+        u_ShadowDepthTexture,
+        projCoords.xy + vec2(x, y) * texelSize
+      ).r;
+      shadow += (currentDepth - bias > pcfDepth) ? 1.0 : 0.0;
+    }
+  }
+
+  return shadow / 9.0;
+}
 
 vec3 BRDF(
-  vec3 Normal,
-  vec3 FragPos,
-  vec3 cameraPos,
-  vec3 lightPos,
-  vec3 lightColor,
-  vec3 albedo,
-  float metallic,
-  float roughness,
-  vec3 emission_color,
-  float emission_strength,
-  float ambient_occlusion
+  vec3 Normal, vec3 FragPos, vec3 cameraPos, vec3 lightPos, vec3 lightColor,
+  vec3 albedo, float metallic, float roughness, bool isFirstLight
 )
 {
   vec3 N = normalize(Normal);
@@ -127,39 +102,41 @@ vec3 BRDF(
   float NdotH = max(dot(N, H), 0.0);
 
   vec3 Fresnel = FresnelSchlick(V, H, albedo, metallic);
-
   float D = Calc_D(NdotH, roughness);
   float G = GGX(NdotV, NdotL, roughness);
 
   vec3 specular = Specular(NdotL, NdotV, D, G, Fresnel);
   vec3 diffuse = Diffuse(Fresnel, albedo, metallic); 
 
-  vec3 lighting = (diffuse + specular) * lightColor * NdotL;
-  vec3 ambient = 0.03 * albedo * ambient_occlusion;
-  vec3 emissiveColor = emission_color * emission_strength;
+  float shadow = 0.0;
+  if (isFirstLight && u_ShadowEnabled == 1) {
+    shadow = CalculateShadow(FragPosLightSpace, N, L);
+  }
 
-  return lighting + ambient + emissiveColor;
-};
-
+  // Return ONLY direct light
+  return (1.0 - shadow) * (diffuse + specular) * lightColor * NdotL;
+}
 
 void main(){
-  vec3 color = vec3(0.0f);
-
+  // Grab material once
+  Material mat = material[material_id];
+  vec3 N = normalize(Normal);
+  vec3 directLighting = vec3(0.0f);
+  
+  // Accumulate Direct Light (Shadows only affect this loop)
   for(int i = 0; i < lightCount; i++){
-    color += BRDF(
-      normalize(Normal),
-      FragPosition,
-      cameraPosition,
-      lights[i].position,
-      lights[i].color,
-      material[material_id].albedo,
-      material[material_id].metallic,
-      material[material_id].roughness,
-      material[material_id].emission_color,
-      material[material_id].emission_strength,
-      material[material_id].ambient_occlusion
+    bool isFirstLight = (i == 0);
+    directLighting += BRDF(
+      N, FragPosition, cameraPosition, lights[i].position, lights[i].color,
+      mat.albedo, mat.metallic, mat.roughness, isFirstLight
     ) * lights[i].strength;
-  };
+  }
 
-  FragColor = vec4(color, 1.0);
+  // Evaluate Ambient and Emission EXACTLY ONCE
+  vec3 ambient = 0.03 * mat.albedo * mat.ambient_occlusion;
+  vec3 emissiveColor = mat.emission_color * mat.emission_strength;
+
+  // Final composite
+  vec3 finalColor = directLighting + ambient + emissiveColor;
+  FragColor = vec4(finalColor, 1.0);
 }

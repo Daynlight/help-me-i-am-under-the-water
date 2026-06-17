@@ -27,7 +27,7 @@ void UW::Terrain::onFixedUpdate(){
 
 
 
-void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
+void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform){
   if(Resources::get().meshes.validateVersion(mesh_version)){
     mesh_version = Resources::get().meshes.getLatestsVersion();
     mesh_id = Resources::get().meshes.get_id("terrain_chunk");
@@ -45,8 +45,8 @@ void UW::Terrain::render(CW::Renderer::Renderer* renderer, Camera& culling_camer
   uniform["uTexture"]->set<int>(0);
   uniform["material_id"]-> set<int>(Resources::get().materials.translate_material("terrain"));
 
-
   Resources::get().getShader("Terrain").getUniforms().emplace_back(&uniform);
+  Resources::get().getShader("Terrain").getUniforms().emplace_back(&shadows_uniform);
 
   Resources::get().getTexture("Terrain/heightmap.png").bind(0);
   glPatchParameteri(GL_PATCH_VERTICES, 4);

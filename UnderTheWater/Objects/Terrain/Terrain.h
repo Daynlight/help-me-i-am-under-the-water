@@ -13,7 +13,7 @@
 
 
 namespace UW{
-class Terrain : public Object{
+class Terrain{
 private:
   CW::Renderer::Uniform uniform;
   std::vector<glm::vec2> chunks;
@@ -25,9 +25,9 @@ public:
   Terrain();
   ~Terrain();
 
-  void onUpdate(float delta_time) override;
-  void onFixedUpdate() override;
-  void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera) override;
+  void onUpdate(float delta_time);
+  void onFixedUpdate();
+  void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform);
 
 private:
   void generateChunks();

@@ -16,6 +16,7 @@ class Camera {
 public:
   glm::vec3 position = {0.0f, 0.0f, 0.0f};
   glm::vec3 direction = {0.0f, 0.0f, 1.0f};
+  float fov = UW::Config::CAMERA_FOV;
   
 private:
   glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f); 

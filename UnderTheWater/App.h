@@ -28,6 +28,7 @@ private:
   // app
   CW::Renderer::Renderer window;
   CW::Renderer::Framebuffer fbo;
+  CW::Renderer::Framebuffer shadows_fbo;
   
   #ifndef PRODUCTION
   UW::UI ui;
