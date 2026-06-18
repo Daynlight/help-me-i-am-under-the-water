@@ -19,7 +19,9 @@ void UW::SDF::render(CW::Renderer::Framebuffer& fbo, UW::Camera& camera, CW::Ren
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  glDepthMask(GL_TRUE);
+  // glDepthMask(GL_TRUE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   CW::Renderer::Uniform sdf_uniform; 
   unsigned int quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
@@ -47,4 +49,6 @@ void UW::SDF::render(CW::Renderer::Framebuffer& fbo, UW::Camera& camera, CW::Ren
   Resources::get().getShader(shader_name).getUniforms().clear();
 
   fbo.unbind();
+
+  glDisable(GL_BLEND);
 };

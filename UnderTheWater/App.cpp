@@ -76,20 +76,37 @@ void UW::App::onDestroy() {
 
 
 
+void UW::App::compileShadows(){
+  shadows_fbo.bind();
+  light_camera.setOrthographic(true);
+  light_camera.fov = 110.0f;
+  light_camera.position = Resources::get().lights[0].position;
+  light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
+  glm::mat4 light_space_matrix = light_camera.transformation(&window);
+  
+  CW::Renderer::Uniform shadows_uniform1;
+  shadows_uniform1["u_ShadowEnabled"]->set<int>(0);
+  shadows_uniform1["u_ShadowDepthTexture"]->set<int>(16);
+  shadows_uniform1["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
+
+  window.beginFrame();
+
+  Resources::get().lights.bind(0);
+  Resources::get().materials.bind(1);
+
+  terrain.render(&window, light_camera, light_camera, shadows_uniform1);
+  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera, shadows_uniform1);
+  
+  Resources::get().materials.unbind();
+  Resources::get().lights.unbind();
+
+  shadows_fbo.unbind();
+};
+
+
+
 void UW::App::render(){
   compileShadows();
-
-  // int w, h;
-  // glfwGetFramebufferSize(window.getWindow(), &w, &h);
-  // shadows_fbo.blitToScreen(w, h);
-
-  // #ifndef PRODUCTION
-  // ui.render();
-  // #endif
-
-  // window.windowEvents();
-  // window.swapBuffer();
-  // return;
 
   fbo.bind();
 
@@ -166,55 +183,28 @@ void UW::App::render(){
 
 
 
-void UW::App::update(){
-#ifndef PRODUCTION
-  updateFps();
-  swapCamera();
-#endif
+void UW::App::renderSFD(CW::Renderer::Framebuffer& fbo, UW::Camera& camera){
+  CW::Renderer::Uniform sdf_uniform;
+  glm::mat4 light_space_matrix = light_camera.transformation(&window);
+  sdf_uniform["u_ShadowDepthTexture"]->set<int>(16);
+  sdf_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
 
-  camera.event(&window);
-  
-  for(UW::GameObject& el : object_manager.objects) el.onUpdate(window.getWindowData()->delta_time);
-  water.onUpdate(window.getWindowData()->delta_time);
-};
+  glm::vec3 position = {153.0f, 28.0f, -116.0f};
+  glm::vec3 rotation = {0.2f, 0.707f, 0.0f};
+  glm::vec3 scale = {0.5f, 0.5f, 0.5f};
 
+  glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
+  glm::mat4 rotationMat = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
+  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), scale);
+  glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
+  glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
+  glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
 
+  sdf_uniform["model"]->set<glm::mat4>(model);
 
-void UW::App::fixedUpdate(){
-  fixed_update_time_acc += window.getWindowData()->delta_time;
-
-  if(fixed_update_time_acc >= 1.0f / UW::Config::FIXED_HZ){
-    
-#ifndef PRODUCTION
-    guiSettings.window_width = window.getWindowData()->width;
-    guiSettings.window_height = window.getWindowData()->height;
-#endif
-
-#ifndef PRODUCTION
-    save_acc += fixed_update_time_acc;
-
-    if(save_acc >= UW::Config::SAVE_TIMESTAMP){
-      save_acc -= UW::Config::SAVE_TIMESTAMP;
-      DataSerializer::get().saveAll(object_manager.objects);
-    };
-#endif
-    
-    for(UW::GameObject& el : object_manager.objects) el.onFixedUpdate();
-    fixed_update_time_acc -= 1.0f / UW::Config::FIXED_HZ;
-  };
-};
-
-
-
-// ============================= //
-// ========== Helpers ========== //
-// ============================= //
-void UW::App::initWindow(){
-  Logger::get().info("App", "Window Initialization");
-
-  window.setWindowTitle(UW::Config::WINDOW_TITLE);
-  window.setCursorVisibility(UW::Config::DEFAULT_CURSOR_IS_VISIBLE);
-  window.setVsync(UW::Config::VSYNC);
+  sdf_uniform["material_id"]->set<int>(Resources::get().materials.translate_material("SDF"));
+  sdf_register.render(fbo, camera, window, &sdf_uniform);
 };
 
 
@@ -271,44 +261,55 @@ void UW::App::postProcessing(){
 
 
 
-void UW::App::renderSFD(CW::Renderer::Framebuffer& fbo, UW::Camera& camera){
-  CW::Renderer::Uniform sdf_uniform;
-  glm::mat4 light_space_matrix = light_camera.transformation(&window);
-  sdf_uniform["u_ShadowDepthTexture"]->set<int>(16);
-  sdf_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
+void UW::App::update(){
+#ifndef PRODUCTION
+  updateFps();
+  swapCamera();
+#endif
 
-  sdf_uniform["material_id"]->set<int>(Resources::get().materials.translate_material("SDF"));
-  sdf_register.render(fbo, camera, window, &sdf_uniform);
-
+  camera.event(&window);
+  
+  for(UW::GameObject& el : object_manager.objects) el.onUpdate(window.getWindowData()->delta_time);
+  water.onUpdate(window.getWindowData()->delta_time);
 };
 
 
 
-void UW::App::compileShadows(){
-  shadows_fbo.bind();
-  light_camera.setOrthographic(true);
-  light_camera.fov = 110.0f;
-  light_camera.position = Resources::get().lights[0].position;
-  light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
-  glm::mat4 light_space_matrix = light_camera.transformation(&window);
-  
-  CW::Renderer::Uniform shadows_uniform1;
-  shadows_uniform1["u_ShadowEnabled"]->set<int>(0);
-  shadows_uniform1["u_ShadowDepthTexture"]->set<int>(16);
-  shadows_uniform1["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
+void UW::App::fixedUpdate(){
+  fixed_update_time_acc += window.getWindowData()->delta_time;
 
-  window.beginFrame();
+  if(fixed_update_time_acc >= 1.0f / UW::Config::FIXED_HZ){
+    
+#ifndef PRODUCTION
+    guiSettings.window_width = window.getWindowData()->width;
+    guiSettings.window_height = window.getWindowData()->height;
+#endif
 
-  Resources::get().lights.bind(0);
-  Resources::get().materials.bind(1);
+#ifndef PRODUCTION
+    save_acc += fixed_update_time_acc;
 
-  terrain.render(&window, light_camera, light_camera, shadows_uniform1);
-  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera, shadows_uniform1);
-  
-  Resources::get().materials.unbind();
-  Resources::get().lights.unbind();
+    if(save_acc >= UW::Config::SAVE_TIMESTAMP){
+      save_acc -= UW::Config::SAVE_TIMESTAMP;
+      DataSerializer::get().saveAll(object_manager.objects);
+    };
+#endif
+    
+    for(UW::GameObject& el : object_manager.objects) el.onFixedUpdate();
+    fixed_update_time_acc -= 1.0f / UW::Config::FIXED_HZ;
+  };
+};
 
-  shadows_fbo.unbind();
+
+
+// ============================= //
+// ========== Helpers ========== //
+// ============================= //
+void UW::App::initWindow(){
+  Logger::get().info("App", "Window Initialization");
+
+  window.setWindowTitle(UW::Config::WINDOW_TITLE);
+  window.setCursorVisibility(UW::Config::DEFAULT_CURSOR_IS_VISIBLE);
+  window.setVsync(UW::Config::VSYNC);
 };
 
 

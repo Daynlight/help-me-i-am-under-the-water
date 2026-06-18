@@ -7,6 +7,7 @@ uniform mat4 transformation;
 uniform int lightCount;
 uniform vec3 cameraPosition;
 uniform int material_id;
+uniform mat4 model;
 
 struct Light {
   vec3 position;
@@ -108,35 +109,47 @@ vec3 BRDF(vec3 Normal, vec3 FragPos, vec3 cameraPos, vec3 lightPos, vec3 lightCo
   return lighting + ambient + emissiveColor;
 }
 
-float sdSphere(vec3 p, vec3 center, float radius) {
-  return length(p - center) - radius;
+
+
+
+float sdElipsolid(vec3 p, vec3 center, vec3 coff, float radius) {
+  return length((p - center) / coff) - radius;
 }
 
-float sdBox(vec3 p, vec3 center, vec3 b) {
-  vec3 q = abs(p - center) - b;
-  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-}
-
-float sdTorus(vec3 p, vec3 center, vec2 t) {
+float sdCone(vec3 p, vec3 center, vec2 c, float h) {
   vec3 translatedP = p - center;
-  vec2 q = vec2(length(translatedP.xz) - t.x, translatedP.y);
-  return length(q) - t.y;
+  float q = length(translatedP.xz);
+  return max(dot(c.xy, vec2(q, translatedP.y)), -h - translatedP.y);
 }
 
-
+float sdConeUpsideDown(vec3 p, vec3 center, vec2 c, float h) {
+  vec3 translatedP = p - center;
+  
+  translatedP.y = -translatedP.y; 
+  
+  float q = length(translatedP.xz);
+  return max(dot(c.xy, vec2(q, translatedP.y)), -h - translatedP.y);
+}
 
 
 
 float map(vec3 p) {
   float minDist = 100000.0; 
-  float sphere1 = sdSphere(p, vec3(0.0, 200.0, 0.0), 15.0);
-  minDist = min(minDist, sphere1);
-  float box1 = sdBox(p, vec3(40.0, 200.0, 0.0), vec3(10.0, 10.0, 10.0));
-  minDist = min(minDist, box1);
-  float torus1 = sdTorus(p, vec3(80.0, 200.0, 0.0), vec2(12.0, 4.0));
-  minDist = min(minDist, torus1);
+
+  float elipsolidTop = sdElipsolid(p, vec3(0.0, 0.0, 0.0), vec3(1.5, 1, 1.5), 5.0);
+  float elipsolidBottomCut = sdElipsolid(p, vec3(0.0, -5.0, 0.0), vec3(1.7, 1, 1.7), 5.0);
+
+  minDist = max(elipsolidTop, -elipsolidBottomCut);
+
+  float cone1 = sdConeUpsideDown(p, vec3(0.0, -8, 0), vec2(0.9, 0.5), 9);
+
+  minDist = min(minDist, cone1);
+
   return minDist;
 }
+
+
+
 
 vec3 calculateNormal(vec3 p) {
   vec2 eps = vec2(0.005, 0.0);
@@ -150,37 +163,75 @@ vec3 calculateNormal(vec3 p) {
 void main() {
   vec2 uv = TexCoords * 2.0 - 1.0;
   mat4 invTransformation = inverse(transformation);
+  mat4 invModel = inverse(model);
+  
   vec4 nearTarget = invTransformation * vec4(uv, -1.0, 1.0);
   vec4 farTarget  = invTransformation * vec4(uv,  1.0, 1.0);
-  vec3 ro = nearTarget.xyz / nearTarget.w;
-  vec3 rd = normalize((farTarget.xyz / farTarget.w) - ro);
+
+  vec3 world_ro = nearTarget.xyz / nearTarget.w;
+  vec3 world_rd = normalize((farTarget.xyz / farTarget.w) - world_ro);
+
+  vec3 ro = (invModel * vec4(world_ro, 1.0)).xyz;
+  vec3 rd = normalize((invModel * vec4(world_rd, 0.0)).xyz);
+
   float t = 0.0;
   float max_t = 4000.0; 
   bool hit = false;
-  vec3 hitPos = vec3(0.0);
+  vec3 hitPosLocal = vec3(0.0);
+
   for(int i = 0; i < 200; i++) { 
     vec3 p = ro + rd * t;
     float d = map(p);
     if(d < 0.005) { 
       hit = true;
-      hitPos = p;
+      hitPosLocal = p;
       break;
     }
     if(t > max_t) break;
     t += d;
   }
+
   if(!hit) {
     discard; 
   }
-  vec4 clipPos = transformation * vec4(hitPos, 1.0);
+
+
+
+  float insideThickness = 0.0;
+  float inside_t = t + 0.1;
+  
+  for(int i = 0; i < 30; i++) {
+    vec3 insideP = ro + rd * inside_t;
+    float d = map(insideP);
+    
+    if(d < 0.0) {
+      insideThickness += abs(d);
+      inside_t += max(abs(d), 0.1);
+    } else {
+      break;
+    }
+    if(inside_t > max_t) break;
+  }
+
+  float densityCoefficient = 0.15;
+  float alpha = 1.0 - exp(-insideThickness * densityCoefficient);
+
+
+
+  vec3 hitPosWorld = (model * vec4(hitPosLocal, 1.0)).xyz;
+  
+  vec4 clipPos = transformation * vec4(hitPosWorld, 1.0);
   float ndcDepth = clipPos.z / clipPos.w;
   gl_FragDepth = ndcDepth * 0.5 + 0.5;
-  vec3 normal = calculateNormal(hitPos);
+
+  vec3 localNormal = calculateNormal(hitPosLocal);
+  vec3 normal = normalize(mat3(transpose(invModel)) * localNormal);
   vec3 totalLighting = vec3(0.0);
+  
   for(int i = 0; i < lightCount; i++) {
     totalLighting += BRDF(
       normal,
-      hitPos,
+      hitPosWorld,
       cameraPosition,
       lights[i].position,
       lights[i].color,
@@ -192,5 +243,6 @@ void main() {
       material[material_id].ambient_occlusion
     ) * lights[i].strength;
   }
-  FragColor = vec4(totalLighting, 1.0);
+  FragColor = vec4(totalLighting, alpha);
 }
+
