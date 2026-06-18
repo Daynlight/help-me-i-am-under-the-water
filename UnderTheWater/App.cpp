@@ -57,6 +57,7 @@ void UW::App::onLoad(){
   #endif
 
   DataSerializer::get().loadAll(object_manager.objects);
+  compileShadows();
 };
 
 
@@ -75,41 +76,6 @@ void UW::App::onDestroy() {
 
 
 void UW::App::render(){
-  shadows_fbo.bind();
-  light_camera.setOrthographic(true);
-  light_camera.fov = 110.0f;
-  light_camera.position = Resources::get().lights[0].position;
-  light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
-  glm::mat4 light_space_matrix = light_camera.transformation(&window);
-  
-  CW::Renderer::Uniform shadows_uniform1;
-  shadows_uniform1["u_ShadowEnabled"]->set<int>(0);
-  shadows_uniform1["u_ShadowDepthTexture"]->set<int>(16);
-  shadows_uniform1["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
-
-  window.beginFrame();
-
-  Resources::get().lights.bind(0);
-  Resources::get().materials.bind(1);
-
-  terrain.render(&window, light_camera, light_camera, shadows_uniform1);
-  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera);
-  
-  Resources::get().materials.unbind();
-  Resources::get().lights.unbind();
-
-  shadows_fbo.unbind();
-
-  // int w, h;
-  // glfwGetFramebufferSize(window.getWindow(), &w, &h);
-  // shadows_fbo.blitToScreen(w, h);
-  // #ifndef PRODUCTION
-  // ui.render();
-  // #endif
-  // window.windowEvents();
-  // window.swapBuffer();
-  // return;
-
   fbo.bind();
 
   window.beginFrame();
@@ -119,7 +85,7 @@ void UW::App::render(){
   CW::Renderer::Uniform shadows_uniform;
   shadows_uniform["u_ShadowEnabled"]->set<int>(1);
   shadows_uniform["u_ShadowDepthTexture"]->set<int>(16);
-  // glm::mat4 light_space_matrix = light_camera.transformation(&window);
+  glm::mat4 light_space_matrix = light_camera.transformation(&window);
   shadows_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
 
   Resources::get().lights.bind(0);
@@ -176,6 +142,8 @@ void UW::App::update(){
   updateFps();
   swapCamera();
 #endif
+  
+  if(Resources::get().lights[0].position != shadow_last_position) compileShadows();
 
   camera.event(&window);
   
@@ -272,6 +240,37 @@ void UW::App::postProcessing(){
 
   glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, 0);
   glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, 0);
+};
+
+
+
+void UW::App::compileShadows(){
+    shadows_fbo.bind();
+  light_camera.setOrthographic(true);
+  light_camera.fov = 110.0f;
+  light_camera.position = Resources::get().lights[0].position;
+  light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
+  glm::mat4 light_space_matrix = light_camera.transformation(&window);
+  
+  CW::Renderer::Uniform shadows_uniform1;
+  shadows_uniform1["u_ShadowEnabled"]->set<int>(0);
+  shadows_uniform1["u_ShadowDepthTexture"]->set<int>(16);
+  shadows_uniform1["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
+
+  window.beginFrame();
+
+  Resources::get().lights.bind(0);
+  Resources::get().materials.bind(1);
+
+  terrain.render(&window, light_camera, light_camera, shadows_uniform1);
+  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera);
+  
+  Resources::get().materials.unbind();
+  Resources::get().lights.unbind();
+
+  shadows_fbo.unbind();
+
+  shadow_last_position = Resources::get().lights[0].position;
 };
 
 
