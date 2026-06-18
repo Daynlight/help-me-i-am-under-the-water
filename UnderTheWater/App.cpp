@@ -271,28 +271,15 @@ void UW::App::postProcessing(){
 
 
 
-void UW::App::renderSFD(CW::Renderer::Framebuffer& fbo, UW::Camera& camera, bool shadows_on){
+void UW::App::renderSFD(CW::Renderer::Framebuffer& fbo, UW::Camera& camera){
   CW::Renderer::Uniform sdf_uniform;
   glm::mat4 light_space_matrix = light_camera.transformation(&window);
   sdf_uniform["u_ShadowDepthTexture"]->set<int>(16);
   sdf_uniform["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
-  
-  if(shadows_on){
-    sdf_uniform["u_ShadowEnabled"]->set<int>(1);
-    glActiveTexture(GL_TEXTURE16);
-    glBindTexture(GL_TEXTURE_2D, shadows_fbo.getDepthTexture());
-  }
-  else sdf_uniform["u_ShadowEnabled"]->set<int>(0);
-
 
   sdf_uniform["material_id"]->set<int>(Resources::get().materials.translate_material("SDF"));
   sdf_register.render(fbo, camera, window, &sdf_uniform);
 
-
-  if(shadows_on){
-    glActiveTexture(GL_TEXTURE16);
-    glBindTexture(GL_TEXTURE_2D, shadows_fbo.getDepthTexture());
-  };
 };
 
 
@@ -322,8 +309,6 @@ void UW::App::compileShadows(){
   Resources::get().lights.unbind();
 
   shadows_fbo.unbind();
-  
-  // renderSFD(shadows_fbo, light_camera, false);
 };
 
 
