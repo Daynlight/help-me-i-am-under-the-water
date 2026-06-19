@@ -6,6 +6,7 @@ set(src
   "main.cpp"
   "App.cpp"
   "SDF.cpp"
+  "Scene.cpp"
   "UI/UI.cpp"
   "UI/UI_Logs.cpp"
   "UI/UI_Materials.cpp"

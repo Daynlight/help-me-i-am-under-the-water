@@ -4,8 +4,8 @@
 
 
 
-UW::UI_AssetLoader::UI_AssetLoader(CW::Gui::Gui& gui, UW::ObjectManager& object_manager)
-  : gui(gui), object_manager(object_manager) {
+UW::UI_AssetLoader::UI_AssetLoader(CW::Gui::Gui& gui, UW::Scene& scene)
+  : gui(gui), scene(scene) {
   Logger::get().info("UI_AssetLoader", "Initialized Asset Loader");
 };
 
@@ -232,7 +232,7 @@ void UW::UI_AssetLoader::finalizeImport() {
       glm::vec3(1.0f)
     );
 
-    object_manager.objects.push_back(new_obj);
+    scene.object_manager.objects.push_back(new_obj);
   };
 
   Logger::get().info("UI_AssetLoader", "Separate Import successful!");
@@ -325,7 +325,7 @@ void UW::UI_AssetLoader::finalizeImportMerged(const std::string& merged_name) {
     glm::vec3(1.0f)
   );
 
-  object_manager.objects.push_back(new_obj);
+  scene.object_manager.objects.push_back(new_obj);
 
   Logger::get().info("UI_AssetLoader", "Merged Import successful!");
   clearTemporaryData(); 

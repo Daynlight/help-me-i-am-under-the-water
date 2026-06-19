@@ -15,6 +15,7 @@
 #include "DataSerializer/DataSerializer.h"
 #include "Objects/GameObject.h"
 #include "Camera/Camera.h"
+#include "Scene.h"
 
 #include "UI/Settings.h"
 #include "UI/UI_AssetLoader.h"
@@ -34,7 +35,7 @@ private:
   CW::Gui::Gui gui;
   CW::Renderer::Renderer& window;
 
-  UW::ObjectManager& object_manager;
+  UW::Scene& scene;
 
   UW::UI_AssetLoader asset_loader_ui;
   UW::UI_Info info_ui;
@@ -45,7 +46,7 @@ private:
   UW::UI_Shaders shader_ui;
 
 public:
-  UI(CW::Renderer::Renderer &window, float &fps, bool& post_processing_on, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager);
+  UI(CW::Renderer::Renderer &window, float &fps, UW::Scene& scene);
   ~UI();
   void onLoad();
   void render();

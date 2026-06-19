@@ -1,15 +1,17 @@
 #include "UI.h"
 #ifndef PRODUCTION
 
-UW::UI::UI(CW::Renderer::Renderer &window, float &fps, bool &post_processing_on, bool &debug_camera_on, UW::Camera &camera, UW::Camera &debug_camera, UW::ObjectManager &object_manager)
-  :window(window), gui(&window), object_manager(object_manager),
-  info_ui(gui, camera, debug_camera, fps, debug_camera_on, post_processing_on),
+
+
+UW::UI::UI(CW::Renderer::Renderer &window, float &fps, UW::Scene& scene)
+  :window(window), gui(&window), scene(scene),
+  info_ui(gui, fps, scene),
   log_ui(gui),
   materials_ui(gui),
-  objects_ui(gui, window, object_manager),
+  objects_ui(gui, window, scene),
   lights_ui(gui),
   shader_ui(gui),
-  asset_loader_ui(gui, object_manager){
+  asset_loader_ui(gui, scene){
   Logger::get().info("UI", "Initializing UI");
   
   gui.setWorkspace(appWorkspace());
@@ -119,6 +121,7 @@ void UW::UI::configControl(){
 
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(handler);
 };
+
 
 
 void UW::UI::uiControl(){

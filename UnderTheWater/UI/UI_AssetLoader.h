@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include "UI/Settings.h"
+#include "Scene.h"
 
 
 
@@ -34,7 +35,7 @@ struct TempAssetData {
 class UI_AssetLoader {
 private:
   CW::Gui::Gui& gui;
-  UW::ObjectManager& object_manager;
+  UW::Scene& scene;
 
   Assimp::Importer importer;
   const aiScene* current_scene = nullptr;
@@ -51,7 +52,7 @@ private:
   std::vector<TempAssetData> temp_materials;
 
 public:
-  UI_AssetLoader(CW::Gui::Gui& gui, UW::ObjectManager& object_manager);
+  UI_AssetLoader(CW::Gui::Gui& gui, UW::Scene& scene);
   ~UI_AssetLoader();
 
   void uiControl();
