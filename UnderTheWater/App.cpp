@@ -58,9 +58,12 @@ void UW::App::onLoad(){
 
   DataSerializer::get().loadAll(object_manager.objects);
 
-  for(int i = 0; i < 10; i++){
+  for(int i = 0; i < 2; i++){
     meduses.emplace_back();
-    meduses[i].genRandom(i, glm::vec3(-20, -20, -20), glm::vec3(20, 20, 20), glm::vec3(174.780f, 26.939f, -80.027f));
+    meduses[i].genRandom(i, 
+      glm::vec3(-50, -10, -50), glm::vec3(50, 10, 50), glm::vec3(174.780f, 40.939f, -80.027f),
+      glm::vec3(-0.2, -0.2, -0.2), glm::vec3(0.2, 0.2, 0.2),
+      0.4f, 0.7f);
   }
     
   compileShadows();

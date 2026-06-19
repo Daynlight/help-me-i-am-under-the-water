@@ -198,7 +198,7 @@ void main() {
 
 
   float insideThickness = 0.0;
-  float inside_t = t + 0.003; 
+  float inside_t = t + 0.03; 
   float max_thickness_dist = t + 20.0; 
   
   for(int i = 0; i < 40; i++) {
@@ -217,7 +217,7 @@ void main() {
     }
   }
 
-  float densityCoefficient = 0.19;
+  float densityCoefficient = 0.15;
   float alpha = 1.0 - exp(-insideThickness * densityCoefficient);
 
 
@@ -248,5 +248,6 @@ void main() {
   }
   FragColor = vec4(totalLighting, alpha);
 }
+
 
 

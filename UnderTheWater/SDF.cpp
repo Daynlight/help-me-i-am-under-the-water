@@ -17,9 +17,9 @@ UW::SDF::~SDF(){
 void UW::SDF::render(CW::Renderer::Framebuffer& fbo, UW::Camera& camera, CW::Renderer::Renderer& window, CW::Renderer::Uniform* uniform){
   fbo.bind();
 
-  glDisable(GL_DEPTH_TEST);
-  // glDepthFunc(GL_LESS);
-  // glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+  glDepthMask(GL_FALSE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -52,4 +52,5 @@ void UW::SDF::render(CW::Renderer::Framebuffer& fbo, UW::Camera& camera, CW::Ren
 
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
 };

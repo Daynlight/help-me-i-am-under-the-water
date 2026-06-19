@@ -40,15 +40,51 @@ public:
     this->position = position;
   };
 
-  void genRandom(int i, glm::vec3 position_min, glm::vec3 position_max, glm::vec3 center){
-    unsigned int seed = UW::Config::SEED + i * 213123123;
-    std::mt19937 gen(seed);
-    
-    std::uniform_real_distribution<float> randomX(position_min.x, position_max.x);
-    std::uniform_real_distribution<float> randomY(position_min.y, position_max.y);
-    std::uniform_real_distribution<float> randomZ(position_min.z, position_max.z);
+  void setRot(glm::vec3 rotation){
+    this->rotation = rotation;
+  };
 
-    setPos(glm::vec3(randomX(gen), randomY(gen), randomZ(gen)) + center);
+  void setScale(glm::vec3 scale){
+    this->scale = scale;
+  };
+
+  void genRandom(int i, 
+    glm::vec3 position_min, glm::vec3 position_max, glm::vec3 center,
+    glm::vec3 rotation_min, glm::vec3 rotation_max,
+    float scale_min, float scale_max) {
+      
+    auto hash = [](uint32_t x) {
+      x = ((x >> 16) ^ x) * 0x45d9f3b;
+      x = ((x >> 16) ^ x) * 0x45d9f3b;
+      x = (x >> 16) ^ x;
+      return x;
+    };
+
+    // Use a unique seed per object, then let the generator run sequentially.
+    // This provides perfect statistical independence without the overhead of 9 objects.
+    std::mt19937 gen(hash(UW::Config::SEED + i));
+
+    std::uniform_real_distribution<float> distPos;
+    std::uniform_real_distribution<float> distRot;
+    std::uniform_real_distribution<float> distScale(scale_min, scale_max);
+
+    // Random Position
+    setPos(glm::vec3(
+      std::uniform_real_distribution<float>(position_min.x, position_max.x)(gen),
+      std::uniform_real_distribution<float>(position_min.y, position_max.y)(gen),
+      std::uniform_real_distribution<float>(position_min.z, position_max.z)(gen)
+    ) + center);
+
+    // Random Rotation
+    setRot(glm::vec3(
+      std::uniform_real_distribution<float>(rotation_min.x, rotation_max.x)(gen),
+      std::uniform_real_distribution<float>(rotation_min.y, rotation_max.y)(gen),
+      std::uniform_real_distribution<float>(rotation_min.z, rotation_max.z)(gen)
+    ));
+
+    // Random Scale (Uniform across axes)
+    float s = distScale(gen);
+    setScale(glm::vec3(s, s, s));
   };
 };
 };
