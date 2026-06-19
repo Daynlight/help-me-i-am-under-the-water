@@ -9,6 +9,7 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [About](#about)
 - [TOC](#toc)
 - [Installation and Usage](#installation-and-usage)
+- [Build in prod](#build-in-prod)
 - [Compiling End Product](#compiling-end-product)
 - [Architecture](#architecture)
   - [Build System](#build-system)
@@ -51,6 +52,17 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
          ```bash
          ./UnderTheWater/UnderTheWater
          ```
+
+
+## Build in prod
+```bash
+mkdir -p build-prod
+cd build-prod
+cmake -B . -DPRODUCTION=ON ..
+cmake --build .
+cd ..
+./build-prod/bin/UnderTheWater
+```
 
 
 
@@ -143,7 +155,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details>
 
 <details>
-<summary>🌟 Iteration 3 (15.06.2026)</summary>
+<summary>Iteration 3 (15.06.2026)</summary>
   
 - [x] Mesh serialization.
 - [x] Compile flag for end product ```PRODUCTION```
@@ -154,20 +166,29 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Full optimization
 </details>
 
-<details open>
-<summary> 🌟 Iteration 4 🌟 (21.06.2026)</summary>
+<details>
+<summary>Iteration 4(19.06.2026)</summary>
 
-- [ ] Water surface shader
-- [ ] FBO Render to texture
-- [ ] Under water fog
-- [ ] Quaternion Camera
-- [ ] Parallel Transport Layer
-- [ ] SDF ray-marching
-- [ ] Shadow Mapping
+- [x] FBO Render to texture
+- [x] Under water fog
+- [x] Quaternion Camera, without gimbal lock.
+- [x] Shadow Mapping
+- [x] SDF ray-marching
+- [x] Parallel Transport Layer
+</details>
+
+</details open>
+<summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
+
+- [ ] Clean up
+- [ ] Optimization
+- [ ] Docs
+- [ ] Assets
+- [ ] Releases
 </details>
 
 <details>
-<summary>Iteration 5</summary>
+<summary>Iteration 6</summary>
 
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
@@ -187,4 +208,5 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Script system
 - [ ] Move terrain, water, skybox to object_register vector.
 - [ ] Window Data Serialization.
+- [ ] Fix black lights for new Scene class.
 </details>

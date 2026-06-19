@@ -9,13 +9,16 @@ flat out int material_id;
 out vec2 uv;
 out vec3 Normal;
 out vec3 FragPosition;
+out vec4 FragPosLightSpace;
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform mat4 u_LightSpaceMatrix;
 
 uniform mat4 model;
 
 void main(){
+  FragPosLightSpace = u_LightSpaceMatrix * model * vec4(aPos, 1.0);
   vec4 pos = projection * view * model * vec4(aPos, 1.0);
   
   material_id = mat_id;
@@ -25,3 +28,4 @@ void main(){
 
   gl_Position = pos;
 }
+

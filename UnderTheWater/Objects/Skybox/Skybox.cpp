@@ -26,7 +26,7 @@ void UW::Skybox::onFixedUpdate(){
 
 
 
-void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
+void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform){
   if(Resources::get().meshes.validateVersion(mesh_version)){
     mesh_version = Resources::get().meshes.getLatestsVersion();
     mesh_id = Resources::get().meshes.get_id("sky_box");
@@ -39,6 +39,7 @@ void UW::Skybox::render(CW::Renderer::Renderer* renderer, Camera& culling_camera
   uniform["skyboxTex"]->set<int>(0);
 
   Resources::get().getShader("Skybox").getUniforms().emplace_back(&uniform);
+  Resources::get().getShader("Skybox").getUniforms().emplace_back(&shadows_uniform);
 
   Resources::get().getTexture("Skybox/Skybox.png").bind(0); 
   Resources::get().getShader("Skybox").bind();

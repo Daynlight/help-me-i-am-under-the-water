@@ -4,8 +4,8 @@
 
 
 
-UW::UI_Info::UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on)
-  :gui(gui), camera(camera), debug_camera(debug_camera), fps(fps), debug_camera_on(debug_camera_on){};
+UW::UI_Info::UI_Info(CW::Gui::Gui& gui, float &fps, UW::Scene& scene)
+  :gui(gui), fps(fps), scene(scene){};
 
 
 
@@ -30,15 +30,15 @@ inline void UW::UI_Info::guiInfo(){
   ImGui::SeparatorText("Info");
   ImGui::Text("FPS: %f", fps);
 
-  ImGui::Text("Current camera: %s", debug_camera_on ? "Debug" : "Normal");
+  ImGui::Text("Current camera: %s", scene.debug_camera_on ? "Debug" : "Normal");
 
   ImGui::Text("Camera:");
-  ImGui::InputFloat3("Camera POS: [%f, %f, %f]", &camera.position[0]);
-  ImGui::SliderFloat3("Camera DIR: [%f, %f, %f]", &camera.direction[0], -1, 1);
+  ImGui::InputFloat3("Camera POS: [%f, %f, %f]", &scene.camera.position[0]);
+  ImGui::SliderFloat3("Camera DIR: [%f, %f, %f]", &scene.camera.direction[0], -1, 1);
 
   ImGui::Text("Debug Camera:");
-  ImGui::InputFloat3("Debug POS: [%f, %f, %f]", &debug_camera.position[0]);
-  ImGui::SliderFloat3("Debug DIR: [%f, %f, %f]", &debug_camera.direction[0], -1, 1);
+  ImGui::InputFloat3("Debug POS: [%f, %f, %f]", &scene.debug_camera.position[0]);
+  ImGui::SliderFloat3("Debug DIR: [%f, %f, %f]", &scene.debug_camera.direction[0], -1, 1);
 
   if(ImGui::Checkbox("Mesh mode", &guiSettings.mesh_mode_on)) mesh_mode_is_updated = false;
   if(!mesh_mode_is_updated){
@@ -52,6 +52,8 @@ inline void UW::UI_Info::guiInfo(){
       Logger::get().info("UI", "Changed Draw Mode To Normal");
     };
   };
+
+  if(ImGui::Checkbox("Post Processing", &scene.post_processing_on));
 };
 
 

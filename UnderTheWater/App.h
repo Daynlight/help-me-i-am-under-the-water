@@ -12,13 +12,8 @@
 #include "Utils/Logger.h"
 #include "Camera/Camera.h"
 #include "Resources/Resources.h"
-#include "Objects/ObjectManager.h"
-#include "Objects/Object.h"
-#include "Objects/GameObject.h"
-#include "Objects/Terrain/Terrain.h"
-#include "Objects/Water/Water.h"
-#include "Objects/Skybox/Skybox.h"
 #include "DataSerializer/DataSerializer.h"
+#include "Scene.h"
 
 
 
@@ -27,31 +22,22 @@ class App{
 private:
   // app
   CW::Renderer::Renderer window;
-  #ifndef PRODUCTION
+  
+#ifndef PRODUCTION
   UW::UI ui;
-  #endif
+#endif
   
-  UW::Camera camera;
-  
-  #ifndef PRODUCTION
-  UW::Camera debug_camera;
-  bool debug_camera_on = UW::Config::DEFAULT_DEBUG_CAMERA_ON;
+  UW::Scene scene;
 
+#ifndef PRODUCTION
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
 
   float camera_swap_cooldown_acc = 0.0f;
-  float save_acc = 0.0f;
-  #endif
+#endif
 
   float fixed_update_time_acc = 0.0f;
-
-  // objects
-  UW::Terrain terrain;
-  UW::Water water;
-  UW::Skybox skybox;
-  UW::ObjectManager object_manager;
 
 
 public:

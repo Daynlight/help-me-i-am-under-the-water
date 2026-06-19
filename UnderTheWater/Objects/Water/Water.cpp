@@ -27,7 +27,7 @@ void UW::Water::onFixedUpdate(){
 
 
 
-void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera){
+void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform){
   if(Resources::get().meshes.validateVersion(mesh_version)){
     mesh_version = Resources::get().meshes.getLatestsVersion();
     mesh_id = Resources::get().meshes.get_id("terrain_chunk");
@@ -47,6 +47,7 @@ void UW::Water::render(CW::Renderer::Renderer* renderer, Camera& culling_camera,
 
 
   Resources::get().getShader("Water").getUniforms().emplace_back(&uniform);
+  Resources::get().getShader("Water").getUniforms().emplace_back(&shadows_uniform);
 
   glPatchParameteri(GL_PATCH_VERTICES, 4);
   glEnable(GL_BLEND);

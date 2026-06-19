@@ -9,22 +9,20 @@
 #include "UI/Settings.h"
 #include "Utils/Logger.h"
 #include "Camera/Camera.h"
-
+#include "Scene.h"
 
 
 namespace UW{
 class UI_Info{
 private:
   float &fps;
-  bool &debug_camera_on;
   bool mesh_mode_is_updated = false;
-  UW::Camera &camera;
-  UW::Camera &debug_camera;
+  UW::Scene& scene;
 
   CW::Gui::Gui& gui;
 
 public:
-  UI_Info(CW::Gui::Gui& gui, UW::Camera &camera, UW::Camera &debug_camera, float &fps, bool &debug_camera_on);
+  UI_Info(CW::Gui::Gui& gui, float &fps, UW::Scene& scene);
   ~UI_Info();
   void uiControl();
 

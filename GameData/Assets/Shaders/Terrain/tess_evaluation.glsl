@@ -4,12 +4,14 @@ layout(quads, fractional_even_spacing, ccw) in;
 
 out vec3 FragPosition;
 out vec3 Normal;
+out vec4 FragPosLightSpace;
 
 uniform mat4 projection;
 uniform mat4 view;
 uniform sampler2D uTexture;
 uniform vec2 mapSize;
 uniform float maxHeight;
+uniform mat4 u_LightSpaceMatrix;
 
 float terrainHeight(vec2 p){
   vec2 worldMin = vec2(-mapSize * 0.5);
@@ -61,5 +63,9 @@ void main(){
   FragPosition = pos;
   Normal  = calcNormal(pos.xz, hCenter);
 
+  FragPosLightSpace = u_LightSpaceMatrix * vec4(pos, 1.0);
+
   gl_Position = projection * view * vec4(pos, 1.0);
 }
+
+

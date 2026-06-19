@@ -11,6 +11,7 @@
 #include "Objects/ObjectManager.h"
 
 #include "UI/Settings.h"
+#include "Scene.h"
 
 
 
@@ -19,11 +20,11 @@ class UI_Objects{
 private:
   CW::Renderer::Renderer& window;
   CW::Gui::Gui& gui;
-  UW::ObjectManager& object_manager;
+  UW::Scene& scene;
 
 
 public:
-  UI_Objects(CW::Gui::Gui& gui, CW::Renderer::Renderer& window, UW::ObjectManager& object_manager);
+  UI_Objects(CW::Gui::Gui& gui, CW::Renderer::Renderer& window, UW::Scene& scene);
   ~UI_Objects();
   void uiControl();
 

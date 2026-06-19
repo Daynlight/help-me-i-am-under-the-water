@@ -6,9 +6,12 @@ in vec3 FragPosition;
 flat in int material_id;
 in vec3 Normal;
 in vec2 uv;
+in vec4 FragPosLightSpace;
 
 uniform int lightCount;
 uniform vec3 cameraPosition;
+uniform sampler2D u_ShadowDepthTexture;
+uniform int u_ShadowEnabled;
 
 struct Light {
   vec3 position;
@@ -104,6 +107,37 @@ vec3 Diffuse(vec3 Fresnel, vec3 albedo, float metallic){
 
 
 
+float CalculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
+  vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+  projCoords = projCoords * 0.5 + 0.5;
+
+  if(projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0) {
+    return 0.0;
+  }
+
+  float currentDepth = projCoords.z;
+    
+  float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
+
+  float shadow = 0.0;
+  vec2 texelSize = 1.0 / textureSize(u_ShadowDepthTexture, 0);
+
+  int radius = 1; 
+  float samples = 0.0;
+
+  for(int x = -radius; x <= radius; ++x) {
+    for(int y = -radius; y <= radius; ++y) {
+      float pcfDepth = texture(u_ShadowDepthTexture, projCoords.xy + vec2(x, y) * texelSize).r;
+      shadow += (currentDepth - bias > pcfDepth) ? 1.0 : 0.0;
+      samples += 1.0;
+    }
+  }
+
+  return shadow / samples;
+}
+
+
 vec3 BRDF(
   vec3 Normal,
   vec3 FragPos,
@@ -115,7 +149,8 @@ vec3 BRDF(
   float roughness,
   vec3 emission_color,
   float emission_strength,
-  float ambient_occlusion
+  float ambient_occlusion,
+  bool isFirstLight
 )
 {
   vec3 N = normalize(Normal);
@@ -135,7 +170,12 @@ vec3 BRDF(
   vec3 specular = Specular(NdotL, NdotV, D, G, Fresnel);
   vec3 diffuse = Diffuse(Fresnel, albedo, metallic); 
 
-  vec3 lighting = (diffuse + specular) * lightColor * NdotL;
+  float shadow = 0.0;
+  if (isFirstLight && u_ShadowEnabled == 1) {
+    shadow = CalculateShadow(FragPosLightSpace, N, L);
+  }
+
+  vec3 lighting = (1 - shadow) * (diffuse + specular) * lightColor * NdotL;
   vec3 ambient = 0.03 * albedo * ambient_occlusion;
   vec3 emissiveColor = emission_color * emission_strength;
 
@@ -150,26 +190,39 @@ uniform sampler2D sky_box;
 uniform int mat_translate[2];
 
 void main(){
-  vec3 color = texture(sky_box, uv).rgb * 0.3f;
+  vec3 finalColor = vec3(1.0f);
 
-  for(int i = 0; i < lightCount; i++){
-    color += BRDF(
-      normalize(Normal),
-      FragPosition,
-      cameraPosition,
-      lights[i].position,
-      lights[i].color,
-      material[mat_translate[material_id]].albedo,
-      material[mat_translate[material_id]].metallic,
-      material[mat_translate[material_id]].roughness,
-      material[mat_translate[material_id]].emission_color,
-      material[mat_translate[material_id]].emission_strength,
-      material[mat_translate[material_id]].ambient_occlusion
-    ) * lights[i].strength;
-  };
+  if(u_ShadowEnabled == 1){
+    vec3 lighting = vec3(0.0);
 
-  FragColor = vec4(color, 1.0);
+    for(int i = 0; i < lightCount; i++){
+      bool isFirstLight = (i == 0);
+      lighting += BRDF(
+        normalize(Normal),
+        FragPosition,
+        cameraPosition,
+        lights[i].position,
+        lights[i].color,
+        material[mat_translate[material_id]].albedo,
+        material[mat_translate[material_id]].metallic,
+        material[mat_translate[material_id]].roughness,
+        material[mat_translate[material_id]].emission_color,
+        material[mat_translate[material_id]].emission_strength,
+        material[mat_translate[material_id]].ambient_occlusion,
+        isFirstLight
+      ) * lights[i].strength;
+    };
+    finalColor = lighting;
+  }
+
+  FragColor = vec4(finalColor, 1.0);
 }
+
+
+
+
+
+
 
 
 
