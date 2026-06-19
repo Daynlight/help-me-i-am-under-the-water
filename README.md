@@ -9,6 +9,8 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [About](#about)
 - [TOC](#toc)
 - [Installation and Usage](#installation-and-usage)
+- [Build in prod](#build-in-prod)
+- [Compiling End Product](#compiling-end-product)
 - [Architecture](#architecture)
   - [Build System](#build-system)
   - [Lights](#lights)
@@ -50,6 +52,23 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
          ```bash
          ./UnderTheWater/UnderTheWater
          ```
+
+
+## Build in prod
+```bash
+mkdir -p build-prod
+cd build-prod
+cmake -B . -DPRODUCTION=ON ..
+cmake --build .
+cd ..
+./build-prod/bin/UnderTheWater
+```
+
+
+
+## Compiling End Product
+Use cmake command with ```PRODUCTION``` FLAG
+
 
 
 ## Architecture
@@ -135,37 +154,59 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Fix bug on delete material
 </details>
 
-<details open>
-<summary>🌟 Iteration 3 🌟 (10.06.2026)</summary>
+<details>
+<summary>Iteration 3 (15.06.2026)</summary>
   
 - [x] Mesh serialization.
-- [x] Compile flag for end product ```END_GAME```
-- [ ] Last Time Write sync
-- [ ] Mesh UI 
-- [ ] Lights UI
-- [ ] Asset loader UI
-- [ ] Texture UI
+- [x] Compile flag for end product ```PRODUCTION```
+- [x] Logger UI
+- [x] Asset loader UI
+- [x] Lights UI
+- [x] Full clean up
+- [x] Full optimization
+</details>
+
+<details>
+<summary>Iteration 4(19.06.2026)</summary>
+
+- [x] FBO Render to texture
+- [x] Under water fog
+- [x] Quaternion Camera, without gimbal lock.
+- [x] Shadow Mapping
+- [x] SDF ray-marching
+- [x] Parallel Transport Layer
+</details>
+
+</details open>
+<summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
+
+- [ ] Clean up
+- [ ] Optimization
+- [ ] Docs
+- [ ] Assets
+- [ ] Releases
+</details>
+
+<details>
+<summary>Iteration 6</summary>
+
 - [ ] Engine like Shaders, Assets, Textures:
-    - [x] Bake into exe
+    - [ ] Bake into exe
     - [ ] When edit save to folder
     - [ ] Create new once
     - [ ] Auto load update on folder change
     - [ ] Explorers
     - [ ] Editor
-- [ ] Full clean up
-- [ ] Full optimization
+- [ ] Texture UI
+- [ ] Mesh UI 
 - [ ] Optimization for Compile version (avoid maps)
-</details>
-
-<details>
-<summary>Iteration 4 (14.06.2026)</summary>
-
-- [ ] Water surface shader
-- [ ] FBO Render to texture
-- [ ] Under water fog
-- [ ] Quaternion Camera
-- [ ] Parallel Transport Layer
-- [ ] SDF ray-marching
-- [ ] Shadow Mapping
+- [ ] Fix CMRC bad alloc
+- [ ] Fix cube data
+- [ ] Editor Camera with movement
+- [ ] Editor mode load from folder instead of cmrc 
+- [ ] Last Time Write sync
 - [ ] Script system
+- [ ] Move terrain, water, skybox to object_register vector.
+- [ ] Window Data Serialization.
+- [ ] Fix black lights for new Scene class.
 </details>
