@@ -73,7 +73,7 @@ void UW::GameObject::onUpdate(float delta_time){
 
 
 
-void UW::GameObject::onFixedUpdate(){
+void UW::GameObject::onFixedUpdate(float fixed_delta_time){
 };
 
 

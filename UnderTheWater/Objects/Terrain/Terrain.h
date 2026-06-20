@@ -26,7 +26,7 @@ public:
   ~Terrain();
 
   void onUpdate(float delta_time) override;
-  void onFixedUpdate() override;
+  void onFixedUpdate(float fixed_delta_time) override;
   void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform) override;
 
 private:

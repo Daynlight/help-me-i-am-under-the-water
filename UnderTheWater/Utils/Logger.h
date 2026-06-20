@@ -1,5 +1,11 @@
-#pragma once
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
 
+
+
+#pragma once
 #include "Renderer.h"
 #include "Gui.h"
 
@@ -14,6 +20,8 @@ enum LogType{
   WARN = 1,
   ERRO = 2,
 };
+
+
 
 struct Log{
   LogType type;
@@ -50,7 +58,7 @@ public:
   void warn(const std::string& module, const std::string& text);
   void erro(const std::string& module, const std::string& text);
 
-  const std::vector<Log>& getLogs() const ;
+  const std::vector<Log>& getLogs() const;
 
 };
 };

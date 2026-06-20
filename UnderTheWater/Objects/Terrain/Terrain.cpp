@@ -21,7 +21,7 @@ void UW::Terrain::onUpdate(float delta_time){
 
 
 
-void UW::Terrain::onFixedUpdate(){
+void UW::Terrain::onFixedUpdate(float fixed_delta_time){
 
 };
 

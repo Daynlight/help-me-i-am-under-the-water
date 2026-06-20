@@ -20,7 +20,7 @@ void UW::Skybox::onUpdate(float delta_time){
 
 
 
-void UW::Skybox::onFixedUpdate(){
+void UW::Skybox::onFixedUpdate(float fixed_delta_time){
 
 };
 

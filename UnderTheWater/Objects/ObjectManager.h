@@ -16,5 +16,6 @@ private:
 
 public:
   std::vector<UW::GameObject> objects;
+  
 };
 }; // namespace UW

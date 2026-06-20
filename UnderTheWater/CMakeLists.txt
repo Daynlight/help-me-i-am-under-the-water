@@ -1,11 +1,19 @@
+# Help me I'am Under The Water
+# Copyright 2025 Daynlight
+# Licensed under the Apache License, Version 2.0.
+# See LICENSE file for details.
+
+
+
 cmake_minimum_required(VERSION 3.15)
 
 project(UnderTheWater LANGUAGES CXX C)
 
+
+
 set(src
   "main.cpp"
   "App.cpp"
-  "SDF.cpp"
   "Scene.cpp"
   "UI/UI.cpp"
   "UI/UI_Logs.cpp"
@@ -25,6 +33,7 @@ set(src
   "Objects/Terrain/Terrain.cpp"
   "Objects/Water/Water.cpp"
   "Objects/Skybox/Skybox.cpp"
+  "Objects/Meduse/Meduse.cpp"
   "Objects/GameObject.cpp"
   "Objects/ObjectManager.cpp"
   "DataSerializer/DataSerializer.cpp"
@@ -36,6 +45,8 @@ set(src
 )
 
 
+
 add_executable(UnderTheWater ${src})
+
 target_link_libraries(UnderTheWater CWindow GameData)
 target_include_directories(UnderTheWater PUBLIC .)

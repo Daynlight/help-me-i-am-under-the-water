@@ -1,10 +1,14 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #include "App.h"
 
 
 
-// ========================= //
-// ========== APP ========== //
-// ========================= //
 UW::App::App()
   :scene(window)
 #ifndef PRODUCTION
@@ -49,7 +53,6 @@ void UW::App::onLoad(){
   ui.onLoad();
   #endif
 
-  DataSerializer::get().loadAll(scene.object_manager.objects);
   scene.onLoad();
 };
 
@@ -85,7 +88,7 @@ void UW::App::update(){
   swapCamera();
 #endif
 
-  scene.onUpdate(window);
+  scene.onUpdate(window.getWindowData()->delta_time);
 };
 
 
@@ -102,11 +105,12 @@ void UW::App::fixedUpdate(){
     guiSettings.window_height = window.getWindowData()->height;
 #endif
     
-    scene.onFixedUpdate(window, fixed_time_step);
+    scene.onFixedUpdate(fixed_time_step);
 
     fixed_update_time_acc -= fixed_time_step;
   };
 };
+
 
 
 // ============================= //
@@ -128,16 +132,14 @@ void UW::App::swapCamera(){
     scene.debug_camera_on = !scene.debug_camera_on;
     camera_swap_cooldown_acc = UW::Config::CAMERA_SWAP_COOLDOWN;
 
-  Logger::get().info("App", "Camera Swapped to { "+ std::string(scene.debug_camera_on ? "DEBUG CAMERA" : "NORMAL CAMERA") + " }");
+    Logger::get().info("App", "Camera Swapped to { "+ std::string(scene.debug_camera_on ? "DEBUG CAMERA" : "NORMAL CAMERA") + " }");
   };
 
   if(camera_swap_cooldown_acc >= 0.0f) camera_swap_cooldown_acc -= window.getWindowData()->delta_time;
 };
-#endif
 
 
 
-#ifndef PRODUCTION
 void UW::App::updateFps(){
   if(fps_id > UW::Config::FPS_SAMPLES){
     fps = fps_id / fps_acc;

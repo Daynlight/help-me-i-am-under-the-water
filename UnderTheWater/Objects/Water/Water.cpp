@@ -21,7 +21,7 @@ void UW::Water::onUpdate(float delta_time){
 
 
 
-void UW::Water::onFixedUpdate(){
+void UW::Water::onFixedUpdate(float fixed_delta_time){
 
 };
 
