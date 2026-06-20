@@ -33,6 +33,7 @@ void UW::ObjectsSerialization::save(const UW::GameObject& object) {
   record.scale = object.scale;
   record.textures = object.textures;
   record.materials = object.materials;
+  for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
   outFile << record;
   outFile.close();
@@ -80,6 +81,7 @@ void UW::ObjectsSerialization::saveAll(std::vector<UW::GameObject>& objects) {
     record.scale = object.scale;
     record.textures = object.textures;
     record.materials = object.materials;
+    for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
     outFile << record;
     Logger::get().info("ObjectsSerialization", "Object saved { " + object.name + " }");
@@ -121,6 +123,7 @@ void UW::ObjectsSerialization::loadAll(std::vector<UW::GameObject>& objects) {
         object.scale = record.scale;
         object.textures = std::move(record.textures);
         object.materials = std::move(record.materials);
+        for(auto& script : record.scripts) object.scripts.emplace_back(script);
 
         objects.push_back(std::move(object));
         Logger::get().info("ObjectsSerialization", "Object loaded { " + record.name + " }");
@@ -169,6 +172,14 @@ std::ostream& UW::operator<<(std::ostream& os, const UW::GameObjectRecord& recor
     size_t mat_sz = mat.size();
     os.write(reinterpret_cast<const char*>(&mat_sz), sizeof(mat_sz));
     if (mat_sz > 0) os.write(mat.data(), mat_sz);
+  };
+
+  size_t scr_count = record.scripts.size();
+  os.write(reinterpret_cast<const char*>(&scr_count), sizeof(scr_count));
+  for (const auto& scr : record.scripts) {
+    size_t scr_sz = scr.size();
+    os.write(reinterpret_cast<const char*>(&scr_sz), sizeof(scr_sz));
+    if (scr_sz > 0) os.write(scr.data(), scr_sz);
   };
 
   return os;
@@ -227,6 +238,22 @@ std::istream& UW::operator>>(std::istream& is, UW::GameObjectRecord& record) {
     is.read(reinterpret_cast<char*>(&mat_sz), sizeof(mat_sz));
     mat.resize(mat_sz);
     if (mat_sz > 0) is.read(&mat[0], mat_sz);
+  };
+
+  size_t scr_count = 0;
+  is.read(reinterpret_cast<char*>(&scr_count), sizeof(scr_count));
+  
+  if (scr_count > 10000) {
+    is.setstate(std::ios::failbit);
+    return is;
+  };
+
+  record.scripts.resize(scr_count);
+  for (auto& scr : record.scripts) {
+    size_t scr_sz = 0;
+    is.read(reinterpret_cast<char*>(&scr_sz), sizeof(scr_sz));
+    scr.resize(scr_sz);
+    if (scr_sz > 0) is.read(&scr[0], scr_sz);
   };
 
   return is;

@@ -5,29 +5,38 @@
 
 
 
-#pragma once
 #define SCRIPTNAME Script_Test
 #define BUILDING_SCRIPT_DLL
 
 #include "GameObjectScriptInterface.h"
+
 #include <cstdio>
 
 
 namespace UW{
 class SCRIPTNAME : public GameObjectScriptInterface {
 public:
-  ~Script_Test() = default;
+  ~SCRIPTNAME() = default;
   
   void OnLoad(){
+    // printf("OnLoad\n");
   };
   
-  void OnUpdate(){
+  void OnUpdate(float delta_time){
+    // printf("OnUpdate\n");
+  };
+
+  void OnFixedUpdate(float fixed_delta_time){
+    // printf("OnFixedUpdate\n");
+  };
+  
+  void OnRender(){
+    // printf("OnRender\n");
   };
   
   void OnDestroy(){
-
+    // printf("OnDestroy\n");
   };
-
 };
 };
 

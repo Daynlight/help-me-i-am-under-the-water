@@ -52,7 +52,7 @@ void UW::UI_Objects::guiObjectList(){
   };
 
   if(ImGui::Button("Add new")) {
-    scene.object_manager.objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
+    scene.object_manager.objects.emplace_back(UW::GameObject("new object", "testing", "testing", {}, {}, {}, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f)));
     Logger::get().info("UI", "Added New Object { new object }");
   };
 };
@@ -147,6 +147,25 @@ void UW::UI_Objects::guiObjectEditor(){
 
   label = "Add material (" + std::to_string(object.materials.size()) + ")";
   if(ImGui::Button(label.c_str())) object.materials.emplace_back("new material");
+
+
+  ImGui::SeparatorText("Scripts: ");
+  for(int i = 0; i < object.scripts.size(); i++){
+    std::string label = "- script (" + std::to_string(i) + ")";
+    
+    char script_buffer[UW::Config::OBJECT_NAME_BUFFER_SIZE];
+    memcpy(script_buffer, object.scripts[i].getPath().data(), object.scripts[i].getPath().size());
+    script_buffer[object.scripts[i].getPath().size()] = '\0';
+    if(ImGui::InputText(label.c_str(), script_buffer, UW::Config::OBJECT_NAME_BUFFER_SIZE))
+      object.scripts[i] = UW::GameObjectScriptRecord(std::string(script_buffer + '\0'));
+    
+    ImGui::SameLine();
+    label = "Delete scripts##(" + std::to_string(i) + ")";
+    if(ImGui::Button(label.c_str())) object.scripts.erase(object.scripts.begin() + i);
+  };
+
+  label = "Add script (" + std::to_string(object.scripts.size()) + ")";
+  if(ImGui::Button(label.c_str())) object.scripts.emplace_back("new script");
 };
 
 

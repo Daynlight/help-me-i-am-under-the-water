@@ -27,7 +27,9 @@ public:
   virtual ~GameObjectScriptInterface() = default;
   
   virtual void OnLoad() = 0;
-  virtual void OnUpdate() = 0;
+  virtual void OnUpdate(float delta_time) = 0;
+  virtual void OnFixedUpdate(float fixed_delta_time) = 0;
+  virtual void OnRender() = 0;
   virtual void OnDestroy() = 0;
 
 };

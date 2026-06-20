@@ -29,6 +29,7 @@ class GameObjectScriptRecord{
   std::string cpp_file = "";
   bool cant_find_file_print = 1;
   void* script_handler = nullptr; 
+  unsigned int version = -1;
   GameObjectScriptInterface* script = nullptr;
 
 public:
@@ -43,17 +44,13 @@ public:
   void removeModule();
   
   void init();
-  void update();
+  void update(float delta_time);
+  void fixedUpdate(float fixed_delta_time);
+  void render();
   void destroy();
 
-};
+  std::string getPath();
+  unsigned int getVersion();
 
-
-
-class GameObjectScriptLoader{
-public:
-  std::unordered_map<std::string, GameObjectScriptRecord> game_object_scripts;
-
-  void observe();
 };
 };

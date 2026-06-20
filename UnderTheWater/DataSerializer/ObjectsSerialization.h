@@ -29,6 +29,7 @@ struct GameObjectRecord {
   glm::vec3 scale = glm::vec3(1.0f);
   std::vector<std::string> textures;
   std::vector<std::string> materials;
+  std::vector<std::string> scripts;
 
   friend std::ostream& operator<<(std::ostream& os, const GameObjectRecord& record);
   friend std::istream& operator>>(std::istream& is, GameObjectRecord& record);

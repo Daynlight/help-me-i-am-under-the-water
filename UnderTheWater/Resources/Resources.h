@@ -25,7 +25,6 @@ public:
   UW::Meshes meshes;
   UW::Lights lights;
   UW::Materials materials;
-  UW::GameObjectScriptLoader game_object_scripts;
 
 public:
   static Resources& get();

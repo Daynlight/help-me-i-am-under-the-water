@@ -49,6 +49,8 @@ bool UW::GameObjectScriptRecord::checkLastWrite() {
   if(currentWriteTime != lastWriteTime){
     changed = 1;
     lastWriteTime = currentWriteTime;
+    version++;
+    Logger::get().info("Script Controller", "Script changed lastWriteTime != currentWriteTime");
   };
 
   return changed;
@@ -88,6 +90,7 @@ int UW::GameObjectScriptRecord::compile() {
   else if(pid > 0){
     int status = 0; 
     waitpid(pid, &status, 0);
+    version++;
 
     if (WIFEXITED(status) && WEXITSTATUS(status) == 0) return 0; 
     else { 
@@ -176,6 +179,7 @@ void UW::GameObjectScriptRecord::init() {
   if(script){
 
 #ifndef PRODUCTION
+#ifdef SANDBOX_SCRIPTS
     pid_t pid = fork();
     if(pid == 0){
       script->OnLoad();
@@ -192,6 +196,7 @@ void UW::GameObjectScriptRecord::init() {
       };
     };
 #endif
+#endif
 
     script->OnLoad();
   };
@@ -199,13 +204,14 @@ void UW::GameObjectScriptRecord::init() {
 
 
 
-void UW::GameObjectScriptRecord::update() {
+void UW::GameObjectScriptRecord::update(float delta_time) {
   if(script){
 
 #ifndef PRODUCTION
+#ifdef SANDBOX_SCRIPTS
     pid_t pid = fork();
     if(pid == 0){
-      script->OnUpdate();
+      script->OnUpdate(delta_time);
 
       _exit(0);
     }
@@ -219,8 +225,67 @@ void UW::GameObjectScriptRecord::update() {
       };
     };
 #endif
+#endif
 
-    script->OnUpdate();
+    script->OnUpdate(delta_time);
+  };
+};
+
+
+
+void UW::GameObjectScriptRecord::fixedUpdate(float fixed_delta_time) {
+  if(script){
+
+#ifndef PRODUCTION
+#ifdef SANDBOX_SCRIPTS
+    pid_t pid = fork();
+    if(pid == 0){
+      script->OnFixedUpdate(fixed_delta_time);
+
+      _exit(0);
+    }
+    else if(pid > 0){
+      int status = 0; 
+      waitpid(pid, &status, 0);
+
+      if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) { 
+        UW::Logger::get().erro("Script Controller", std::to_string(status) + " - FixedUpdate failed!");
+        return; 
+      };
+    };
+#endif
+#endif
+
+    script->OnFixedUpdate(fixed_delta_time);
+  };
+};
+
+
+
+void UW::GameObjectScriptRecord::render() {
+  if(script){
+
+#ifndef PRODUCTION
+#ifdef SANDBOX_SCRIPTS
+    pid_t pid = fork();
+    if(pid == 0){
+      script->OnRender();
+
+      _exit(0);
+    }
+    else if(pid > 0){
+      int status = 0; 
+      waitpid(pid, &status, 0);
+
+      if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) { 
+        UW::Logger::get().erro("Script Controller", std::to_string(status) + " - Render failed!");
+        return; 
+      };
+    };
+#endif
+#endif
+
+    script->OnRender();
   };
 };
 
@@ -230,6 +295,7 @@ void UW::GameObjectScriptRecord::destroy() {
   if(script){
 
 #ifndef PRODUCTION
+#ifdef SANDBOX_SCRIPTS
     pid_t pid = fork();
     if(pid == 0){
       script->OnDestroy();
@@ -246,6 +312,7 @@ void UW::GameObjectScriptRecord::destroy() {
       };
     };
 #endif
+#endif
 
     script->OnDestroy();
   };
@@ -253,11 +320,12 @@ void UW::GameObjectScriptRecord::destroy() {
 
 
 
+std::string UW::GameObjectScriptRecord::getPath(){
+  return path;
+};
 
 
 
-void UW::GameObjectScriptLoader::observe(){
-  for(auto& script : game_object_scripts)
-    if(script.second.checkLastWrite())
-      script.second.updateScript();
+unsigned int UW::GameObjectScriptRecord::getVersion(){
+  return version;
 };

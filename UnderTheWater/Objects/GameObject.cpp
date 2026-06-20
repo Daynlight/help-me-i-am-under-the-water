@@ -9,9 +9,10 @@
 
 
 
-UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {
+UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, const std::vector<UW::GameObjectScriptRecord>& scripts, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), scripts(scripts), position(position), rotation(rotation), scale(scale) {
   mesh_id = Resources::get().meshes.get_id(mesh);
+  UW::Logger::get().info("GameObject", "GameObject Constructor Called!");
   onLoad();
 };
 
@@ -24,25 +25,35 @@ UW::GameObject::~GameObject(){
 
 
 void UW::GameObject::onLoad(){
-
+  for(auto& script : scripts) {
+    script.loadModule();
+    script.init();
+  };
 };
 
 
 
 void UW::GameObject::onDestroy(){
-
+  for(auto& script : scripts) {
+    script.destroy();
+    script.removeModule();
+  };
 };
 
 
 
 void UW::GameObject::onUpdate(float delta_time){
-
+  for(auto& script : scripts) script.update(delta_time);
 };
 
 
 
 void UW::GameObject::onFixedUpdate(float fixed_delta_time){
+  for(auto& script : scripts)
+    if(script.checkLastWrite())
+      script.updateScript();
 
+  for(auto& script : scripts) script.fixedUpdate(fixed_delta_time);
 };
 
 
@@ -66,6 +77,8 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
   glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
   glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
+
+  for(auto& script : scripts) script.render();
 
   if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[mesh_id])){
     uniform["model"]->set<glm::mat4>(model);

@@ -227,6 +227,7 @@ void UW::UI_AssetLoader::finalizeImport() {
       UW::Config::DEFAULT_SHADER,
       { assigned_mat_name },
       {},
+      {},
       glm::vec3(0.0f),
       glm::vec3(0.0f),
       glm::vec3(1.0f)
@@ -319,6 +320,7 @@ void UW::UI_AssetLoader::finalizeImportMerged(const std::string& merged_name) {
     final_merged_name,
     UW::Config::DEFAULT_SHADER,
     assigned_materials,
+    {},
     {},
     glm::vec3(0.0f),
     glm::vec3(0.0f),

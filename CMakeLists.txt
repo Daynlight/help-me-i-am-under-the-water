@@ -11,6 +11,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(PRODUCTION "Enable production build flags" OFF)
+# option(SANDBOX_SCRIPTS "Enable script sandboxing build flags" ON)
 
 
 
@@ -33,3 +34,7 @@ add_subdirectory(UnderTheWater)
 if(PRODUCTION)
   target_compile_definitions(UnderTheWater PRIVATE PRODUCTION)
 endif()
+
+# if(SANDBOX_SCRIPTS)
+#   target_compile_definitions(UnderTheWater PRIVATE SANDBOX_SCRIPTS)
+# endif()
