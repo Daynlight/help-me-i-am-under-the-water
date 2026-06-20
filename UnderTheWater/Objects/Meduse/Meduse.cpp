@@ -21,6 +21,97 @@ UW::Meduse::~Meduse(){
 
 
 
+void UW::Meduse::Meduse::onLoad(){
+  screen_quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
+  meshes_version = Resources::get().meshes.getLatestsVersion();
+};
+
+
+
+void UW::Meduse::Meduse::onDestroy(){
+
+};
+
+
+
+void UW::Meduse::Meduse::onUpdate(float delta_time){
+
+};
+
+
+
+void UW::Meduse::Meduse::onFixedUpdate(float fixed_delta_time) {
+  if (path.size() < 3) return;
+
+  glm::vec3 p0 = path[0];
+  glm::vec3 p1 = path[1];
+  glm::vec3 p2 = path[2];
+
+  glm::vec3 raw_tangent = (4.0f * t - 3.0f) * p0 
+    - (8.0f * t - 4.0f) * p1 
+    + (4.0f * t - 1.0f) * p2;
+
+  float tangent_len = glm::length(raw_tangent);
+  if (tangent_len < 0.001f) tangent_len = 0.001f;
+
+  float dt_pct = (speed * fixed_delta_time) / tangent_len;
+  bool segment_swapped = false;
+
+  if (t + dt_pct >= 0.5f) {
+    float t_needed = 0.5f - t;
+    float dt_used = (t_needed * tangent_len) / speed;
+    float dt_remaining = glm::max(0.0f, fixed_delta_time - dt_used);
+
+    t = 0.0f; 
+    path.push_back(path.front());
+    path.pop_front();
+
+    if (path.size() < 3) return;
+    p0 = path[0];
+    p1 = path[1];
+    p2 = path[2];
+
+    raw_tangent = (4.0f * t - 3.0f) * p0 
+      - (8.0f * t - 4.0f) * p1 
+      + (4.0f * t - 1.0f) * p2;
+
+    tangent_len = glm::length(raw_tangent);
+    if (tangent_len < 0.001f) tangent_len = 0.001f;
+
+    t += (speed * dt_remaining) / tangent_len;
+    segment_swapped = true; 
+  } else {
+    t += dt_pct;
+  }
+
+  position = 2.0f * (t - 0.5f) * (t - 1.0f) * p0 
+    - 4.0f * t * (t - 1.0f) * p1 
+    + 2.0f * t * (t - 0.5f) * p2;
+
+  if (glm::length(raw_tangent) > 0.001f) {
+    glm::vec3 current_tangent = glm::normalize(raw_tangent);
+
+    if (glm::length(last_tangent) < 0.1f || segment_swapped) {
+      last_tangent = current_tangent;
+    }
+
+    glm::vec3 axis = glm::cross(last_tangent, current_tangent);
+    float dot_prod = glm::clamp(glm::dot(last_tangent, current_tangent), -1.0f, 1.0f);
+    
+    if (glm::length(axis) > 0.0001f) {
+      float angle = std::acos(dot_prod);
+      glm::quat delta_rot = glm::angleAxis(angle, glm::normalize(axis));
+      
+      orientation = delta_rot * orientation;
+      orientation = glm::normalize(orientation);
+    }
+
+    last_tangent = current_tangent;
+  };
+};
+
+
+
 void UW::Meduse::Meduse::render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform){
   if(meshes_version != Resources::get().meshes.getLatestsVersion()){
     screen_quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
@@ -136,95 +227,4 @@ void UW::Meduse::Meduse::genRandom(int i, glm::vec3 position_min, glm::vec3 posi
 
   float s = distScale(gen);
   setScale(glm::vec3(s, s, s));
-};
-
-
-
-void UW::Meduse::Meduse::onFixedUpdate(float fixed_delta_time) {
-  if (path.size() < 3) return;
-
-  glm::vec3 p0 = path[0];
-  glm::vec3 p1 = path[1];
-  glm::vec3 p2 = path[2];
-
-  glm::vec3 raw_tangent = (4.0f * t - 3.0f) * p0 
-    - (8.0f * t - 4.0f) * p1 
-    + (4.0f * t - 1.0f) * p2;
-
-  float tangent_len = glm::length(raw_tangent);
-  if (tangent_len < 0.001f) tangent_len = 0.001f;
-
-  float dt_pct = (speed * fixed_delta_time) / tangent_len;
-  bool segment_swapped = false;
-
-  if (t + dt_pct >= 0.5f) {
-    float t_needed = 0.5f - t;
-    float dt_used = (t_needed * tangent_len) / speed;
-    float dt_remaining = glm::max(0.0f, fixed_delta_time - dt_used);
-
-    t = 0.0f; 
-    path.push_back(path.front());
-    path.pop_front();
-
-    if (path.size() < 3) return;
-    p0 = path[0];
-    p1 = path[1];
-    p2 = path[2];
-
-    raw_tangent = (4.0f * t - 3.0f) * p0 
-      - (8.0f * t - 4.0f) * p1 
-      + (4.0f * t - 1.0f) * p2;
-
-    tangent_len = glm::length(raw_tangent);
-    if (tangent_len < 0.001f) tangent_len = 0.001f;
-
-    t += (speed * dt_remaining) / tangent_len;
-    segment_swapped = true; 
-  } else {
-    t += dt_pct;
-  }
-
-  position = 2.0f * (t - 0.5f) * (t - 1.0f) * p0 
-    - 4.0f * t * (t - 1.0f) * p1 
-    + 2.0f * t * (t - 0.5f) * p2;
-
-  if (glm::length(raw_tangent) > 0.001f) {
-    glm::vec3 current_tangent = glm::normalize(raw_tangent);
-
-    if (glm::length(last_tangent) < 0.1f || segment_swapped) {
-      last_tangent = current_tangent;
-    }
-
-    glm::vec3 axis = glm::cross(last_tangent, current_tangent);
-    float dot_prod = glm::clamp(glm::dot(last_tangent, current_tangent), -1.0f, 1.0f);
-    
-    if (glm::length(axis) > 0.0001f) {
-      float angle = std::acos(dot_prod);
-      glm::quat delta_rot = glm::angleAxis(angle, glm::normalize(axis));
-      
-      orientation = delta_rot * orientation;
-      orientation = glm::normalize(orientation);
-    }
-
-    last_tangent = current_tangent;
-  };
-};
-
-
-
-void UW::Meduse::Meduse::onUpdate(float delta_time){
-
-};
-
-
-
-void UW::Meduse::Meduse::onLoad(){
-  screen_quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
-  meshes_version = Resources::get().meshes.getLatestsVersion();
-};
-
-
-
-void UW::Meduse::Meduse::onDestroy(){
-
 };

@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
 
@@ -26,6 +33,8 @@ public:
   Water();
   ~Water();
 
+  void onLoad() override;
+  void onDestroy() override;
   void onUpdate(float delta_time) override;
   void onFixedUpdate(float fixed_delta_time) override;
   void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform) override;
@@ -33,5 +42,6 @@ public:
 private:
   void generateChunks();
   bool isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, const CW::Renderer::Mesh& mesh);
+
 };
 }; // namespace UW

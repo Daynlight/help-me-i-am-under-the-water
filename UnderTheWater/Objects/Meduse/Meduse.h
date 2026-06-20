@@ -43,6 +43,10 @@ public:
   Meduse();
   ~Meduse();
 
+  void onLoad() override;
+  void onDestroy() override;
+  void onUpdate(float delta_time) override;
+  void onFixedUpdate(float fixed_delta_time) override;
   void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform) override;
 
   void setPosition(glm::vec3 position);
@@ -52,11 +56,6 @@ public:
   void setPath(std::deque<glm::vec3> path);
 
   void genRandom(int i, glm::vec3 position_min, glm::vec3 position_max, glm::vec3 center, glm::vec3 rotation_min, glm::vec3 rotation_max, float scale_min, float scale_max);
-
-  void onLoad();
-  void onDestroy();
-  void onFixedUpdate(float fixed_delta_time) override;
-  void onUpdate(float delta_time) override;
 
 };
 };

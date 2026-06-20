@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #include "Water.h"
 
 
@@ -5,12 +12,25 @@
 UW::Water::Water(){
   generateChunks();
   mesh_id = Resources::get().meshes.get_id("terrain_chunk");
+  onLoad();
 };
 
 
 
 UW::Water::~Water(){
-  
+  onDestroy();
+};
+
+
+
+void UW::Water::onLoad(){
+
+};
+
+
+
+void UW::Water::onDestroy(){
+
 };
 
 
@@ -117,7 +137,7 @@ bool UW::Water::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, c
   for (int i = 1; i < 8; i++){
     aabbMin = glm::min(aabbMin, corners[i]);
     aabbMax = glm::max(aabbMax, corners[i]);
-  }
+  };
 
   glm::mat4 m = culling_camera_transform;
 
@@ -167,11 +187,8 @@ bool UW::Water::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, c
 
   for (int i = 0; i < 6; i++){
     float length = glm::length(glm::vec3(planes[i]));
-
-    if (length > 0.0f){
-      planes[i] /= length;
-    }
-  }
+    if (length > 0.0f) planes[i] /= length;
+  };
 
   for (int i = 0; i < 6; i++){
     glm::vec3 normal = glm::vec3(planes[i]);
@@ -184,10 +201,8 @@ bool UW::Water::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, c
 
     float distance = glm::dot(normal, positiveVertex) + planes[i].w;
 
-    if (distance < 0.0f){
-      return false;
-    }
-  }
+    if (distance < 0.0f) return false;
+  };
 
   return true;
-}
+};

@@ -1,15 +1,35 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #include "Skybox.h"
 
 
 
 UW::Skybox::Skybox(){
   mesh_id = Resources::get().meshes.get_id("sky_box");
+  onLoad();
 };
 
 
 
 UW::Skybox::~Skybox(){
+  onDestroy();
+};
 
+
+
+void UW::Skybox::onLoad(){
+
+};
+
+
+
+void UW::Skybox::onDestroy(){
+  
 };
 
 

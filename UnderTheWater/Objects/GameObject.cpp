@@ -1,15 +1,48 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #include "GameObject.h"
 
 
 
 UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
   :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {
-    mesh_id = Resources::get().meshes.get_id(mesh);
-  };
+  mesh_id = Resources::get().meshes.get_id(mesh);
+  onLoad();
+};
 
 
 
 UW::GameObject::~GameObject(){
+  onDestroy();
+};
+
+
+
+void onLoad(){
+
+};
+
+
+
+void onDestroy(){
+
+};
+
+
+
+void UW::GameObject::onUpdate(float delta_time){
+
+};
+
+
+
+void UW::GameObject::onFixedUpdate(float fixed_delta_time){
+
 };
 
 
@@ -68,16 +101,6 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
 
 
 
-void UW::GameObject::onUpdate(float delta_time){
-};
-
-
-
-void UW::GameObject::onFixedUpdate(float fixed_delta_time){
-};
-
-
-
 bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model, const CW::Renderer::Mesh& mesh){
   auto cullingBox = mesh.getCullingBox();
   glm::vec3 localMin = glm::vec3(cullingBox[0][0], cullingBox[0][1], cullingBox[0][2]); 
@@ -121,9 +144,7 @@ bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 mod
 
   for (int i = 0; i < 6; i++){
     float length = glm::length(glm::vec3(planes[i]));
-    if (length > 0.0f){
-      planes[i] /= length;
-    };
+    if (length > 0.0f) planes[i] /= length;
   };
 
   for (int i = 0; i < 6; i++){
@@ -136,9 +157,7 @@ bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 mod
 
     float distance = glm::dot(normal, positiveVertex) + planes[i].w;
 
-    if (distance < 0.0f){
-      return false; 
-    };
+    if (distance < 0.0f) return false;
   };
 
   return true;

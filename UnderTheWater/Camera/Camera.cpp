@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2025 Daynlight
+// Licensed under the Apache License, Version 2.0.
+// See LICENSE file for details.
+
+
+
 #include "Camera.h"
 
 
@@ -10,7 +17,8 @@ UW::Camera::Camera(CW::Renderer::Renderer* renderer, glm::vec3 position, glm::ve
   } else {
     this->direction = glm::vec3(0.0f, 0.0f, 1.0f);
     this->orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-  }
+  };
+
   resetMouse();
 };
 
@@ -59,8 +67,8 @@ glm::mat4 UW::Camera::projection(CW::Renderer::Renderer* renderer) {
     return glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_ORTHO_FAR_PLANE);
   } else {
     return glm::perspective(glm::radians(UW::Config::CAMERA_FOV), aspectRatio, UW::Config::CAMERA_NEAR_PLANE, UW::Config::CAMERA_FAR_PLANE);
-  }
-}
+  };
+};
 
 
 
@@ -95,6 +103,7 @@ void UW::Camera::event(CW::Renderer::Renderer* renderer) {
     position -= right * velocity * dt;
     target_bank -= UW::Config::CAMERA_TILT_ACCELERATION;
   };
+  
   if (renderer->getInputData()->is_key_down(UW::Config::CAMERA_MOVE_LEFT)) {
     position += right * velocity * dt;
     target_bank += UW::Config::CAMERA_TILT_ACCELERATION;
