@@ -23,13 +23,13 @@ UW::GameObject::~GameObject(){
 
 
 
-void onLoad(){
+void UW::GameObject::onLoad(){
 
 };
 
 
 
-void onDestroy(){
+void UW::GameObject::onDestroy(){
 
 };
 
