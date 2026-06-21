@@ -1,8 +1,10 @@
 # Help Me I'm Under The Water
 
 
+
 ## About
 Project for **GRK** under water scene. Build on top of [**CWindow library**](https://github.com/Daynlight/CWindow.git). Uses **ImGui** build in **CWindow** for parameters adjustment and visualization.
+
 
 
 ## TOC
@@ -24,6 +26,7 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [License](#license)
 - [Author](#author)
 - [TODO](#todo)
+
 
 
 ## Installation and Usage
@@ -52,6 +55,7 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
          ```bash
          ./UnderTheWater/UnderTheWater
          ```
+
 
 
 ## Build in prod
@@ -109,12 +113,15 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [**cmrc**](https://github.com/vector-of-bool/cmrc.git): master
 
 
+
 ## License
 [GNU GENERAL v3](LICENSE)
 
 
+
 ## Author
 - Daniel Stodulski
+
 
 
 ## TODO
