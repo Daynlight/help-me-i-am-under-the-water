@@ -185,6 +185,22 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Docs
 - [ ] Assets
 - [ ] Releases
+- [ ] Scripts Win support
+
+- [ ] Multiple Scripts seg fault (Object UI) -> (GameObject)
+- [ ] Object Add object issue (Object UI) -> (GameObject)
+- [ ] Object Delete Script (Object UI) -> (GameObject)
+- [ ] Object Duplicate object issue (Object UI) -> (GameObject)
+- [ ] Asset Loader seg fault (Object UI) -> (GameObject)
+
+- [x] Info UI
+- [x] Log UI
+- [x] Materials UI
+- [x] Lights UI
+- [x] Shaders UI
+- [x] Scripts UI
+- [ ] Object UI
+- [ ] Asset Loader UI
 </details>
 
 <details>

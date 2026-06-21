@@ -26,6 +26,17 @@ UW::GameObject::GameObject(const std::string& name, const std::string& mesh, con
 
 
 
+UW::GameObject::GameObject(const std::string& name, const GameObject& other){
+  UW::Logger::get().info("GameObject", "GameObject Duplicating");
+  for(auto script : other.scripts) scripts.emplace_back(script.getPath());
+  game_object_data = other.game_object_data;
+  // game_object_data.name = name;
+  mesh_id = Resources::get().meshes.get_id(other.game_object_data.mesh);
+  onLoad();
+};
+
+
+
 UW::GameObject::~GameObject(){
   onDestroy();
 };
@@ -69,6 +80,8 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
     mesh_id = Resources::get().meshes.get_id(this->game_object_data.mesh);
     mesh_last = game_object_data.mesh;
   };
+
+  if(Resources::get().meshes.size() <= mesh_id) return;
 
   uniform["projection"]->set<glm::mat4>(render_camera.projection(renderer));
   uniform["view"]->set<glm::mat4>(render_camera.view(renderer));

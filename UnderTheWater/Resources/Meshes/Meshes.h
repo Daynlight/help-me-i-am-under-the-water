@@ -29,6 +29,7 @@ public:
   unsigned int get_id(const std::string& name);
 
   void erase(const std::string& name);
+  unsigned int size() const;
   void clear();
 
   void emplace_back(const std::string& name, CW::Renderer::Mesh&& mesh);

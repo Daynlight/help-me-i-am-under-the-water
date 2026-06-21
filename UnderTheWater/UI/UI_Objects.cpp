@@ -49,6 +49,13 @@ void UW::UI_Objects::guiObjectList(){
       scene.object_manager.objects.erase(scene.object_manager.objects.begin() + id);
       Logger::get().warn("UI", "Deleted Object { " + scene.object_manager.objects[id].game_object_data.name + " }");
     };
+
+    label = "Duplicate##" + std::to_string(id);
+    ImGui::SameLine();
+    if(ImGui::Button(label.c_str())) {
+      scene.object_manager.objects.emplace_back(GameObject(scene.object_manager.objects[id].game_object_data.name + "_copy", scene.object_manager.objects[id]));
+      Logger::get().warn("UI", "Duplicated Object { " + scene.object_manager.objects[id].game_object_data.name + " }");
+    };
   };
 
   if(ImGui::Button("Add new")) {
@@ -165,7 +172,9 @@ void UW::UI_Objects::guiObjectEditor(){
   };
 
   label = "Add script (" + std::to_string(object.scripts.size()) + ")";
-  if(ImGui::Button(label.c_str())) object.scripts.emplace_back("new script");
+  if(ImGui::Button(label.c_str())) {
+    object.scripts.emplace_back(GameObjectScriptRecord("new script"));
+  };
 };
 
 

@@ -80,6 +80,12 @@ void UW::Meshes::erase(const std::string& name) {
 
 
 
+unsigned int UW::Meshes::size() const{
+  return mesh_data.size();
+};
+
+
+
 void UW::Meshes::clear(){
   version += 1;
   mesh_data.clear();
