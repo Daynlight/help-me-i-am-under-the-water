@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Objects.h"
 
 #ifndef PRODUCTION
@@ -67,9 +74,9 @@ void UW::UI_Objects::guiObjectList(){
 
 
 std::function<void(CW::Renderer::iRenderer *window)> UW::UI_Objects::objectExplorerGui(){
-  return [this](CW::Renderer::iRenderer *window){
-    guiObjectList();
-  };
+return [this](CW::Renderer::iRenderer *window){
+  guiObjectList();
+};
 };
 
 

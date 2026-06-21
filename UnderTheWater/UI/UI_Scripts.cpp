@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Scripts.h"
 
 #ifndef PRODUCTION
@@ -61,21 +68,17 @@ std::vector<std::string> UW::UI_Scripts::getAvailableScripts() {
     for (const auto& entry : fs::directory_iterator(UW::Config::SCRIPTS_FOLDER)) {
       if (entry.is_regular_file() && entry.path().extension() == ".cpp") {
         script_files.push_back(entry.path().filename().string());
-      }
-    }
-  }
+      };
+    };
+  };
   
   return script_files;
-}
+};
 
 
 
 void UW::UI_Scripts::guiScriptList() {
   ImGui::SeparatorText("Scripts List");
-
-  if (ImGui::Button("Refresh Files")) {
-    Logger::get().info("UI_Scripts", "Refreshing script list from disk");
-  }
 
   auto available_scripts = getAvailableScripts();
   std::vector<std::string> scripts_to_close;
@@ -98,13 +101,13 @@ void UW::UI_Scripts::guiScriptList() {
 
 
   for (const auto& name_to_close : scripts_to_close) {
-  script_editors.erase(
-    std::remove_if(script_editors.begin(), script_editors.end(),
-      [&](const auto& editor) { return editor->getName() == name_to_close; }
-    ),
-    script_editors.end()
-  );
-};
+    script_editors.erase(
+      std::remove_if(script_editors.begin(), script_editors.end(),
+        [&](const auto& editor) { return editor->getName() == name_to_close; }
+      ),
+      script_editors.end()
+    );
+  };
 };
 
 
@@ -114,7 +117,5 @@ inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI_Scripts::scri
     guiScriptList();
   };
 };
-
-
 
 #endif

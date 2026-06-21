@@ -246,7 +246,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details open>
 <summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
 
-- [ ] Clean up
+- [x] Clean up
 - [ ] Optimization
 - [ ] Docs
 - [ ] Assets

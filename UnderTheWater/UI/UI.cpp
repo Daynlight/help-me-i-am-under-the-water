@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI.h"
 #ifndef PRODUCTION
 
@@ -254,7 +261,5 @@ std::function<void(std::function<void()> render_windows)> UW::UI::appWorkspace()
     ImGui::End();
   };
 };
-
-
 
 #endif

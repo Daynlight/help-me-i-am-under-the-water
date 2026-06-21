@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Shaders.h"
 
 #ifndef PRODUCTION
@@ -94,7 +101,5 @@ inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI_Shaders::shad
     guiShaderList();
   };
 };
-
-
 
 #endif

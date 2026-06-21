@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Materials.h"
 
 #ifndef PRODUCTION
@@ -49,22 +56,22 @@ inline void UW::UI_Materials::guiMaterialList(){
       Resources::get().materials.erase(el.first);
       Logger::get().warn("UI", "Deleted Material { " + el.first + " }");
       break;
-    }
-  }
+    };
+  };
 
   std::string button_label = "Add " + std::to_string(Resources::get().materials.size());
   if (ImGui::Button(button_label.c_str())) {
     Resources::get().materials.emplace_back("new material", UW::Material());
     Logger::get().info("UI", "Added new Material { new material }");
-  }
+  };
 };
 
 
 
 inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI_Materials::materialExplorerGui(){
-  return [this](CW::Renderer::iRenderer *window){
-    guiMaterialList();
-  };
+return [this](CW::Renderer::iRenderer *window){
+  guiMaterialList();
+};
 };
 
 

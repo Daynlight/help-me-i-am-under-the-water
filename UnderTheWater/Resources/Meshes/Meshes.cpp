@@ -121,6 +121,5 @@ unsigned int UW::Meshes::getLatestsVersion(){
 
 
 void UW::Meshes::compileAll(){
-  for(CW::Renderer::Mesh& mesh : mesh_data)
-    mesh.compile();
+  for(CW::Renderer::Mesh& mesh : mesh_data) mesh.compile();
 };
