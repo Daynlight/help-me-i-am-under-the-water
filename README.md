@@ -1,4 +1,9 @@
+<div align=center>
+
 # Help Me I'm Under The Water
+
+[![wakatime](https://wakatime.com/badge/user/233b40bd-5512-4e3e-9573-916f7b4127c3/project/408b7767-840b-45a2-b96f-d4c1d6a11ab1.svg)](https://wakatime.com/badge/user/233b40bd-5512-4e3e-9573-916f7b4127c3/project/408b7767-840b-45a2-b96f-d4c1d6a11ab1)
+</div>
 
 
 
