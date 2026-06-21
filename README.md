@@ -67,9 +67,8 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [UI](#ui)
 - [TOC](#toc)
 - [Installation and Usage](#installation-and-usage)
-- [Build in prod](#build-in-prod)
-- [Supported Platforms](#supported-platforms)
 - [Compiling End Product](#compiling-end-product)
+- [Supported Platforms](#supported-platforms)
 - [Architecture](#architecture)
   - [Build System](#build-system)
   - [Lights](#lights)
@@ -115,7 +114,9 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 
 
 
-## Build in prod
+## Compiling End Product
+Use cmake command with ```PRODUCTION``` FLAG
+
 ```bash
 mkdir -p build-prod
 cd build-prod
@@ -130,11 +131,6 @@ cd ..
 ## Supported Platforms
 * Linux X11
 * Windows in plans (Scripts issue) 
-
-
-
-## Compiling End Product
-Use cmake command with ```PRODUCTION``` FLAG
 
 
 
