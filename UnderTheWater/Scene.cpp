@@ -126,6 +126,7 @@ void UW::Scene::onDestroy() {
   Logger::get().info("Scene", "Destroying Scene");
 
   #ifndef PRODUCTION
+  for(GameObject& object : object_manager.objects) object.onDestroy();
   DataSerializer::get().saveAll(object_manager.objects);
   #endif
   
