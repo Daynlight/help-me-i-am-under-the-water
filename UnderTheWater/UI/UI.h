@@ -53,6 +53,7 @@ public:
   ~UI();
   void onLoad();
   void render();
+  void onDestroy();
 
 private:
 // gui

@@ -30,7 +30,9 @@ void UW::UI_ScriptEditor::guiScriptLoad(const std::string& name){
   memset(buffer, '\0', UW::Config::SCRIPT_EDITOR_BUFFER_SIZE);
   
   std::string source = DataSerializer::get().loadScript(name);
-  memcpy(buffer, source.data(), source.size());
+  size_t copy_size = std::min(source.size(), static_cast<size_t>(UW::Config::SCRIPT_EDITOR_BUFFER_SIZE) - 1);
+  memcpy(buffer, source.data(), copy_size);
+  buffer[copy_size] = '\0';
 
 
   Logger::get().info("UI_ScriptEditor", "Loaded { " + script_name + " }");

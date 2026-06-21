@@ -18,6 +18,14 @@ UW::UI_Scripts::~UI_Scripts(){
 
 
 
+void UW::UI_Scripts::onDestroy() {
+  script_editors.clear();
+  
+  Logger::get().info("UI_Scripts", "All Script Editors closed safely.");
+}
+
+
+
 void UW::UI_Scripts::uiControl(){
   if(guiSettings.scriptsExplorerWindowOn){
     Logger::get().info("UI_Scripts", "Opening Script Explorer GUI");
@@ -44,7 +52,7 @@ void UW::UI_Scripts::loadScriptEditors(){
 
 
 void UW::UI_Scripts::saveScriptEditors(){
-  Logger::get().info("UI_Scripts", "Saving Shader Editors");
+  Logger::get().info("UI_Scripts", "Saving Scripts Editors");
 
   guiSettings.scripts_editors_reg.clear();
   for(const auto& el : script_editors){
@@ -78,33 +86,37 @@ void UW::UI_Scripts::guiScriptList() {
   }
 
   auto available_scripts = getAvailableScripts();
+  std::vector<std::string> scripts_to_close;
 
   for (const auto& script_name : available_scripts) {
     if (ImGui::CollapsingHeader(script_name.c_str())) {
-      
       bool is_open = std::any_of(
         script_editors.begin(),
         script_editors.end(),
         [&](const auto& editor) { return editor->getName() == script_name; }
       );
 
+      
       if (ImGui::Button(is_open ? "Close Editor" : "Open Editor")) {
         if (is_open) {
-          script_editors.erase(
-            std::remove_if(
-              script_editors.begin(),
-              script_editors.end(),
-              [&](const auto& editor) { return editor->getName() == script_name; }
-            ),
-            script_editors.end()
-          );
+          scripts_to_close.push_back(script_name);
         } else {
           script_editors.emplace_back(std::make_unique<UI_ScriptEditor>(gui, script_name));
-        }
-      }
-    }
-  }
-}
+        };
+      };
+    };
+  };
+
+
+  for (const auto& name_to_close : scripts_to_close) {
+  script_editors.erase(
+    std::remove_if(script_editors.begin(), script_editors.end(),
+      [&](const auto& editor) { return editor->getName() == name_to_close; }
+    ),
+    script_editors.end()
+  );
+};
+};
 
 
 

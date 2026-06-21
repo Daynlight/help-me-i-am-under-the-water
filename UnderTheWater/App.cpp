@@ -61,6 +61,7 @@ void UW::App::onLoad(){
 void UW::App::onDestroy() {
   Logger::get().info("App", "Destroying Scene");
 
+  ui.onDestroy();
   scene.onDestroy();
   
   Resources::get().destroy();

@@ -19,11 +19,11 @@ UW::UI::UI(CW::Renderer::Renderer &window, float &fps, UW::Scene& scene)
 };
 
 
+
 UW::UI::~UI(){
-  Logger::get().info("UI", "Destroying UI");
-  shader_ui.saveShaderEditors();
-  scripts_ui.saveScriptEditors();
+  onDestroy();
 };
+
 
 
 void UW::UI::onLoad(){
@@ -35,9 +35,20 @@ void UW::UI::onLoad(){
 };
 
 
+
 void UW::UI::render(){
   gui.render();
 };
+
+
+
+void UW::UI::onDestroy() {
+  Logger::get().info("UI", "Destroying UI");
+  scripts_ui.saveScriptEditors();
+  shader_ui.saveShaderEditors();
+  scripts_ui.onDestroy();
+};
+
 
 
 // ========================= //
@@ -84,7 +95,7 @@ void UW::UI::configControl(){
     if (sscanf(line, "Window_Height=%d", &value) == 1) s->window_height = value;
     
     char value_str[256];
-    if (sscanf(line, "Material_ID=%256s", &value_str) == 1) s->material_name = std::string(value_str);
+    if (sscanf(line, "Material_ID=%255s", &value_str) == 1) s->material_name = std::string(value_str);
     
     char name[256];
     unsigned int type;
@@ -93,7 +104,7 @@ void UW::UI::configControl(){
       s->shader_editors_reg.emplace_back(name, type);
     };
 
-    if (sscanf(line, "ScriptEditor=%255[^,]", name) == 1){
+    if (sscanf(line, "ScriptEditor=%255[^\n]", name) == 1){
       s->scripts_editors_reg.emplace_back(name);
     };
   };
