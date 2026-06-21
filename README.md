@@ -209,4 +209,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Move terrain, water, skybox to object_register vector.
 - [ ] Window Data Serialization.
 - [ ] Fix black lights for new Scene class.
+- [ ] Script System for ```PRODUCTION```.
+- [ ] Scripts multiple compilation issue.
+- [ ] Script async compile.
 </details>

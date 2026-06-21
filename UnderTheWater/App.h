@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -33,6 +33,10 @@ private:
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
+
+  float total_fps_acc = 0.0f;
+  unsigned int total_fps_id = 0;
+
   float camera_swap_cooldown_acc = 0.0f;
 #endif
 

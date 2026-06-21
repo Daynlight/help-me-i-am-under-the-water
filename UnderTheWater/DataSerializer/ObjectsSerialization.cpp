@@ -7,7 +7,7 @@ CMRC_DECLARE(GameData);
 
 #ifndef PRODUCTION
 void UW::ObjectsSerialization::save(const UW::GameObject& object) {
-  Logger::get().info("ObjectsSerialization", "Saving object: " + object.name);
+  Logger::get().info("ObjectsSerialization", "Saving object: " + object.game_object_data.name);
   
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
@@ -25,20 +25,20 @@ void UW::ObjectsSerialization::save(const UW::GameObject& object) {
   };
 
   UW::GameObjectRecord record;
-  record.name = object.name;
-  record.mesh = object.mesh;
-  record.shader = object.shader;
+  record.name = object.game_object_data.name;
+  record.mesh = object.game_object_data.mesh;
+  record.shader = object.game_object_data.shader;
   record.position = object.game_object_data.position;
   record.rotation = object.game_object_data.rotation;
   record.scale = object.game_object_data.scale;
-  record.textures = object.textures;
-  record.materials = object.materials;
+  record.textures = object.game_object_data.textures;
+  record.materials = object.game_object_data.materials;
   for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
   outFile << record;
   outFile.close();
 
-  Logger::get().info("ObjectsSerialization", "Object saved { " + object.name + " }");
+  Logger::get().info("ObjectsSerialization", "Object saved { " + object.game_object_data.name + " }");
 };
 #endif
 
@@ -73,18 +73,18 @@ void UW::ObjectsSerialization::saveAll(std::vector<UW::GameObject>& objects) {
 
   for (const auto& object : objects) {
     UW::GameObjectRecord record;
-    record.name = object.name;
-    record.mesh = object.mesh;
-    record.shader = object.shader;
+    record.name = object.game_object_data.name;
+    record.mesh = object.game_object_data.mesh;
+    record.shader = object.game_object_data.shader;
     record.position = object.game_object_data.position;
     record.rotation = object.game_object_data.rotation;
     record.scale = object.game_object_data.scale;
-    record.textures = object.textures;
-    record.materials = object.materials;
+    record.textures = object.game_object_data.textures;
+    record.materials = object.game_object_data.materials;
     for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
     outFile << record;
-    Logger::get().info("ObjectsSerialization", "Object saved { " + object.name + " }");
+    Logger::get().info("ObjectsSerialization", "Object saved { " + object.game_object_data.name + " }");
   };
 
   outFile.close();
@@ -121,8 +121,8 @@ void UW::ObjectsSerialization::loadAll(std::vector<UW::GameObject>& objects) {
         object.game_object_data.position = record.position;
         object.game_object_data.rotation = record.rotation;
         object.game_object_data.scale = record.scale;
-        object.textures = std::move(record.textures);
-        object.materials = std::move(record.materials);
+        object.game_object_data.textures = std::move(record.textures);
+        object.game_object_data.materials = std::move(record.materials);
         for(auto& script : record.scripts) object.scripts.emplace_back(script);
 
         objects.push_back(std::move(object));

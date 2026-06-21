@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -14,22 +14,28 @@ UW::Scene::Scene(CW::Renderer::Renderer& window)
 #ifndef PRODUCTION
   , debug_camera(&window)
 #endif
-   {};
+{
+  UW::Logger::get().info("Scene", "Scene Initialized");
+};
 
 
 
-UW::Scene::~Scene(){};
+UW::Scene::~Scene(){
+  UW::Logger::get().info("Scene", "Scene Destroyed");
+};
 
 
 
 void UW::Scene::onLoad(){
-  DataSerializer::get().loadAll(object_manager.objects);
-
   Logger::get().info("Scene", "Loading Scene");
+  
+  DataSerializer::get().loadAll(object_manager.objects);
+  Logger::get().info("Scene", "Data Loaded from DataSerializer");
 
 
   screen_quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
   meshes_version = Resources::get().meshes.getLatestsVersion();
+  Logger::get().info("Scene", "Meshes ID's Initialized");
 
 
   post_uniform["u_water_height"]->set<float>(UW::Config::WATER_HEIGHT);
@@ -37,36 +43,36 @@ void UW::Scene::onLoad(){
   post_uniform["u_Far"]->set<float>(UW::Config::CAMERA_ORTHO_FAR_PLANE);
   post_uniform["u_FogDensity"]->set<float>(UW::Config::FOG_DENSITY);
   post_uniform["u_FogColor"]->set<glm::vec3>(UW::Config::FOG_COLOR);
-
+  Logger::get().info("Scene", "PostProcessing Uniforms Initialized");
+  
 
   light_camera.setOrthographic(true);
-
   light_camera.fov = 110.0f;
   last_light_camera_fov = light_camera.fov; 
-  
   light_camera.position = Resources::get().lights[0].position;
   last_light_camera_pos = light_camera.position;
-
   light_camera.direction = glm::normalize(-Resources::get().lights[0].position);
   last_light_camera_dir = light_camera.direction;
-  
   light_space_matrix = light_camera.transformation(&window);
   
   shadows_uniform_off["u_ShadowEnabled"]->set<int>(0);
   shadows_uniform_off["u_ShadowDepthTexture"]->set<int>(16);
   shadows_uniform_off["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
-  
   shadows_uniform_on["u_ShadowEnabled"]->set<int>(1);
   shadows_uniform_on["u_ShadowDepthTexture"]->set<int>(16);
   shadows_uniform_on["u_LightSpaceMatrix"]->set<glm::mat4>(light_space_matrix);
-
+  Logger::get().info("Scene", "Shadows Camera and Uniform Initialized");
+  
 
   camera.position = {174.780f, 26.939f, -80.027f};
   camera.direction = {-0.847f, -0.466f, -0.256f};
+  Logger::get().info("Scene", "Main Camera Initialized");
 
-  #ifndef PRODUCTION
+
+#ifndef PRODUCTION
   debug_camera.position = {453.198f, 250.233f, -26.842f};
   debug_camera.direction = {-0.668f, -0.734f, -0.122f};
+  Logger::get().info("Scene", "Debug Camera Initialized");
 #endif
   
 
@@ -85,8 +91,11 @@ void UW::Scene::onLoad(){
                       glm::vec3(282.921, 21.784, 0.884)});
   meduses[0].setOrientation(glm::vec3(0.0f, 0.0f, 0.0f));
   meduses[0].setSpeed(20.0f);
+  Logger::get().info("Scene", "Meduses SDF Objects Initialized");
     
+
   compileShadows();
+  Logger::get().info("Scene", "Shadows Compiled");
 };
 
 
@@ -110,6 +119,7 @@ void UW::Scene::onFixedUpdate(float fixed_delta_time){
   if(save_acc >= UW::Config::SAVE_TIMESTAMP){
     save_acc -= UW::Config::SAVE_TIMESTAMP;
     DataSerializer::get().saveAll(object_manager.objects);
+    Logger::get().info("Scene", "Auto-Save scene data");
   };
 #endif
 
@@ -125,12 +135,18 @@ void UW::Scene::onFixedUpdate(float fixed_delta_time){
 void UW::Scene::onDestroy() {
   Logger::get().info("Scene", "Destroying Scene");
 
-  #ifndef PRODUCTION
+#ifndef PRODUCTION
   for(GameObject& object : object_manager.objects) object.onDestroy();
+  Logger::get().info("Scene", "Objects onDestroy");
+
   DataSerializer::get().saveAll(object_manager.objects);
-  #endif
+  Logger::get().info("Scene", "Force saved scene data");
+#endif
   
   object_manager.objects.clear();
+  Logger::get().info("Scene", "Objects Removed");
+
+  Logger::get().info("Scene", "Destroyed Scene");
 };
 
 
@@ -189,7 +205,6 @@ void UW::Scene::render(){
     renderFrame(camera);
 
 
-
 #ifndef PRODUCTION
   if(debug_camera_on)
     renderSFD(debug_camera);
@@ -207,11 +222,11 @@ void UW::Scene::render(){
   window.beginFrame();
 
 
-  #ifndef PRODUCTION
+#ifndef PRODUCTION
   if(!post_processing_on)
     fbo.blitToScreen(window.getWindowData()->width, window.getWindowData()->height);
   else
-  #endif
+#endif
     postProcessing();
 };
 
@@ -245,6 +260,7 @@ void UW::Scene::postProcessing(){
   if(meshes_version != Resources::get().meshes.getLatestsVersion()){
     screen_quad_mesh_id = Resources::get().meshes.get_id("screen_quad");
     meshes_version = Resources::get().meshes.getLatestsVersion();
+    Logger::get().info("Scene", "Meshes ID's Updated");
   };
 
   std::string shader_name = "PostProcessing";

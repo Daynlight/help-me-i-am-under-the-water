@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -8,8 +8,9 @@
 #define SCRIPTNAME Script_Test
 #define BUILDING_SCRIPT_DLL
 
-#include "GameObjectScriptInterface.h"
-#include "../UnderTheWater/Objects/GameObjectData.h"
+#include "../UnderTheWater/ScriptShared/GameObjectScriptInterface.h"
+#include "../UnderTheWater/ScriptShared/GameObjectData.h"
+#include "../UnderTheWater/ScriptShared/Logger.h"
 #include <cstdio>
 #include <math.h>
 
@@ -19,39 +20,39 @@ namespace UW{
 class SCRIPTNAME : public GameObjectScriptInterface {
 private:
   glm::vec3 initial_position = glm::vec3(0.0f);
-
   glm::vec3 initial_size = glm::vec3(1.0f);
+  std::string initial_mesh = "";
   float time = 0;
 
 public:
   ~SCRIPTNAME() = default;
   
   void OnLoad(){
+    Logger::get().info("Test Script", "Loaded");
     initial_position = game_object_data->position;
     initial_size = game_object_data->scale;
+    initial_mesh = game_object_data->mesh;
     game_object_data->position = glm::vec3(0.0f, 100.0f, 0.0f);
     game_object_data->scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    // printf("OnLoad\n");
+    // game_object_data->mesh = "Statue";
   };
   
   void OnUpdate(float delta_time){
-    // printf("OnUpdate\n");
   };
   
   void OnFixedUpdate(float fixed_delta_time){
     time += fixed_delta_time;
     game_object_data->position += glm::vec3(sin(time) / 2.0f, cos(time)/ 2.0f, 0.0f);
-    // printf("OnFixedUpdate\n");
   };
   
   void OnRender(){
-    // printf("OnRender\n");
   };
   
   void OnDestroy(){
-    // printf("OnDestroy\n");
     game_object_data->position = initial_position;
     game_object_data->scale = initial_size;
+    game_object_data->mesh = initial_mesh;
+    Logger::get().info("Test Script", "Destroyed");
   };
 };
 };

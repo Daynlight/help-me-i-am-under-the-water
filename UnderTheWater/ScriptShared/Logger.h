@@ -6,15 +6,15 @@
 
 
 #pragma once
-#include "Renderer.h"
-#include "Gui.h"
 
 #include <string>
 #include <vector>
 #include <fstream>
 #include <filesystem>
 
-#include "config.h"
+
+
+class ImVec4;
 
 
 

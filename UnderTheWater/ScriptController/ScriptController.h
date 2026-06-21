@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
-#include "../Scripts/GameObjectScriptInterface.h"
+#include "ScriptShared/GameObjectScriptInterface.h"
 #include "Utils/Logger.h"
 #include "config.h"
 
@@ -31,30 +31,33 @@ class GameObjectScriptRecord{
   std::string path = "";
   std::string so_file = "";
   std::string cpp_file = "";
-  bool cant_find_file_print = 1;
-  void* script_handler = nullptr; 
-  unsigned int version = -1;
+  bool log_observe_lock = 1;
+
+  void* script_handler = nullptr;
   GameObjectScriptInterface* script = nullptr;
 
 public:
   GameObjectScriptRecord(const std::string& path);
   ~GameObjectScriptRecord();
 
-  bool checkLastWrite();
-  void updateScript(GameObjectData* data);
+  void observe(GameObjectData* data);
   
-  int compile();
-  int loadModule();
-  void removeModule();
-  
-  void init(GameObjectData* data);
-  void update(float delta_time);
-  void fixedUpdate(float fixed_delta_time);
-  void render();
-  void destroy();
+  void onLoad(GameObjectData* data);
+  void onUpdate(float delta_time);
+  void onFixedUpdate(float fixed_delta_time);
+  void onRender();
+  void onDestroy();
 
   std::string getPath();
-  unsigned int getVersion();
+
+  int loadModule();
+  void removeModule();
+
+private:
+  bool checkLastWrite();
+  void updateScript(GameObjectData* data);
+
+  int compile();
 
 };
 };

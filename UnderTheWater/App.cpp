@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -14,17 +14,23 @@ UW::App::App()
 #ifndef PRODUCTION
   , ui(window, fps, scene)
 #endif
-  {
+{
   Logger::get().info("App", "App Initialization");
   
   initWindow();
   onLoad();
+
+  Logger::get().info("App", "App Initialized");
 };
 
 
 
 UW::App::~App(){
+  Logger::get().info("App", "App Destroying");
+
   onDestroy();
+  
+  Logger::get().info("App", "App Destroyed");
 };
 
 
@@ -47,24 +53,38 @@ void UW::App::run(){
 // ========== Core Operations ========== //
 // ===================================== //
 void UW::App::onLoad(){
-  Logger::get().info("App", "Loading Scene");
+  Logger::get().info("App", "App Loading");
 
-  #ifndef PRODUCTION
+#ifndef PRODUCTION
   ui.onLoad();
-  #endif
+  Logger::get().info("App", "UI Loaded");
+#endif
 
   scene.onLoad();
+  Logger::get().info("App", "Scene Loaded");
+
+  Logger::get().info("App", "App Loaded");
 };
 
 
 
 void UW::App::onDestroy() {
-  Logger::get().info("App", "Destroying Scene");
+  Logger::get().info("App", "Destroying App");
 
   ui.onDestroy();
+  Logger::get().info("App", "UI Destroyed");
+
   scene.onDestroy();
+  Logger::get().info("App", "Scene Destroyed");
   
   Resources::get().destroy();
+  Logger::get().info("App", "Resources Destroyed");
+
+  Logger::get().info("App", "App Destroyed");
+
+#ifndef PRODUCTION
+  Logger::get().info("App", "Recorded AVG FPS = " + std::to_string(total_fps_acc / total_fps_id));
+#endif
 };
 
 
@@ -72,9 +92,9 @@ void UW::App::onDestroy() {
 void UW::App::render(){
   scene.render();
 
-  #ifndef PRODUCTION
+#ifndef PRODUCTION
   ui.render();
-  #endif
+#endif
 
   window.windowEvents();
   window.swapBuffer();
@@ -121,8 +141,15 @@ void UW::App::initWindow(){
   Logger::get().info("App", "Window Initialization");
 
   window.setWindowTitle(UW::Config::WINDOW_TITLE);
+  Logger::get().info("App", "Title set to - " + UW::Config::WINDOW_TITLE);
+
   window.setCursorVisibility(UW::Config::DEFAULT_CURSOR_IS_VISIBLE);
+  Logger::get().info("App", "Cursor visiblity set to - " + std::string(UW::Config::DEFAULT_CURSOR_IS_VISIBLE == 1 ? "On" : "Off"));
+
   window.setVsync(UW::Config::VSYNC);
+  Logger::get().info("App", "VSync set to - " + std::string(UW::Config::VSYNC != 0 ? "On" : "Off"));
+
+  Logger::get().info("App", "Window Initialized");
 };
 
 
@@ -146,6 +173,8 @@ void UW::App::updateFps(){
     fps = fps_id / fps_acc;
     fps_acc = 0.0f;
     fps_id = 0;
+    total_fps_acc += fps;
+    total_fps_id++;
   }
   else{
     fps_acc += window.getWindowData()->delta_time;

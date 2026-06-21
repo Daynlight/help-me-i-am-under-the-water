@@ -1,5 +1,5 @@
 // Help me I'am Under The Water
-// Copyright 2025 Daynlight
+// Copyright 2026 Daynlight
 // Licensed under the GNU General, Version 3.0.
 // See LICENSE file for details.
 
@@ -16,7 +16,7 @@
 #include "Camera/Camera.h"
 #include "Objects/Object.h"
 #include "Resources/Resources.h"
-#include "Objects/GameObjectData.h"
+#include "ScriptShared/GameObjectData.h"
 #include "ScriptController/ScriptController.h"
 
 
@@ -27,13 +27,9 @@ private:
   CW::Renderer::Uniform uniform;
 
 public:
-  std::string name = "";
-  std::string mesh = "";
-  std::string shader = "";
-  std::vector<std::string> textures;
-  std::vector<std::string> materials;
   std::vector<UW::GameObjectScriptRecord> scripts;
 
+  std::string mesh_last = "";
   unsigned int mesh_id = -1;
   unsigned int mesh_version = -1;
 
