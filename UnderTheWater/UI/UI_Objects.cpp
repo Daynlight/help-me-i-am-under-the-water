@@ -95,20 +95,20 @@ void UW::UI_Objects::guiObjectEditor(){
   object.shader = std::string(shader_buffer + '\0');
 
 
-  ImGui::InputFloat3("position: ", &object.position[0]);
+  ImGui::InputFloat3("position: ", &object.game_object_data.position[0]);
   glm::vec3 position_offset = glm::vec3(0.0f);
   ImGui::SliderFloat3("position slider: ", &position_offset[0], -100.0f, 100.0f);
-  object.position += position_offset * window.getWindowData()->delta_time;
+  object.game_object_data.position += position_offset * window.getWindowData()->delta_time;
 
-  ImGui::InputFloat3("rotate: ", &object.rotation[0]);
+  ImGui::InputFloat3("rotate: ", &object.game_object_data.rotation[0]);
   glm::vec3 rotate_offset = glm::vec3(0.0f);
   ImGui::SliderFloat3("rotate slider: ", &rotate_offset[0], -1.0f, 1.0f);
-  object.rotation += rotate_offset * window.getWindowData()->delta_time;
+  object.game_object_data.rotation += rotate_offset * window.getWindowData()->delta_time;
 
-  ImGui::InputFloat3("scale: ", &object.scale[0]);
+  ImGui::InputFloat3("scale: ", &object.game_object_data.scale[0]);
   glm::vec3 scale_offset = glm::vec3(0.0f);
   ImGui::SliderFloat3("scale slider: ", &scale_offset[0], -100.0f, 100.0f);
-  object.scale += scale_offset * window.getWindowData()->delta_time;
+  object.game_object_data.scale += scale_offset * window.getWindowData()->delta_time;
 
 
   ImGui::SeparatorText("Textures: ");

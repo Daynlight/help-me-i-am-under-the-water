@@ -16,6 +16,7 @@
 #include "Camera/Camera.h"
 #include "Objects/Object.h"
 #include "Resources/Resources.h"
+#include "Objects/GameObjectData.h"
 #include "ScriptController/ScriptController.h"
 
 
@@ -35,9 +36,8 @@ public:
 
   unsigned int mesh_id = -1;
   unsigned int mesh_version = -1;
-  glm::vec3 position = glm::vec3(0.0f);
-  glm::vec3 rotation = glm::vec3(0.0f);
-  glm::vec3 scale = glm::vec3(1.0f);
+
+  UW::GameObjectData game_object_data;
 
 public:
   GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials = {}, const std::vector<std::string>& textures = {}, const std::vector<UW::GameObjectScriptRecord>& scripts = {}, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));

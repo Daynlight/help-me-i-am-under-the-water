@@ -9,24 +9,33 @@
 #define BUILDING_SCRIPT_DLL
 
 #include "GameObjectScriptInterface.h"
-
+#include "../UnderTheWater/Objects/GameObjectData.h"
 #include <cstdio>
+#include <math.h>
+
 
 
 namespace UW{
 class SCRIPTNAME : public GameObjectScriptInterface {
+private:
+  glm::vec3 initial_position = glm::vec3(0.0f);
+  float time = 0;
+
 public:
   ~SCRIPTNAME() = default;
   
   void OnLoad(){
+    initial_position = game_object_data->position;
     // printf("OnLoad\n");
   };
   
   void OnUpdate(float delta_time){
     // printf("OnUpdate\n");
   };
-
+  
   void OnFixedUpdate(float fixed_delta_time){
+    time += fixed_delta_time;
+    game_object_data->position += glm::vec3(sin(time), cos(time), sin(time));
     // printf("OnFixedUpdate\n");
   };
   
@@ -36,6 +45,7 @@ public:
   
   void OnDestroy(){
     // printf("OnDestroy\n");
+    game_object_data->position = initial_position;
   };
 };
 };

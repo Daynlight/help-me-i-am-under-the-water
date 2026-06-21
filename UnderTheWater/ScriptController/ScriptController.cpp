@@ -58,12 +58,12 @@ bool UW::GameObjectScriptRecord::checkLastWrite() {
 
 
 
-void UW::GameObjectScriptRecord::updateScript() {
+void UW::GameObjectScriptRecord::updateScript(GameObjectData* data) {
   removeModule();
 
   if(!compile())
     if(!loadModule())
-      init();
+      init(data);
 };
 
 
@@ -175,8 +175,9 @@ void UW::GameObjectScriptRecord::removeModule(){
 
 
 
-void UW::GameObjectScriptRecord::init() {
+void UW::GameObjectScriptRecord::init(GameObjectData* data) {
   if(script){
+    script->game_object_data = data;
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS

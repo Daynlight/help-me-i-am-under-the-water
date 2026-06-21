@@ -22,8 +22,13 @@
 
 
 namespace UW{
+class GameObjectData;
+
+
+
 class GameObjectScriptInterface {
 public:
+  GameObjectData* game_object_data = nullptr;
   virtual ~GameObjectScriptInterface() = default;
   
   virtual void OnLoad() = 0;

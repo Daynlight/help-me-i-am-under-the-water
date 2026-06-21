@@ -22,6 +22,10 @@
 
 
 namespace UW{
+class GameObjectData;
+
+
+
 class GameObjectScriptRecord{
   std::filesystem::file_time_type lastWriteTime{};
   std::string path = "";
@@ -37,13 +41,13 @@ public:
   ~GameObjectScriptRecord();
 
   bool checkLastWrite();
-  void updateScript();
+  void updateScript(GameObjectData* data);
   
   int compile();
   int loadModule();
   void removeModule();
   
-  void init();
+  void init(GameObjectData* data);
   void update(float delta_time);
   void fixedUpdate(float fixed_delta_time);
   void render();

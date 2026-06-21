@@ -10,9 +10,12 @@
 
 
 UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, const std::vector<UW::GameObjectScriptRecord>& scripts, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), scripts(scripts), position(position), rotation(rotation), scale(scale) {
+  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), scripts(scripts) {
   mesh_id = Resources::get().meshes.get_id(mesh);
   UW::Logger::get().info("GameObject", "GameObject Constructor Called!");
+  game_object_data.position = position;
+  game_object_data.rotation = rotation;
+  game_object_data.scale = scale;
   onLoad();
 };
 
@@ -27,7 +30,7 @@ UW::GameObject::~GameObject(){
 void UW::GameObject::onLoad(){
   for(auto& script : scripts) {
     script.loadModule();
-    script.init();
+    script.init(&game_object_data);
   };
 };
 
@@ -51,7 +54,7 @@ void UW::GameObject::onUpdate(float delta_time){
 void UW::GameObject::onFixedUpdate(float fixed_delta_time){
   for(auto& script : scripts)
     if(script.checkLastWrite())
-      script.updateScript();
+      script.updateScript(&game_object_data);
 
   for(auto& script : scripts) script.fixedUpdate(fixed_delta_time);
 };
@@ -71,9 +74,9 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
-  glm::mat4 rotationMat = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
-  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->scale);
+  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), game_object_data.position);
+  glm::mat4 rotationMat = glm::eulerAngleXYZ(game_object_data.rotation.x, game_object_data.rotation.y, game_object_data.rotation.z);
+  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->game_object_data.scale);
   glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
   glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
   glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;

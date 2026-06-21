@@ -28,9 +28,9 @@ void UW::ObjectsSerialization::save(const UW::GameObject& object) {
   record.name = object.name;
   record.mesh = object.mesh;
   record.shader = object.shader;
-  record.position = object.position;
-  record.rotation = object.rotation;
-  record.scale = object.scale;
+  record.position = object.game_object_data.position;
+  record.rotation = object.game_object_data.rotation;
+  record.scale = object.game_object_data.scale;
   record.textures = object.textures;
   record.materials = object.materials;
   for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
@@ -76,9 +76,9 @@ void UW::ObjectsSerialization::saveAll(std::vector<UW::GameObject>& objects) {
     record.name = object.name;
     record.mesh = object.mesh;
     record.shader = object.shader;
-    record.position = object.position;
-    record.rotation = object.rotation;
-    record.scale = object.scale;
+    record.position = object.game_object_data.position;
+    record.rotation = object.game_object_data.rotation;
+    record.scale = object.game_object_data.scale;
     record.textures = object.textures;
     record.materials = object.materials;
     for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
@@ -118,9 +118,9 @@ void UW::ObjectsSerialization::loadAll(std::vector<UW::GameObject>& objects) {
       UW::GameObjectRecord record;
       if (inFile >> record) {
         GameObject object(record.name, record.mesh, record.shader);
-        object.position = record.position;
-        object.rotation = record.rotation;
-        object.scale = record.scale;
+        object.game_object_data.position = record.position;
+        object.game_object_data.rotation = record.rotation;
+        object.game_object_data.scale = record.scale;
         object.textures = std::move(record.textures);
         object.materials = std::move(record.materials);
         for(auto& script : record.scripts) object.scripts.emplace_back(script);
