@@ -108,7 +108,7 @@ const std::vector<UW::Log>& UW::Logger::getLogs() const {
 
 
 void UW::Logger::checkAndTrimLog() {
-  std::ifstream infile(log_file_path);
+  std::ifstream infile(UW::Config::LOG_FILE_PATH);
   if (!infile.is_open()) return;
 
   std::vector<std::string> lines;
@@ -118,14 +118,14 @@ void UW::Logger::checkAndTrimLog() {
   }
   infile.close();
 
-  if (lines.size() >= MAX_LINES) {
-    std::ofstream outfile(log_file_path, std::ios::trunc);
+  if (lines.size() >= UW::Config::LOGS_MAX_LINES) {
+    std::ofstream outfile(UW::Config::LOG_FILE_PATH, std::ios::trunc);
     if (outfile.is_open()) {
-      size_t start_index = lines.size() - TARGET_TRIM_LINES;
+      size_t start_index = lines.size() - UW::Config::LOGS_TARGET_TRIM_LINES;
       for (size_t i = start_index; i < lines.size(); ++i) {
         outfile << lines[i] << "\n";
       }
-      current_lines = TARGET_TRIM_LINES;
+      current_lines = UW::Config::LOGS_TARGET_TRIM_LINES;
     };
   };
 };
@@ -133,24 +133,24 @@ void UW::Logger::checkAndTrimLog() {
 
 
 void UW::Logger::calculateInitialLineCount() {
-  if (!std::filesystem::exists(log_file_path)) return;
-  std::ifstream infile(log_file_path);
+  if (!std::filesystem::exists(UW::Config::LOG_FILE_PATH)) return;
+  std::ifstream infile(UW::Config::LOG_FILE_PATH);
   std::string line;
   while (std::getline(infile, line)) {
     current_lines++;
-  }
+  };
 };
 
 
 
 void UW::Logger::log_to_file(Log log){
-  std::ofstream log_file(log_file_path, std::ios::app);
+  std::ofstream log_file(UW::Config::LOG_FILE_PATH, std::ios::app);
   if (log_file.is_open()) {
     log_file << log.getText() << "\n";
     current_lines++;
     log_file.close();
 
-    if (current_lines >= MAX_LINES) {
+    if (current_lines >= UW::Config::LOGS_MAX_LINES) {
       checkAndTrimLog();
     };
   };

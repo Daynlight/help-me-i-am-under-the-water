@@ -46,7 +46,6 @@ void UW::UI::onDestroy() {
   Logger::get().info("UI", "Destroying UI");
   scripts_ui.saveScriptEditors();
   shader_ui.saveShaderEditors();
-  scripts_ui.onDestroy();
 };
 
 
@@ -87,6 +86,7 @@ void UW::UI::configControl(){
     if (sscanf(line, "ShaderExplorerWindowOn=%d", &value) == 1) s->shaderExplorerWindowOn = value;
     if (sscanf(line, "ScriptsExplorerWindowOn=%d", &value) == 1) s->scriptsExplorerWindowOn= value;
     if (sscanf(line, "ShaderEditorWindowOn=%d", &value) == 1) s->shaderEditorWindowOn = value;
+    if (sscanf(line, "ScriptEditorWindowOn=%d", &value) == 1) s->scriptEditorWindowOn = value;
     if (sscanf(line, "ObjectExplorerWindowOn=%d", &value) == 1) s->objectExplorerWindowOn = value;
     if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
     if (sscanf(line, "Object_ID=%d", &value) == 1) s->object_id = value;
@@ -104,7 +104,7 @@ void UW::UI::configControl(){
       s->shader_editors_reg.emplace_back(name, type);
     };
 
-    if (sscanf(line, "ScriptEditor=%255[^\n]", name) == 1){
+    if (sscanf(line, "ScriptEditor=%255[^,]", name) == 1){
       s->scripts_editors_reg.emplace_back(name);
     };
   };
@@ -119,6 +119,7 @@ void UW::UI::configControl(){
     out_buf->appendf("ShaderExplorerWindowOn=%d\n", guiSettings.shaderExplorerWindowOn);
     out_buf->appendf("ScriptsExplorerWindowOn=%d\n", guiSettings.scriptsExplorerWindowOn);
     out_buf->appendf("ShaderEditorWindowOn=%d\n", guiSettings.shaderEditorWindowOn);
+    out_buf->appendf("ScriptEditorWindowOn=%d\n", guiSettings.scriptEditorWindowOn);
     out_buf->appendf("ObjectExplorerWindowOn=%d\n", guiSettings.objectExplorerWindowOn);
     out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
     out_buf->appendf("Object_ID=%d\n", guiSettings.object_id);

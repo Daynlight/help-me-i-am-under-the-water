@@ -33,7 +33,6 @@ public:
   void uiControl();
   void loadScriptEditors();
   void saveScriptEditors();
-  void onDestroy();
 
 private:
   std::vector<std::string> getAvailableScripts();

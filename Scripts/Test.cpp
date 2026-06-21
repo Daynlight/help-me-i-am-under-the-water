@@ -19,6 +19,8 @@ namespace UW{
 class SCRIPTNAME : public GameObjectScriptInterface {
 private:
   glm::vec3 initial_position = glm::vec3(0.0f);
+
+  glm::vec3 initial_size = glm::vec3(1.0f);
   float time = 0;
 
 public:
@@ -26,7 +28,9 @@ public:
   
   void OnLoad(){
     initial_position = game_object_data->position;
+    initial_size = game_object_data->scale;
     game_object_data->position = glm::vec3(0.0f, 100.0f, 0.0f);
+    game_object_data->scale = glm::vec3(1.0f, 1.0f, 1.0f);
     // printf("OnLoad\n");
   };
   
@@ -36,7 +40,7 @@ public:
   
   void OnFixedUpdate(float fixed_delta_time){
     time += fixed_delta_time;
-    game_object_data->position += glm::vec3(sin(time), cos(time), 0.0f);
+    game_object_data->position += glm::vec3(sin(time) / 2.0f, cos(time)/ 2.0f, 0.0f);
     // printf("OnFixedUpdate\n");
   };
   
@@ -47,6 +51,7 @@ public:
   void OnDestroy(){
     // printf("OnDestroy\n");
     game_object_data->position = initial_position;
+    game_object_data->scale = initial_size;
   };
 };
 };

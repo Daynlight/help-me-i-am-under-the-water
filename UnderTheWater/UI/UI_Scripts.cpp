@@ -18,14 +18,6 @@ UW::UI_Scripts::~UI_Scripts(){
 
 
 
-void UW::UI_Scripts::onDestroy() {
-  script_editors.clear();
-  
-  Logger::get().info("UI_Scripts", "All Script Editors closed safely.");
-}
-
-
-
 void UW::UI_Scripts::uiControl(){
   if(guiSettings.scriptsExplorerWindowOn){
     Logger::get().info("UI_Scripts", "Opening Script Explorer GUI");
@@ -89,20 +81,17 @@ void UW::UI_Scripts::guiScriptList() {
   std::vector<std::string> scripts_to_close;
 
   for (const auto& script_name : available_scripts) {
-    if (ImGui::CollapsingHeader(script_name.c_str())) {
+    if (ImGui::Button(script_name.c_str())) {
       bool is_open = std::any_of(
         script_editors.begin(),
         script_editors.end(),
         [&](const auto& editor) { return editor->getName() == script_name; }
       );
 
-      
-      if (ImGui::Button(is_open ? "Close Editor" : "Open Editor")) {
-        if (is_open) {
-          scripts_to_close.push_back(script_name);
-        } else {
-          script_editors.emplace_back(std::make_unique<UI_ScriptEditor>(gui, script_name));
-        };
+      if (is_open) {
+        scripts_to_close.push_back(script_name);
+      } else {
+        script_editors.emplace_back(std::make_unique<UI_ScriptEditor>(gui, script_name));
       };
     };
   };

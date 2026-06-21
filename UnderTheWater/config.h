@@ -40,7 +40,7 @@ namespace UW::Config{
   inline const unsigned int SHADER_EDITOR_BUFFER_SIZE = 20480;                  // 20KiB
   inline const unsigned int SCRIPT_EDITOR_BUFFER_SIZE = 20480;                  // 20KiB
   inline const unsigned int OBJECT_NAME_BUFFER_SIZE = 1024;                     // 1KiB
-  inline const float SCRIPT_SAVE_COOLDOWN = 0.1f;
+  inline const float SCRIPT_SAVE_COOLDOWN = 3.5f;
   inline const std::string DEFAULT_SHADER = "Default";
   inline const std::string DEFAULT_MESH = "Default";
   inline const std::string DEFAULT_TEXTURE = "Default";
@@ -77,6 +77,9 @@ namespace UW::Config{
   inline const std::string LIGHTS_FILENAME = "Lights.lit";
   inline const std::string SCRIPTS_SRC_FOLDER = "Scripts/";
   inline const std::string SCRIPTS_DLL_FOLDER = "Scripts_DLL/";
+  inline const std::string LOG_FILE_PATH = "editor.log";
+  inline const size_t LOGS_MAX_LINES = 10000;
+  inline const size_t LOGS_TARGET_TRIM_LINES = 8000;
   
   // controls
   inline const std::string SWAP_CAMERA_BTN = "P";

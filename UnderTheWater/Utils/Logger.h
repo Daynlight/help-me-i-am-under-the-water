@@ -14,6 +14,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include "config.h"
+
 
 
 namespace UW{
@@ -42,10 +44,7 @@ struct Log{
 class Logger{
 private:
   std::vector<Log> data;
-  std::string log_file_path = "app.log";
   size_t current_lines = 0;
-  const size_t MAX_LINES = 10000;
-  const size_t TARGET_TRIM_LINES = 8000;
 
 public:
   static Logger& get();

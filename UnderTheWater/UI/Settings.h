@@ -18,6 +18,7 @@ struct GuiSettings{
   bool shaderExplorerWindowOn = false;
   bool scriptsExplorerWindowOn = false;
   bool shaderEditorWindowOn = false;
+  bool scriptEditorWindowOn = false;
   bool objectExplorerWindowOn = false;
   bool objectEditorWindowOn = false;
   bool mesh_mode_on = false;

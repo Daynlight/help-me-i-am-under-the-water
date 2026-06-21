@@ -17,6 +17,11 @@ UW::UI_ScriptEditor::UI_ScriptEditor(CW::Gui::Gui& gui, const std::string& name)
 
 
 UW::UI_ScriptEditor::~UI_ScriptEditor(){
+  if (script_is_updated) {
+    DataSerializer::get().saveScript(script_name, buffer);
+    Logger::get().info("UI_ScriptEditor", "Force saved on close: { " + script_name + " }");
+  };
+
   gui.deleteWindow("Script Editor " + script_name);
   Logger::get().info("UI_ScriptEditor", "Closed { " + script_name  + " }");
 };
@@ -48,8 +53,10 @@ void UW::UI_ScriptEditor::guiScriptEditor(){
   ImGui::SeparatorText("Script Editor");
   ImGui::Text("Script: %s", script_name.c_str());
   
-  ImGui::InputTextMultiline("##Script Content", buffer, UW::Config::SCRIPT_EDITOR_BUFFER_SIZE, ImVec2(width, height), ImGuiInputTextFlags_WordWrap);
-  if(ImGui::Button(("Save##SaveScript:" + script_name).c_str()))  script_is_updated = true;
+  if(ImGui::InputTextMultiline("##Script Content", buffer, UW::Config::SCRIPT_EDITOR_BUFFER_SIZE, ImVec2(width, height), ImGuiInputTextFlags_WordWrap)){
+    script_is_updated = true;
+    last_save_time = std::chrono::steady_clock::now();
+  };
 
   if(script_is_updated){
     auto now = std::chrono::steady_clock::now();
@@ -57,8 +64,7 @@ void UW::UI_ScriptEditor::guiScriptEditor(){
     if (now - last_save_time >= save_cooldown_duration) {
       
       DataSerializer::get().saveScript(script_name, buffer);
-      Logger::get().info("UI_ScriptEditor", "Saved { " + script_name + " }");
-      
+      Logger::get().info("UI_ScriptEditor", "Auto-Saved { " + script_name + " }");
       last_save_time = now;
       script_is_updated = false; 
     }
