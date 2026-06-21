@@ -130,7 +130,7 @@ cd ..
 
 ## Supported Platforms
 * Linux X11
-* Windows in plans (Scripts issue) 
+* Windows 
 
 
 
@@ -247,11 +247,11 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 <summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
 
 - [x] Clean up
+- [x] Scripts Win support
 - [ ] Optimization
 - [ ] Docs
 - [ ] Assets
 - [ ] Releases
-- [ ] Scripts Win support
 
 - [x] Multiple Scripts seg fault (Scripts)
 - [x] Object Add object issue (Scripts)

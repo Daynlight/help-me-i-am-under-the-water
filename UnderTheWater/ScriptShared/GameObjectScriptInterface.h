@@ -6,7 +6,8 @@
 
 
 #pragma once
-
+#include "ILogger.h"
+#include "GameObjectData.h"
 
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -22,11 +23,11 @@
 
 
 namespace UW{
-class GameObjectData;
-
 class GameObjectScriptInterface {
 public:
   GameObjectData* game_object_data = nullptr;
+  ILogger* logger = nullptr;
+
   virtual ~GameObjectScriptInterface() = default;
   
   virtual void OnLoad() = 0;

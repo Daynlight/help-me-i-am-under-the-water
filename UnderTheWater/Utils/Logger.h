@@ -16,6 +16,8 @@
 
 #include "config.h"
 
+#include "ScriptShared/ILogger.h"
+
 
 
 namespace UW{
@@ -41,7 +43,7 @@ struct Log{
 
 
 
-class Logger{
+class Logger : public ILogger {
 private:
   std::vector<Log> data;
   size_t current_lines = 0;
