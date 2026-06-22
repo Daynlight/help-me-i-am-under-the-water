@@ -271,6 +271,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 <details>
 <summary>Iteration 6</summary>
 
+- [ ] Terrain sometimes break after adding new mesh (mesh_id).
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder
