@@ -10,10 +10,14 @@
 #include <string>
 #include <filesystem>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
 #include <dlfcn.h>
-#include <fcntl.h>
 #include <sys/wait.h>
+#endif
+#include <fcntl.h>
 
 #include "ScriptShared/GameObjectScriptInterface.h"
 #include "Utils/Logger.h"

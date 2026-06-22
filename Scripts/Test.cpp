@@ -9,8 +9,6 @@
 #define BUILDING_SCRIPT_DLL
 
 #include "../UnderTheWater/ScriptShared/GameObjectScriptInterface.h"
-#include "../UnderTheWater/ScriptShared/GameObjectData.h"
-#include "../UnderTheWater/ScriptShared/Logger.h"
 #include <cstdio>
 #include <math.h>
 
@@ -28,7 +26,7 @@ public:
   ~SCRIPTNAME() = default;
   
   void OnLoad(){
-    Logger::get().info("Test Script", "Loaded");
+    logger->info("Test Script", "Loaded");
     initial_position = game_object_data->position;
     initial_size = game_object_data->scale;
     initial_mesh = game_object_data->mesh;
@@ -52,7 +50,7 @@ public:
     game_object_data->position = initial_position;
     game_object_data->scale = initial_size;
     game_object_data->mesh = initial_mesh;
-    Logger::get().info("Test Script", "Destroyed");
+    logger->info("Test Script", "Destroyed");
   };
 };
 };

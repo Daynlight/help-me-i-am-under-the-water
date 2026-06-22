@@ -12,7 +12,12 @@
 UW::GameObjectScriptRecord::GameObjectScriptRecord(const std::string &path)
   : path(path), 
     cpp_file(UW::Config::SCRIPTS_SRC_FOLDER + path + ".cpp"),
-    so_file(UW::Config::SCRIPTS_DLL_FOLDER + path + ".so") {
+#ifdef _WIN32
+    so_file(UW::Config::SCRIPTS_DLL_FOLDER + path + ".dll")
+#else
+    so_file(UW::Config::SCRIPTS_DLL_FOLDER + path + ".so")
+#endif 
+{
   UW::Logger::get().info("Script Controller", "Script Initialized");
 };
 
@@ -92,6 +97,7 @@ void UW::GameObjectScriptRecord::observe(GameObjectData *data){
 void UW::GameObjectScriptRecord::onLoad(GameObjectData* data) {
   if(script){
     script->game_object_data = data;
+    script->logger = static_cast<ILogger*>(&UW::Logger::get());
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
@@ -249,6 +255,22 @@ int UW::GameObjectScriptRecord::loadModule() {
   bool file_exist = std::filesystem::exists(so_file);
   if(!file_exist) return -1;
 
+#ifdef _WIN32
+  script_handler = LoadLibraryA(so_file.c_str());
+  if (!script_handler) {
+    Logger::get().erro("Script Controller", "Failed to load DLL - Error Code: " + std::to_string(GetLastError()));
+    return -1;
+  }
+
+  typedef GameObjectScriptInterface* (*GetScriptFunc)();
+  GetScriptFunc getScript = (GetScriptFunc)GetProcAddress((HMODULE)script_handler, "GetScript");
+  
+  if (!getScript) {
+    Logger::get().erro("Script Controller", "Cannot load symbol 'GetScript' - Error Code: " + std::to_string(GetLastError()));
+    removeModule();
+    return -1;
+  }
+#else
   script_handler = dlopen((so_file).c_str(), RTLD_NOW);
 
   if (!script_handler) {
@@ -267,6 +289,7 @@ int UW::GameObjectScriptRecord::loadModule() {
     removeModule();
     return -1;
   };
+#endif
 
   script = getScript();
 
@@ -295,6 +318,18 @@ void UW::GameObjectScriptRecord::removeModule(){
   if(script){
     onDestroy();
 
+#ifdef _WIN32
+    using DeleteScriptFunc = void (*)(GameObjectScriptInterface*);
+    DeleteScriptFunc deleteScript = (DeleteScriptFunc)GetProcAddress((HMODULE)script_handler, "DeleteScript");
+
+    if (!deleteScript) {
+      Logger::get().warn("Script Controller", "DeleteScript not found or invalid");
+      script = nullptr;
+    } else {
+      deleteScript(script);
+      script = nullptr;
+    }
+#else
     dlerror();
     using DeleteScriptFunc = void (*)(GameObjectScriptInterface*);
     DeleteScriptFunc deleteScript = (DeleteScriptFunc)dlsym(script_handler, "DeleteScript");
@@ -308,10 +343,15 @@ void UW::GameObjectScriptRecord::removeModule(){
       deleteScript(script);
       script = nullptr;
     };
+#endif
   };
 
   
+#ifdef _WIN32
+  if (script_handler) FreeLibrary((HMODULE)script_handler);
+#else
   if(script_handler) dlclose(script_handler);
+#endif
   script_handler = nullptr;
   script = nullptr;
 
@@ -378,6 +418,26 @@ void UW::GameObjectScriptRecord::updateScript(GameObjectData* data) {
 
 
 int UW::GameObjectScriptRecord::compile() {
+  std::filesystem::path p(so_file);
+  std::filesystem::path dir = p.parent_path();
+
+  if (!dir.empty() && !std::filesystem::exists(dir)) std::filesystem::create_directories(dir);
+
+#ifdef _WIN32
+  std::string cmd = "g++ -shared -o \"" + so_file + "\" \"" + cpp_file + "\"";
+  
+  UW::Logger::get().info("Script Controller", "Compiling on Windows: " + cmd);
+  int status = system(cmd.c_str());
+  
+  if (status == 0) {
+    UW::Logger::get().info("Script Controller", "successful compilation");
+    return 0;
+  } else {
+    UW::Logger::get().erro("Script Controller", "Compilation failed with status: " + std::to_string(status));
+    return -1;
+  }
+
+#else
   const char* command = "g++";
   const char* argv[] = {
     "g++",
@@ -410,4 +470,5 @@ int UW::GameObjectScriptRecord::compile() {
 
   UW::Logger::get().erro("Script Controller", "Failed to fork()");
   return -1;
+#endif
 };
