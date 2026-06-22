@@ -265,7 +265,11 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Shaders UI Check
 - [x] Scripts UI Check
 - [x] Object UI Check
-- [x] Asset Loader UI Check
+
+- [ ] Asset loader on load terrain break
+- [ ] Asset loader multiple meshes corrupts
+- [ ] Asset loader materials didn't import or missing materials
+- [ ] Asset Loader UI Check
 </details>
 
 <details>
