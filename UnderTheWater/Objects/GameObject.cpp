@@ -28,10 +28,12 @@ UW::GameObject::GameObject(const std::string& name, const std::string& mesh, con
 
 UW::GameObject::GameObject(const std::string& name, const GameObject& other){
   UW::Logger::get().info("GameObject", "GameObject Duplicating");
-  for(auto script : other.scripts) scripts.emplace_back(script.getPath());
+  
+  for(const auto& script : other.scripts) scripts.emplace_back(script.getPath());
   game_object_data = other.game_object_data;
-  // game_object_data.name = name;
+  game_object_data.name = name;
   mesh_id = Resources::get().meshes.get_id(other.game_object_data.mesh);
+  
   onLoad();
 };
 
@@ -62,14 +64,20 @@ void UW::GameObject::onDestroy(){
 
 
 void UW::GameObject::onUpdate(float delta_time){
-  for(auto& script : scripts) script.onUpdate(delta_time);
+  for(auto& script : scripts) {
+    script.syncPointer(&game_object_data);
+    script.onUpdate(delta_time);
+  };
 };
 
 
 
 void UW::GameObject::onFixedUpdate(float fixed_delta_time){
-  for(auto& script : scripts) script.observe(&game_object_data);
-  for(auto& script : scripts) script.onFixedUpdate(fixed_delta_time);
+  for(auto& script : scripts) {
+    script.syncPointer(&game_object_data);
+    script.observe(&game_object_data);
+    script.onFixedUpdate(fixed_delta_time);
+  };
 };
 
 

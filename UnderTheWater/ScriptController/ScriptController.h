@@ -40,6 +40,12 @@ public:
   GameObjectScriptRecord(const std::string& path);
   ~GameObjectScriptRecord();
 
+  GameObjectScriptRecord(const GameObjectScriptRecord& other);
+  GameObjectScriptRecord& operator=(const GameObjectScriptRecord& other);
+  GameObjectScriptRecord(GameObjectScriptRecord&& other) noexcept;
+  GameObjectScriptRecord& operator=(GameObjectScriptRecord&& other) noexcept;
+  void syncPointer(GameObjectData* data);
+
   void observe(GameObjectData* data);
   
   void onLoad(GameObjectData* data);
@@ -48,7 +54,7 @@ public:
   void onRender();
   void onDestroy();
 
-  std::string getPath();
+  std::string getPath() const;
 
   int loadModule();
   void removeModule();

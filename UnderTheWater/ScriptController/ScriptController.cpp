@@ -26,6 +26,63 @@ UW::GameObjectScriptRecord::~GameObjectScriptRecord(){
 
 
 
+UW::GameObjectScriptRecord::GameObjectScriptRecord(const GameObjectScriptRecord& other)
+  : path(other.path), cpp_file(other.cpp_file), so_file(other.so_file), log_observe_lock(other.log_observe_lock) {
+  script_handler = nullptr;
+  script = nullptr;
+};
+
+
+
+UW::GameObjectScriptRecord& UW::GameObjectScriptRecord::operator=(const GameObjectScriptRecord& other) {
+  if (this != &other) {
+    removeModule();
+    path = other.path;
+    cpp_file = other.cpp_file;
+    so_file = other.so_file;
+    log_observe_lock = other.log_observe_lock;
+    script_handler = nullptr;
+    script = nullptr;
+  };
+  return *this;
+};
+
+
+
+UW::GameObjectScriptRecord::GameObjectScriptRecord(GameObjectScriptRecord&& other) noexcept
+  : path(std::move(other.path)), cpp_file(std::move(other.cpp_file)),
+    so_file(std::move(other.so_file)), log_observe_lock(other.log_observe_lock),
+    script_handler(other.script_handler), script(other.script) {
+  other.script_handler = nullptr;
+  other.script = nullptr;
+};
+
+
+
+UW::GameObjectScriptRecord& UW::GameObjectScriptRecord::operator=(GameObjectScriptRecord&& other) noexcept {
+  if (this != &other) {
+    removeModule();
+    path = std::move(other.path);
+    cpp_file = std::move(other.cpp_file);
+    so_file = std::move(other.so_file);
+    log_observe_lock = other.log_observe_lock;
+    script_handler = other.script_handler;
+    script = other.script;
+
+    other.script_handler = nullptr;
+    other.script = nullptr;
+  };
+  return *this;
+};
+
+
+
+void UW::GameObjectScriptRecord::syncPointer(GameObjectData* data) {
+  if (script) script->game_object_data = data;
+};
+
+
+
 void UW::GameObjectScriptRecord::observe(GameObjectData *data){
   if(checkLastWrite()) updateScript(data);
 };
@@ -178,7 +235,7 @@ void UW::GameObjectScriptRecord::onDestroy() {
 
 
 
-std::string UW::GameObjectScriptRecord::getPath(){
+std::string UW::GameObjectScriptRecord::getPath() const {
   return path;
 };
 
