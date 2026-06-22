@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Info.h"
 
 #ifndef PRODUCTION
@@ -54,6 +61,7 @@ inline void UW::UI_Info::guiInfo(){
   };
 
   if(ImGui::Checkbox("Post Processing", &scene.post_processing_on));
+  if(ImGui::Checkbox("Shadows", &scene.shadows_on));
 };
 
 
@@ -79,7 +87,5 @@ return [this](CW::Renderer::iRenderer *window){
   guiInfo();
 };
 };
-
-
 
 #endif

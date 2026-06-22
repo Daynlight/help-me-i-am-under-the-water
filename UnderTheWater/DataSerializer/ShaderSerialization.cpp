@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "ShaderSerialization.h"
 
 #include <cmrc/cmrc.hpp>
@@ -72,19 +79,16 @@ void UW::ShaderSerialization::loadAll() {
   
   std::string root_path = UW::Config::GAME_DATA_FOLDER + UW::Config::ASSETS_FOLDER + UW::Config::SHADERS_FOLDER;
   
-  if (!root_path.empty() && root_path.back() == '/') {
-    root_path.pop_back();
-  }
+  if (!root_path.empty() && root_path.back() == '/') root_path.pop_back();
 
   try {
     auto fs = cmrc::GameData::get_filesystem();
     
     for (auto&& entry : fs.iterate_directory(root_path))
-      if (entry.is_directory())
-        load(entry.filename());
+      if (entry.is_directory()) load(entry.filename());
     
     Logger::get().info("ShaderSerialization", "Finished loading all shaders.");
   } catch (const std::exception& e) {
     Logger::get().erro("ShaderSerialization", "[LoadAll] CMRC Exception: " + std::string(e.what()));
-  }
-}
+  };
+};

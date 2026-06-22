@@ -1,10 +1,20 @@
-#pragma once
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
 
+
+
+#pragma once
 #include "Renderer.h"
 #include "Gui.h"
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <filesystem>
+
+#include "config.h"
 
 
 
@@ -14,6 +24,8 @@ enum LogType{
   WARN = 1,
   ERRO = 2,
 };
+
+
 
 struct Log{
   LogType type;
@@ -32,6 +44,7 @@ struct Log{
 class Logger{
 private:
   std::vector<Log> data;
+  size_t current_lines = 0;
 
 public:
   static Logger& get();
@@ -42,7 +55,7 @@ public:
   Logger& operator=(Logger&&) = delete;
 
 private:
-  Logger() = default;
+  Logger();
   ~Logger() = default;
   
 public:
@@ -50,7 +63,12 @@ public:
   void warn(const std::string& module, const std::string& text);
   void erro(const std::string& module, const std::string& text);
 
-  const std::vector<Log>& getLogs() const ;
+  const std::vector<Log>& getLogs() const;
+
+private:
+  void checkAndTrimLog();
+  void calculateInitialLineCount();
+  void log_to_file(Log log);
 
 };
 };

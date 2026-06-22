@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
 
@@ -20,6 +27,7 @@
 #include "DataSerializer/MaterialsSerialization.h"
 #include "DataSerializer/LightsSerialization.h"
 #include "DataSerializer/ShaderSerialization.h"
+#include "DataSerializer/ScriptSerialization.h"
 
 
 
@@ -40,6 +48,7 @@ private:
   MaterialsSerialization materials_serializer;
   LightsSerialization lights_serializer;
   ShaderSerialization shader_serializer;
+  ScriptSerialization script_serializer;
 
 public:
   static DataSerializer& get();
@@ -80,6 +89,11 @@ public:
 #endif
   void loadShader(const std::string& shader_name);
 
+#ifndef PRODUCTION
+  void saveScript(const std::string& script_name, const std::string& source);
+#endif
+  std::string loadScript(const std::string& script_name);
+
   void loadAllTextures();
 
 #ifndef PRODUCTION
@@ -87,5 +101,6 @@ public:
 #endif
 
   void loadAll(std::vector<UW::GameObject> &objects);
+
 };
 }; // namespace UW

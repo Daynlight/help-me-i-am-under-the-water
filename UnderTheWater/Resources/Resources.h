@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
 
@@ -13,6 +20,7 @@
 #include "Lights/Lights.h"
 #include "Materials/Materials.h"
 #include "Resources/Meshes/Meshes.h"
+#include "ScriptController/ScriptController.h"
 
 
 
@@ -24,7 +32,6 @@ public:
   UW::Meshes meshes;
   UW::Lights lights;
   UW::Materials materials;
-
 
 public:
   static Resources& get();
@@ -46,5 +53,6 @@ private:
 private:
   void initMeshes();
   void initLights();
+  
 };
 };

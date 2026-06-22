@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "MaterialsSerialization.h"
 
 #include <cmrc/cmrc.hpp>
@@ -7,14 +14,14 @@ CMRC_DECLARE(GameData);
 
 #ifndef PRODUCTION
 void UW::MaterialsSerialization::save(const UW::Material& material) {
-  // Single material save implementation
+  
 };
 #endif
 
 
 
 void UW::MaterialsSerialization::load(UW::Material& material) {
-  // Single material load implementation
+  
 };
 
 
@@ -35,7 +42,7 @@ void UW::MaterialsSerialization::saveAll(UW::Materials& materials) {
   if (!outFile.is_open()) {
     Logger::get().erro("MaterialsSerialization", "Failed to open file for saving");
     return;
-  }
+  };
 
   size_t mat_size = materials.size();
   outFile.write(reinterpret_cast<const char*>(&mat_size), sizeof(mat_size));
@@ -54,7 +61,7 @@ void UW::MaterialsSerialization::saveAll(UW::Materials& materials) {
 
     outFile << record;
     Logger::get().info("MaterialsSerialization", "Material saved { " + el.first + " }");
-  }
+  };
 
   outFile.close();
   Logger::get().info("MaterialsSerialization", "All Materials Had Been Saved");
@@ -99,12 +106,12 @@ void UW::MaterialsSerialization::loadAll(UW::Materials& materials) {
       } else {
         Logger::get().erro("MaterialsSerialization", "File format corrupted at index " + std::to_string(i));
         break;
-      }
-    }
+      };
+    };
     Logger::get().info("MaterialsSerialization", "All materials have been loaded");
   } catch(const std::exception& e) {
     Logger::get().erro("MaterialsSerialization", "Exception - " + std::string(e.what()));
-  }
+  };
 };
 
 

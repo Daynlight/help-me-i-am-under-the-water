@@ -1,7 +1,15 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "MeshSerialization.h"
 
 #include <cmrc/cmrc.hpp>
 CMRC_DECLARE(GameData);
+
 
 
 #ifndef PRODUCTION
@@ -98,7 +106,7 @@ void UW::MeshSerialization::saveAll(UW::Meshes& meshes) {
     save(mesh_name, meshes[mesh_id]);
   
   Logger::get().info("MeshSerialization", "All meshes have been saved");
-}
+};
 #endif
 
 
@@ -114,9 +122,7 @@ void UW::MeshSerialization::loadAll(UW::Meshes& meshes) {
     std::vector<std::string> mesh_files;
     UW::Utils::scanCmrcDirectory(fs, meshes_root, "\\.msh$", mesh_files);
 
-    for (const auto& file_path : mesh_files) {
-      load(file_path, meshes);
-    }
+    for (const auto& file_path : mesh_files) load(file_path, meshes);
 
     meshes.compileAll();
 

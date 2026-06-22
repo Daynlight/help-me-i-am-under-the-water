@@ -1,16 +1,74 @@
+<div align=center>
+
 # Help Me I'm Under The Water
+
+[![wakatime](https://wakatime.com/badge/user/233b40bd-5512-4e3e-9573-916f7b4127c3/project/408b7767-840b-45a2-b96f-d4c1d6a11ab1.svg)](https://wakatime.com/badge/user/233b40bd-5512-4e3e-9573-916f7b4127c3/project/408b7767-840b-45a2-b96f-d4c1d6a11ab1)
+</div>
+
+
+
+## Screenshots
+
 
 
 ## About
 Project for **GRK** under water scene. Build on top of [**CWindow library**](https://github.com/Daynlight/CWindow.git). Uses **ImGui** build in **CWindow** for parameters adjustment and visualization.
 
 
+
+## Methods
+* normal mapping 
+* PBR 
+* quaternion camera
+* shadow mapping
+* Parallel Transport Frames 
+* underwater skybox
+* **A09** Ray-marched SDF object
+* **B07** Heightmap-based seabed mesh
+
+
+
+## Controls
+* **SWAP_CAMERA_BTN**: P (Editor)
+* **CAMERA_SWAP_MODE_BTN**: ESC (Editor)
+* **CAMERA_ACCELERATE**: O (Editor, Product)
+* **CAMERA_DECELERATE**: I (Editor, Product)
+* **CAMERA_MOVE_FORWARD**: W (Editor, Product)
+* **CAMERA_MOVE_BACK**: S (Editor, Product)
+* **CAMERA_MOVE_RIGHT**: D (Editor, Product)
+* **CAMERA_MOVE_LEFT**: A (Editor, Product)
+* **CAMERA_ROLL_LEFT**: Q (Editor, Product)
+* **CAMERA_ROLL_RIGHT**: E (Editor, Product)
+
+
+
+## UI
+* **Info**
+* **Logs**
+* **Materials Explorer**
+* **Materials Editor**
+* **Lights Explorer**
+* **Lights Editor**
+* **Objects Explorer**
+* **Objects Editor**
+* **Asset Loader**
+* **Shader Explorer**
+* **Shader Editor**
+* **Script Explorer**
+* **Script Editor**
+
+
+
 ## TOC
+- [Screenshots](#screenshots)
 - [About](#about)
+- [Methods](#methods)
+- [Controls](#controls)
+- [UI](#ui)
 - [TOC](#toc)
 - [Installation and Usage](#installation-and-usage)
-- [Build in prod](#build-in-prod)
 - [Compiling End Product](#compiling-end-product)
+- [Supported Platforms](#supported-platforms)
 - [Architecture](#architecture)
   - [Build System](#build-system)
   - [Lights](#lights)
@@ -26,35 +84,39 @@ Project for **GRK** under water scene. Build on top of [**CWindow library**](htt
 - [TODO](#todo)
 
 
+
 ## Installation and Usage
 1. Install from [**Releases**](https://github.com/Daynlight/help-me-i-am-under-the-water/releases)
 2. Compile by yourself
-     1. Install required programs
-        - [**Cmake**](https://cmake.org/download/)
-        - [**gcc**](https://gcc.gnu.org/) or via [**MySYS2**](https://www.msys2.org/)
-        - [**Ninja**](https://ninja-build.org/)
-     2. Clone repository
-         ```bash
-         git clone https://github.com/Daynlight/help-me-i-am-under-the-water
-         ```
-     3. Update Submodules
-         ```bash
-         git submodule update --init --recursive
-         ```
-     4. Compile with **CMake**
-         ```bash
-         mkdir -p build/
-         cd build/
-         cmake -B ..
-         cmake --build .
-         ```
-     5. Run program
-         ```bash
-         ./UnderTheWater/UnderTheWater
-         ```
+  1. Install required programs
+     - [**Cmake**](https://cmake.org/download/)
+     - [**gcc**](https://gcc.gnu.org/) or via [**MySYS2**](https://www.msys2.org/)
+     - [**Ninja**](https://ninja-build.org/)
+  2. Clone repository
+      ```bash
+      git clone https://github.com/Daynlight/help-me-i-am-under-the-water
+      ```
+  3. Update Submodules
+      ```bash
+      git submodule update --init --recursive
+      ```
+  4. Compile with **CMake**
+      ```bash
+      mkdir -p build/
+      cd build/
+      cmake -B ..
+      cmake --build .
+      ```
+  5. Run program
+      ```bash
+      ./UnderTheWater/UnderTheWater
+      ```
 
 
-## Build in prod
+
+## Compiling End Product
+Use cmake command with ```PRODUCTION``` FLAG
+
 ```bash
 mkdir -p build-prod
 cd build-prod
@@ -66,8 +128,9 @@ cd ..
 
 
 
-## Compiling End Product
-Use cmake command with ```PRODUCTION``` FLAG
+## Supported Platforms
+* Linux X11
+* Windows in plans (Scripts issue) 
 
 
 
@@ -109,12 +172,15 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [**cmrc**](https://github.com/vector-of-bool/cmrc.git): master
 
 
+
 ## License
 [GNU GENERAL v3](LICENSE)
 
 
+
 ## Author
 - Daniel Stodulski
+
 
 
 ## TODO
@@ -180,16 +246,32 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details open>
 <summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
 
-- [ ] Clean up
+- [x] Clean up
 - [ ] Optimization
 - [ ] Docs
 - [ ] Assets
 - [ ] Releases
+- [ ] Scripts Win support
+
+- [x] Multiple Scripts seg fault (Scripts)
+- [x] Object Add object issue (Scripts)
+- [x] Object Delete Script (Scripts)
+- [x] Object Duplicate object issue (Scripts)
+- [x] Asset Loader seg fault (Scripts)
+- [x] Info UI Check
+- [x] Log UI Check
+- [x] Materials UI Check
+- [x] Lights UI Check
+- [x] Shaders UI Check
+- [x] Scripts UI Check
+- [x] Object UI Check
+- [x] Asset Loader UI Check
 </details>
 
 <details>
 <summary>Iteration 6</summary>
 
+- [ ] Terrain sometimes break after adding new mesh (mesh_id).
 - [ ] Engine like Shaders, Assets, Textures:
     - [ ] Bake into exe
     - [ ] When edit save to folder
@@ -209,4 +291,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Move terrain, water, skybox to object_register vector.
 - [ ] Window Data Serialization.
 - [ ] Fix black lights for new Scene class.
+- [ ] Script System for ```PRODUCTION```.
+- [ ] Scripts multiple compilation issue.
+- [ ] Script async compile.
 </details>

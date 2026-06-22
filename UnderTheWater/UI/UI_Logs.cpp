@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_Log.h"
 
 #ifndef PRODUCTION
@@ -40,18 +47,18 @@ void UW::UI_Log::guiLogs() {
       ImGui::PushStyleColor(ImGuiCol_Text, entry.getLogColor());
       ImGui::TextUnformatted(entry.getText().c_str());
       ImGui::PopStyleColor();
-    }
-  }
+    };
+  };
 
   if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
-}
+};
+
+
 
 std::function<void(CW::Renderer::iRenderer *window)> UW::UI_Log::ui(){
   return [this](CW::Renderer::iRenderer *window){
     guiLogs();
   };
 };
-
-
 
 #endif

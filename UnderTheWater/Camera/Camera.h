@@ -1,13 +1,18 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/quaternion.hpp"
-#include "../config.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../vendor/glm/glm/gtx/euler_angles.hpp"
 #include "../vendor/glm/glm/gtx/quaternion.hpp"
+
+#include "../config.h"
 
 
 

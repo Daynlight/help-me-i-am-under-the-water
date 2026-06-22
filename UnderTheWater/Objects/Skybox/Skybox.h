@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include <string.h>
 #include <cmath>
@@ -22,8 +29,10 @@ public:
   Skybox();
   ~Skybox();
 
+  void onLoad() override;
+  void onDestroy() override;
   void onUpdate(float delta_time) override;
-  void onFixedUpdate() override;
+  void onFixedUpdate(float fixed_delta_time) override;
   void render(CW::Renderer::Renderer* renderer, Camera& culling_camera, Camera& render_camera, CW::Renderer::Uniform& shadows_uniform) override;
 };
 }; // namespace UW

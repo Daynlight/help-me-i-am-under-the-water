@@ -1,24 +1,95 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "GameObject.h"
 
 
 
-UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
-  :name(name), mesh(mesh), shader(shader), materials(materials), textures(textures), position(position), rotation(rotation), scale(scale) {
-    mesh_id = Resources::get().meshes.get_id(mesh);
-  };
+UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, const std::vector<UW::GameObjectScriptRecord>& scripts, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+  : scripts(scripts) {
+  UW::Logger::get().info("GameObject", "GameObject Constructor Called!");
+  mesh_id = Resources::get().meshes.get_id(mesh);
+  game_object_data.name = name;
+  game_object_data.mesh = mesh;
+  game_object_data.shader = shader;
+  game_object_data.materials = materials;
+  game_object_data.textures = textures;
+  game_object_data.position = position;
+  game_object_data.rotation = rotation;
+  game_object_data.scale = scale;
+  onLoad();
+};
+
+
+
+UW::GameObject::GameObject(const std::string& name, const GameObject& other){
+  UW::Logger::get().info("GameObject", "GameObject Duplicating");
+  
+  for(const auto& script : other.scripts) scripts.emplace_back(script.getPath());
+  game_object_data = other.game_object_data;
+  game_object_data.name = name;
+  mesh_id = Resources::get().meshes.get_id(other.game_object_data.mesh);
+  
+  onLoad();
+};
 
 
 
 UW::GameObject::~GameObject(){
+  onDestroy();
+};
+
+
+
+void UW::GameObject::onLoad(){
+  for(auto& script : scripts) {
+    script.loadModule();
+    script.onLoad(&game_object_data);
+  };
+};
+
+
+
+void UW::GameObject::onDestroy(){
+  for(auto& script : scripts) {
+    script.onDestroy();
+    script.removeModule();
+  };
+};
+
+
+
+void UW::GameObject::onUpdate(float delta_time){
+  for(auto& script : scripts) {
+    script.syncPointer(&game_object_data);
+    script.onUpdate(delta_time);
+  };
+};
+
+
+
+void UW::GameObject::onFixedUpdate(float fixed_delta_time){
+  for(auto& script : scripts) {
+    script.syncPointer(&game_object_data);
+    script.observe(&game_object_data);
+    script.onFixedUpdate(fixed_delta_time);
+  };
 };
 
 
 
 void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_camera, Camera &render_camera, CW::Renderer::Uniform& shadows_uniform){
-  if(Resources::get().meshes.validateVersion(mesh_version)){
+  if(Resources::get().meshes.validateVersion(mesh_version) || mesh_last != game_object_data.mesh){
     mesh_version = Resources::get().meshes.getLatestsVersion();
-    mesh_id = Resources::get().meshes.get_id(this->mesh);
+    mesh_id = Resources::get().meshes.get_id(this->game_object_data.mesh);
+    mesh_last = game_object_data.mesh;
   };
+
+  if(Resources::get().meshes.size() <= mesh_id) return;
 
   uniform["projection"]->set<glm::mat4>(render_camera.projection(renderer));
   uniform["view"]->set<glm::mat4>(render_camera.view(renderer));
@@ -27,53 +98,45 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
   uniform["lightCount"]->set<int>(Resources::get().lights.size());
 
   glm::vec3 pivotOffset = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), position);
-  glm::mat4 rotationMat = glm::eulerAngleXYZ(rotation.x, rotation.y, rotation.z);
-  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->scale);
+  glm::mat4 translationMat = glm::translate(glm::mat4(1.0f), game_object_data.position);
+  glm::mat4 rotationMat = glm::eulerAngleXYZ(game_object_data.rotation.x, game_object_data.rotation.y, game_object_data.rotation.z);
+  glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), this->game_object_data.scale);
   glm::mat4 preRotate = glm::translate(glm::mat4(1.0f), -pivotOffset);
   glm::mat4 postRotate = glm::translate(glm::mat4(1.0f), pivotOffset);
   glm::mat4 model = translationMat * postRotate * rotationMat * preRotate * scaleMat;
 
+  for(auto& script : scripts) script.onRender();
+
   if(isVisible(culling_camera.transformation(renderer), model, Resources::get().meshes[mesh_id])){
     uniform["model"]->set<glm::mat4>(model);
 
-    for(unsigned int i = 0; i < textures.size(); i++){
-      Resources::get().getTexture(this->textures[i]).bind(i);
-      uniform[this->textures[i]]->set<int>(i);
+    for(unsigned int i = 0; i < game_object_data.textures.size(); i++){
+      Resources::get().getTexture(this->game_object_data.textures[i]).bind(i);
+      uniform[this->game_object_data.textures[i]]->set<int>(i);
     };
     
-    Resources::get().getShader(this->shader).getUniforms().emplace_back(&uniform);
-    Resources::get().getShader(this->shader).getUniforms().emplace_back(&shadows_uniform);
+    Resources::get().getShader(this->game_object_data.shader).getUniforms().emplace_back(&uniform);
+    Resources::get().getShader(this->game_object_data.shader).getUniforms().emplace_back(&shadows_uniform);
     
-    Resources::get().getShader(this->shader).bind();
+    Resources::get().getShader(this->game_object_data.shader).bind();
     
     std::vector<int> translation;
-    for(std::string el : materials){
+    for(std::string el : game_object_data.materials){
       translation.emplace_back(Resources::get().materials.translate_material(el));
     };
 
-    GLint loc = glGetUniformLocation(Resources::get().getShader(shader).getShaderProgram(), "mat_translate");
+    GLint loc = glGetUniformLocation(Resources::get().getShader(game_object_data.shader).getShaderProgram(), "mat_translate");
     glUniform1iv(loc, translation.size(), translation.data());
     
     Resources::get().meshes[mesh_id].render();
     
-    Resources::get().getShader(this->shader).unbind();
+    Resources::get().getShader(this->game_object_data.shader).unbind();
 
-    for(unsigned int i = 0; i < textures.size(); i++) 
-      Resources::get().getTexture(this->textures[i]).unbind();
+    for(unsigned int i = 0; i < game_object_data.textures.size(); i++) 
+      Resources::get().getTexture(this->game_object_data.textures[i]).unbind();
 
-    Resources::get().getShader(this->shader).getUniforms().clear();
+    Resources::get().getShader(this->game_object_data.shader).getUniforms().clear();
   };
-};
-
-
-
-void UW::GameObject::onUpdate(float delta_time){
-};
-
-
-
-void UW::GameObject::onFixedUpdate(){
 };
 
 
@@ -121,9 +184,7 @@ bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 mod
 
   for (int i = 0; i < 6; i++){
     float length = glm::length(glm::vec3(planes[i]));
-    if (length > 0.0f){
-      planes[i] /= length;
-    };
+    if (length > 0.0f) planes[i] /= length;
   };
 
   for (int i = 0; i < 6; i++){
@@ -136,9 +197,7 @@ bool UW::GameObject::isVisible(glm::mat4 culling_camera_transform, glm::mat4 mod
 
     float distance = glm::dot(normal, positiveVertex) + planes[i].w;
 
-    if (distance < 0.0f){
-      return false; 
-    };
+    if (distance < 0.0f) return false;
   };
 
   return true;

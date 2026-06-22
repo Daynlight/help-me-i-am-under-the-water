@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_ShaderEditors.h"
 #ifndef PRODUCTION
 
@@ -77,10 +84,10 @@ void UW::UI_ShaderEditor::guiShaderEditor(){
 
 
 inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI_ShaderEditor::shaderEditorGui(){
-  return [this](CW::Renderer::iRenderer *window){
-    guiShaderLoad(shader_name, shader_type);
-    guiShaderEditor();
-  };
+return [this](CW::Renderer::iRenderer *window){
+  guiShaderLoad(shader_name, shader_type);
+  guiShaderEditor();
+};
 };
 
 
@@ -88,6 +95,7 @@ inline std::function<void(CW::Renderer::iRenderer *window)> UW::UI_ShaderEditor:
 std::string UW::UI_ShaderEditor::getName(){
   return shader_name;
 };
+
 
 
 GLenum UW::UI_ShaderEditor::getType(){

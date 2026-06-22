@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
 
@@ -10,9 +17,7 @@
 
 #include "config.h"
 #include "Utils/Logger.h"
-#include "Camera/Camera.h"
 #include "Resources/Resources.h"
-#include "DataSerializer/DataSerializer.h"
 #include "Scene.h"
 
 
@@ -20,25 +25,22 @@
 namespace UW{
 class App{
 private:
-  // app
   CW::Renderer::Renderer window;
+  UW::Scene scene;
   
 #ifndef PRODUCTION
   UW::UI ui;
-#endif
-  
-  UW::Scene scene;
-
-#ifndef PRODUCTION
   float fps = 0.0f;
   float fps_acc = 0.0f;
   unsigned int fps_id = 0;
+
+  float total_fps_acc = 0.0f;
+  unsigned int total_fps_id = 0;
 
   float camera_swap_cooldown_acc = 0.0f;
 #endif
 
   float fixed_update_time_acc = 0.0f;
-
 
 public:
   App();
@@ -62,5 +64,6 @@ private:
   void swapCamera();
   void updateFps();
 #endif
+
 };
 };

@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "LightsSerialization.h"
 
 #include <cmrc/cmrc.hpp>
@@ -7,14 +14,14 @@ CMRC_DECLARE(GameData);
 
 #ifndef PRODUCTION
 void UW::LightsSerialization::save(const std::string& name, const UW::Light& light) {
-  // Single light save implementation
+
 };
 #endif
 
 
 
 void UW::LightsSerialization::load(const std::string& name, UW::Light& light) {
-  // Single light load implementation
+
 };
 
 

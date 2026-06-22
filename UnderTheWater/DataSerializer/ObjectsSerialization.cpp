@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "ObjectsSerialization.h"
 
 #include <cmrc/cmrc.hpp>
@@ -7,7 +14,7 @@ CMRC_DECLARE(GameData);
 
 #ifndef PRODUCTION
 void UW::ObjectsSerialization::save(const UW::GameObject& object) {
-  Logger::get().info("ObjectsSerialization", "Saving object: " + object.name);
+  Logger::get().info("ObjectsSerialization", "Saving object: " + object.game_object_data.name);
   
   try {
     std::filesystem::path p(UW::Config::GAME_DATA_FOLDER + UW::Config::OBJECTS_FILENAME);
@@ -25,26 +32,27 @@ void UW::ObjectsSerialization::save(const UW::GameObject& object) {
   };
 
   UW::GameObjectRecord record;
-  record.name = object.name;
-  record.mesh = object.mesh;
-  record.shader = object.shader;
-  record.position = object.position;
-  record.rotation = object.rotation;
-  record.scale = object.scale;
-  record.textures = object.textures;
-  record.materials = object.materials;
+  record.name = object.game_object_data.name;
+  record.mesh = object.game_object_data.mesh;
+  record.shader = object.game_object_data.shader;
+  record.position = object.game_object_data.position;
+  record.rotation = object.game_object_data.rotation;
+  record.scale = object.game_object_data.scale;
+  record.textures = object.game_object_data.textures;
+  record.materials = object.game_object_data.materials;
+  for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
   outFile << record;
   outFile.close();
 
-  Logger::get().info("ObjectsSerialization", "Object saved { " + object.name + " }");
+  Logger::get().info("ObjectsSerialization", "Object saved { " + object.game_object_data.name + " }");
 };
 #endif
 
 
 
 void UW::ObjectsSerialization::load(UW::GameObject& object) {
-  // Single object load would need file path parameter
+
 };
 
 
@@ -72,17 +80,18 @@ void UW::ObjectsSerialization::saveAll(std::vector<UW::GameObject>& objects) {
 
   for (const auto& object : objects) {
     UW::GameObjectRecord record;
-    record.name = object.name;
-    record.mesh = object.mesh;
-    record.shader = object.shader;
-    record.position = object.position;
-    record.rotation = object.rotation;
-    record.scale = object.scale;
-    record.textures = object.textures;
-    record.materials = object.materials;
+    record.name = object.game_object_data.name;
+    record.mesh = object.game_object_data.mesh;
+    record.shader = object.game_object_data.shader;
+    record.position = object.game_object_data.position;
+    record.rotation = object.game_object_data.rotation;
+    record.scale = object.game_object_data.scale;
+    record.textures = object.game_object_data.textures;
+    record.materials = object.game_object_data.materials;
+    for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
     outFile << record;
-    Logger::get().info("ObjectsSerialization", "Object saved { " + object.name + " }");
+    Logger::get().info("ObjectsSerialization", "Object saved { " + object.game_object_data.name + " }");
   };
 
   outFile.close();
@@ -116,11 +125,12 @@ void UW::ObjectsSerialization::loadAll(std::vector<UW::GameObject>& objects) {
       UW::GameObjectRecord record;
       if (inFile >> record) {
         GameObject object(record.name, record.mesh, record.shader);
-        object.position = record.position;
-        object.rotation = record.rotation;
-        object.scale = record.scale;
-        object.textures = std::move(record.textures);
-        object.materials = std::move(record.materials);
+        object.game_object_data.position = record.position;
+        object.game_object_data.rotation = record.rotation;
+        object.game_object_data.scale = record.scale;
+        object.game_object_data.textures = std::move(record.textures);
+        object.game_object_data.materials = std::move(record.materials);
+        for(auto& script : record.scripts) object.scripts.emplace_back(script);
 
         objects.push_back(std::move(object));
         Logger::get().info("ObjectsSerialization", "Object loaded { " + record.name + " }");
@@ -169,6 +179,14 @@ std::ostream& UW::operator<<(std::ostream& os, const UW::GameObjectRecord& recor
     size_t mat_sz = mat.size();
     os.write(reinterpret_cast<const char*>(&mat_sz), sizeof(mat_sz));
     if (mat_sz > 0) os.write(mat.data(), mat_sz);
+  };
+
+  size_t scr_count = record.scripts.size();
+  os.write(reinterpret_cast<const char*>(&scr_count), sizeof(scr_count));
+  for (const auto& scr : record.scripts) {
+    size_t scr_sz = scr.size();
+    os.write(reinterpret_cast<const char*>(&scr_sz), sizeof(scr_sz));
+    if (scr_sz > 0) os.write(scr.data(), scr_sz);
   };
 
   return os;
@@ -227,6 +245,22 @@ std::istream& UW::operator>>(std::istream& is, UW::GameObjectRecord& record) {
     is.read(reinterpret_cast<char*>(&mat_sz), sizeof(mat_sz));
     mat.resize(mat_sz);
     if (mat_sz > 0) is.read(&mat[0], mat_sz);
+  };
+
+  size_t scr_count = 0;
+  is.read(reinterpret_cast<char*>(&scr_count), sizeof(scr_count));
+  
+  if (scr_count > 10000) {
+    is.setstate(std::ios::failbit);
+    return is;
+  };
+
+  record.scripts.resize(scr_count);
+  for (auto& scr : record.scripts) {
+    size_t scr_sz = 0;
+    is.read(reinterpret_cast<char*>(&scr_sz), sizeof(scr_sz));
+    scr.resize(scr_sz);
+    if (scr_sz > 0) is.read(&scr[0], scr_sz);
   };
 
   return is;

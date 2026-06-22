@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 
 #include "Renderer.h"
@@ -61,4 +68,4 @@ private:
   friend std::istream& operator>>(std::istream& is, MeshRecord& record);
 };
 
-} // namespace UW
+}; // namespace UW

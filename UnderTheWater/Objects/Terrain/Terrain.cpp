@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "Terrain.h"
 
 
@@ -5,12 +12,25 @@
 UW::Terrain::Terrain(){
   generateChunks();
   mesh_id = Resources::get().meshes.get_id("terrain_chunk");
+  onLoad();
 };
 
 
 
 UW::Terrain::~Terrain(){
-  
+  onDestroy();
+};
+
+
+
+void UW::Terrain::onLoad(){
+
+};
+
+
+
+void UW::Terrain::onDestroy(){
+
 };
 
 
@@ -21,7 +41,7 @@ void UW::Terrain::onUpdate(float delta_time){
 
 
 
-void UW::Terrain::onFixedUpdate(){
+void UW::Terrain::onFixedUpdate(float fixed_delta_time){
 
 };
 
@@ -113,7 +133,7 @@ bool UW::Terrain::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model,
   for (int i = 1; i < 8; i++){
     aabbMin = glm::min(aabbMin, corners[i]);
     aabbMax = glm::max(aabbMax, corners[i]);
-  }
+  };
 
   glm::mat4 m = culling_camera_transform;
 
@@ -163,11 +183,8 @@ bool UW::Terrain::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model,
 
   for (int i = 0; i < 6; i++){
     float length = glm::length(glm::vec3(planes[i]));
-
-    if (length > 0.0f){
-      planes[i] /= length;
-    }
-  }
+    if (length > 0.0f) planes[i] /= length;
+  };
 
   for (int i = 0; i < 6; i++){
     glm::vec3 normal = glm::vec3(planes[i]);
@@ -180,10 +197,8 @@ bool UW::Terrain::isVisible(glm::mat4 culling_camera_transform, glm::mat4 model,
 
     float distance = glm::dot(normal, positiveVertex) + planes[i].w;
 
-    if (distance < 0.0f){
-      return false;
-    }
-  }
+    if (distance < 0.0f) return false;
+  };
 
   return true;
-}
+};

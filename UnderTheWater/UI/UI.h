@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 
 #ifndef PRODUCTION
@@ -26,6 +33,8 @@
 #include "UI/UI_Objects.h"
 #include "UI/UI_Lights.h"
 #include "UI/UI_Shaders.h"
+#include "UI/UI_Scripts.h"
+#include "UI/UI_ScriptEditor.h"
 
 
 
@@ -44,13 +53,14 @@ private:
   UW::UI_Objects objects_ui;
   UW::UI_Lights lights_ui;
   UW::UI_Shaders shader_ui;
+  UW::UI_Scripts scripts_ui;
 
 public:
   UI(CW::Renderer::Renderer &window, float &fps, UW::Scene& scene);
   ~UI();
   void onLoad();
   void render();
-
+  void onDestroy();
 
 private:
 // gui
@@ -60,6 +70,7 @@ private:
   void menuBarGui();
 
   std::function<void(std::function<void()> render_windows)> appWorkspace();
+
 };
 };
 

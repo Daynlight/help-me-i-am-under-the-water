@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI_AssetLoader.h"
 
 #ifndef PRODUCTION
@@ -227,6 +234,7 @@ void UW::UI_AssetLoader::finalizeImport() {
       UW::Config::DEFAULT_SHADER,
       { assigned_mat_name },
       {},
+      {},
       glm::vec3(0.0f),
       glm::vec3(0.0f),
       glm::vec3(1.0f)
@@ -319,6 +327,7 @@ void UW::UI_AssetLoader::finalizeImportMerged(const std::string& merged_name) {
     final_merged_name,
     UW::Config::DEFAULT_SHADER,
     assigned_materials,
+    {},
     {},
     glm::vec3(0.0f),
     glm::vec3(0.0f),
@@ -449,7 +458,5 @@ return [this](CW::Renderer::iRenderer *window) {
   guiAssetLoader();
 };
 };
-
-
 
 #endif

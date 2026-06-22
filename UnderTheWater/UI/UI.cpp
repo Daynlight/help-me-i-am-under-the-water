@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "UI.h"
 #ifndef PRODUCTION
 
@@ -11,17 +18,19 @@ UW::UI::UI(CW::Renderer::Renderer &window, float &fps, UW::Scene& scene)
   objects_ui(gui, window, scene),
   lights_ui(gui),
   shader_ui(gui),
-  asset_loader_ui(gui, scene){
+  asset_loader_ui(gui, scene),
+  scripts_ui(gui){
   Logger::get().info("UI", "Initializing UI");
   
   gui.setWorkspace(appWorkspace());
 };
 
 
+
 UW::UI::~UI(){
-  Logger::get().info("UI", "Destroying UI");
-  shader_ui.saveShaderEditors();
+  onDestroy();
 };
+
 
 
 void UW::UI::onLoad(){
@@ -33,9 +42,19 @@ void UW::UI::onLoad(){
 };
 
 
+
 void UW::UI::render(){
   gui.render();
 };
+
+
+
+void UW::UI::onDestroy() {
+  Logger::get().info("UI", "Destroying UI");
+  scripts_ui.saveScriptEditors();
+  shader_ui.saveShaderEditors();
+};
+
 
 
 // ========================= //
@@ -47,6 +66,8 @@ void UW::UI::uiLoad(){
   Logger::get().info("UI", "Loading UI Data from disck");
 
   shader_ui.loadShaderEditors();
+  scripts_ui.loadScriptEditors();
+
   uiControl();
 };
 
@@ -70,7 +91,9 @@ void UW::UI::configControl(){
     if (sscanf(line, "LightsExplorerOn=%d", &value) == 1) s->lightsExplorerOn = value;
     if (sscanf(line, "MaterialEditorOn=%d", &value) == 1) s->materialEditorOn = value;
     if (sscanf(line, "ShaderExplorerWindowOn=%d", &value) == 1) s->shaderExplorerWindowOn = value;
+    if (sscanf(line, "ScriptsExplorerWindowOn=%d", &value) == 1) s->scriptsExplorerWindowOn= value;
     if (sscanf(line, "ShaderEditorWindowOn=%d", &value) == 1) s->shaderEditorWindowOn = value;
+    if (sscanf(line, "ScriptEditorWindowOn=%d", &value) == 1) s->scriptEditorWindowOn = value;
     if (sscanf(line, "ObjectExplorerWindowOn=%d", &value) == 1) s->objectExplorerWindowOn = value;
     if (sscanf(line, "ObjectEditorWindowOn=%d", &value) == 1) s->objectEditorWindowOn = value;
     if (sscanf(line, "Object_ID=%d", &value) == 1) s->object_id = value;
@@ -79,13 +102,17 @@ void UW::UI::configControl(){
     if (sscanf(line, "Window_Height=%d", &value) == 1) s->window_height = value;
     
     char value_str[256];
-    if (sscanf(line, "Material_ID=%256s", &value_str) == 1) s->material_name = std::string(value_str);
+    if (sscanf(line, "Material_ID=%255s", &value_str) == 1) s->material_name = std::string(value_str);
     
     char name[256];
     unsigned int type;
 
     if (sscanf(line, "ShaderEditor=%255[^,],%u", name, &type) == 2){
       s->shader_editors_reg.emplace_back(name, type);
+    };
+
+    if (sscanf(line, "ScriptEditor=%255[^,]", name) == 1){
+      s->scripts_editors_reg.emplace_back(name);
     };
   };
 
@@ -97,7 +124,9 @@ void UW::UI::configControl(){
     out_buf->appendf("LightsExplorerOn=%d\n", guiSettings.lightsExplorerOn);
     out_buf->appendf("MaterialEditorOn=%d\n", guiSettings.materialEditorOn);
     out_buf->appendf("ShaderExplorerWindowOn=%d\n", guiSettings.shaderExplorerWindowOn);
+    out_buf->appendf("ScriptsExplorerWindowOn=%d\n", guiSettings.scriptsExplorerWindowOn);
     out_buf->appendf("ShaderEditorWindowOn=%d\n", guiSettings.shaderEditorWindowOn);
+    out_buf->appendf("ScriptEditorWindowOn=%d\n", guiSettings.scriptEditorWindowOn);
     out_buf->appendf("ObjectExplorerWindowOn=%d\n", guiSettings.objectExplorerWindowOn);
     out_buf->appendf("ObjectEditorWindowOn=%d\n", guiSettings.objectEditorWindowOn);
     out_buf->appendf("Object_ID=%d\n", guiSettings.object_id);
@@ -113,6 +142,15 @@ void UW::UI::configControl(){
         "ShaderEditor=%s,%u\n",
         guiSettings.shader_editors_reg[i].first.c_str(),
         guiSettings.shader_editors_reg[i].second
+      );
+    };
+
+    out_buf->appendf("ScriptEditorCount=%zu\n", guiSettings.scripts_editors_reg.size());
+
+    for (size_t i = 0; i < guiSettings.scripts_editors_reg.size(); ++i){
+      out_buf->appendf(
+        "ScriptEditor=%s\n",
+        guiSettings.scripts_editors_reg[i].c_str()
       );
     };
 
@@ -132,6 +170,7 @@ void UW::UI::uiControl(){
   lights_ui.uiControl();
   shader_ui.uiControl();
   asset_loader_ui.uiControl();
+  scripts_ui.uiControl();
 };
 
 
@@ -161,6 +200,10 @@ void UW::UI::menuBarGui(){
       };
       if(ImGui::MenuItem("Shader Explorer")){
         guiSettings.shaderExplorerWindowOn = !guiSettings.shaderExplorerWindowOn;
+        uiControl();
+      };
+      if(ImGui::MenuItem("Script Explorer")){
+        guiSettings.scriptsExplorerWindowOn = !guiSettings.scriptsExplorerWindowOn;
         uiControl();
       };
       if(ImGui::MenuItem("Object Explorer")){
@@ -218,7 +261,5 @@ std::function<void(std::function<void()> render_windows)> UW::UI::appWorkspace()
     ImGui::End();
   };
 };
-
-
 
 #endif

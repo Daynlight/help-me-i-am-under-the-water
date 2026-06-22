@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #include "Meshes.h"
 
 
@@ -80,6 +87,12 @@ void UW::Meshes::erase(const std::string& name) {
 
 
 
+unsigned int UW::Meshes::size() const{
+  return mesh_data.size();
+};
+
+
+
 void UW::Meshes::clear(){
   version += 1;
   mesh_data.clear();
@@ -108,6 +121,5 @@ unsigned int UW::Meshes::getLatestsVersion(){
 
 
 void UW::Meshes::compileAll(){
-  for(CW::Renderer::Mesh& mesh : mesh_data)
-    mesh.compile();
+  for(CW::Renderer::Mesh& mesh : mesh_data) mesh.compile();
 };

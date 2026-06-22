@@ -1,3 +1,10 @@
+// Help me I'am Under The Water
+// Copyright 2026 Daynlight
+// Licensed under the GNU General, Version 3.0.
+// See LICENSE file for details.
+
+
+
 #pragma once
 #include "Renderer.h"
 
@@ -29,6 +36,7 @@ public:
   unsigned int get_id(const std::string& name);
 
   void erase(const std::string& name);
+  unsigned int size() const;
   void clear();
 
   void emplace_back(const std::string& name, CW::Renderer::Mesh&& mesh);
@@ -40,5 +48,6 @@ public:
   unsigned int getLatestsVersion();
 
   void compileAll();
+
 };
 };
