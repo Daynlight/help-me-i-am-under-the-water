@@ -12,7 +12,7 @@
 
 
 
-#if !defined(PRODUCTION) && defined(_WIN32) || defined(_WIN64)
+#if !defined(PRODUCTION) && (defined(_WIN32) || defined(_WIN64))
   #ifdef BUILDING_SCRIPT_DLL
     #define SCRIPT_API __declspec(dllexport)
   #else

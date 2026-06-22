@@ -52,6 +52,8 @@ set(src
 
 add_executable(UnderTheWater ${src})
 
+
+
 if(PRODUCTION)
   target_compile_definitions(UnderTheWater PRIVATE PRODUCTION)
   file(GLOB_RECURSE PROD_SCRIPTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../Scripts/*.cpp")

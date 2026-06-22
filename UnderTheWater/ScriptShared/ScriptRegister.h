@@ -45,6 +45,8 @@ public:
   };
 };
 
+#endif
+
 
 
 #ifdef PRODUCTION
@@ -63,6 +65,4 @@ public:
   #define REGISTER_SCRIPT(RegKey, ScriptClassName) REGISTER_SCRIPT_INTERNAL(RegKey, ScriptClassName)
 #else
   #define REGISTER_SCRIPT(RegKey, ScriptClassName)
-#endif
-
 #endif

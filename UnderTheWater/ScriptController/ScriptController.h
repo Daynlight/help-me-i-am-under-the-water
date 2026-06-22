@@ -37,6 +37,10 @@ class GameObjectScriptRecord{
   std::string cpp_file = "";
   bool log_observe_lock = 1;
 
+#ifdef PRODUCTION
+  bool module_initialized = false;
+#endif
+
   void* script_handler = nullptr;
   GameObjectScriptInterface* script = nullptr;
 

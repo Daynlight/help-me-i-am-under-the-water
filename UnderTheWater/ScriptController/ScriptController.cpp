@@ -91,6 +91,10 @@ void UW::GameObjectScriptRecord::syncPointer(GameObjectData* data) {
 void UW::GameObjectScriptRecord::observe(GameObjectData *data){
 #ifndef PRODUCTION
   if(checkLastWrite()) updateScript(data);
+#else
+  if(!module_initialized) 
+    if(!loadModule()) 
+      onLoad(data);
 #endif
 };
 
@@ -103,7 +107,7 @@ void UW::GameObjectScriptRecord::onLoad(GameObjectData* data) {
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
-#if defined(_WIN32) || defined(_WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
     pid_t pid = fork();
     if(pid == 0){
       script->OnLoad();
@@ -134,7 +138,7 @@ void UW::GameObjectScriptRecord::onUpdate(float delta_time) {
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
-#if defined(_WIN32) || defined(_WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
     pid_t pid = fork();
     if(pid == 0){
       script->OnUpdate(delta_time);
@@ -165,7 +169,7 @@ void UW::GameObjectScriptRecord::onFixedUpdate(float fixed_delta_time) {
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
-#if defined(_WIN32) || defined(_WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
     pid_t pid = fork();
     if(pid == 0){
       script->OnFixedUpdate(fixed_delta_time);
@@ -196,7 +200,7 @@ void UW::GameObjectScriptRecord::onRender() {
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
-#if defined(_WIN32) || defined(_WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
     pid_t pid = fork();
     if(pid == 0){
       script->OnRender();
@@ -227,7 +231,7 @@ void UW::GameObjectScriptRecord::onDestroy() {
 
 #ifndef PRODUCTION
 #ifdef SANDBOX_SCRIPTS
-#if defined(_WIN32) || defined(_WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
     pid_t pid = fork();
     if(pid == 0){
       script->OnDestroy();
@@ -272,6 +276,7 @@ int UW::GameObjectScriptRecord::loadModule() {
     return -1;
   };
   
+  module_initialized = 1;
   UW::Logger::get().info("Script Controller", "Module Loaded statically");
   return 0;
 
@@ -341,6 +346,8 @@ void UW::GameObjectScriptRecord::removeModule(){
     delete script;
     script = nullptr;
   };
+
+  module_initialized = 0;
 
 #else
 
