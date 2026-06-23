@@ -56,7 +56,6 @@ void UW::UI_AssetLoader::loadModelFromFile(const std::string& path) {
 
   current_scene = importer.ReadFile(path, 
     aiProcess_Triangulate | 
-    aiProcess_FlipUVs | 
     aiProcess_CalcTangentSpace |
     aiProcess_GenNormals
   );

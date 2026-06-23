@@ -112,7 +112,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
 
     for(unsigned int i = 0; i < game_object_data.textures.size(); i++){
       Resources::get().getTexture(this->game_object_data.textures[i]).bind(i);
-      uniform[this->game_object_data.textures[i]]->set<int>(i);
+      uniform["texture" + std::to_string(i)]->set<int>(i);
     };
     
     Resources::get().getShader(this->game_object_data.shader).getUniforms().emplace_back(&uniform);

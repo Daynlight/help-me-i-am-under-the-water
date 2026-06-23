@@ -1,6 +1,6 @@
 # Blender 5.1.2
 # www.blender.org
-mtllib Fsihon.mtl
+mtllib Telescope.mtl
 o Eye
 v 0.659600 0.996085 0.470664
 v 0.902700 1.181794 0.647284

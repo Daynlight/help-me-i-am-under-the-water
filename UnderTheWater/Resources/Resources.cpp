@@ -65,7 +65,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     
     return it->second;
   } catch (const std::runtime_error& e) {
-  }
+  };
 
   if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
     std::ifstream file(local_path, std::ios::binary | std::ios::ate);
