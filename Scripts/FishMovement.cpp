@@ -5,8 +5,8 @@
 
 
 
-#define SCRIPT_NAME Script_Test
-#define SCRIPT_FILE_NAME "Test"
+#define SCRIPT_NAME Script_FishMovement
+#define SCRIPT_FILE_NAME "FishMovement"
 #define BUILDING_SCRIPT_DLL
 
 #include "../UnderTheWater/ScriptShared/GameObjectScriptInterface.h"
@@ -28,6 +28,10 @@ private:
   
   glm::vec3 last_tangent = glm::vec3(0.0f);
   glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+
+  glm::vec3 up_vector = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 initial_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+  float rotation_speed = 5.0f;
 
   float t = 0.0f;
   float speed = 10.0f;
@@ -130,29 +134,35 @@ public:
       - 4.0f * t * (t - 1.0f) * p1 
       + 2.0f * t * (t - 0.5f) * p2;
 
+
     if (glm::length(raw_tangent) > 0.001f) {
       glm::vec3 current_tangent = glm::normalize(raw_tangent);
 
-      if (glm::length(last_tangent) < 0.1f || segment_swapped) {
-        last_tangent = current_tangent;
+      glm::vec3 reference_up = up_vector;
+      if (glm::abs(glm::dot(current_tangent, reference_up)) > 0.999f) {
+        reference_up = glm::vec3(1.0f, 0.0f, 0.0f);
       }
 
-      glm::vec3 axis = glm::cross(last_tangent, current_tangent);
-      float dot_prod = glm::clamp(glm::dot(last_tangent, current_tangent), -1.0f, 1.0f);
+      glm::vec3 target_forward = current_tangent;
+      glm::vec3 target_right = glm::normalize(glm::cross(target_forward, reference_up));
+      glm::vec3 target_up = glm::cross(target_right, target_forward);
+
+      glm::vec3 init_forward = glm::normalize(initial_forward);
+      glm::vec3 init_right = glm::normalize(glm::cross(init_forward, reference_up));
+      glm::vec3 init_up = glm::cross(init_right, init_forward);
+
+      glm::mat3 target_mat(target_right, target_up, target_forward);
+      glm::mat3 initial_mat(init_right, init_up, init_forward);
       
-      if (glm::length(axis) > 0.0001f) {
-        float angle = std::acos(dot_prod);
-        glm::quat delta_rot = glm::angleAxis(angle, glm::normalize(axis));
-        
-        orientation = delta_rot * orientation;
-        orientation = glm::normalize(orientation);
-      }
+      glm::mat3 rot_mat = target_mat * glm::inverse(initial_mat);
+      glm::quat target_orientation = glm::quat_cast(rot_mat);
 
-      last_tangent = current_tangent;
+      float slerp_factor = glm::clamp(fixed_delta_time * rotation_speed, 0.0f, 1.0f);
+      orientation = glm::slerp(orientation, target_orientation, slerp_factor);
+      orientation = glm::normalize(orientation);
     };
 
     game_object_data->rotation = glm::eulerAngles(orientation);;
-    
     game_object_data->position = position;
   };
   
