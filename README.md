@@ -13,26 +13,18 @@
 <table cellspacing="15" cellpadding="0" style="width: 100%; border: none;">
   <tr>
     <td width="50%">
-      <video autoplay loop muted width="100%" style="margin-bottom: 5px;">
-        <source src="./docs/Prod.mp4" type="video/mp4">
-      </video>
+      <img width="100%" src="./docs/Prod.gif">
     </td>
     <td width="50%">
-      <video autoplay loop muted width="100%" style="margin-bottom: 5px;">
-        <source src="./docs/Editor.mp4" type="video/mp4">
-      </video>
+      <img width="100%" src="./docs/Editor.gif">
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <video autoplay loop muted width="100%">
-        <source src="./docs/Movement.mp4" type="video/mp4">
-      </video>
+      <img width="100%" src="./docs/Movement.gif">
     </td>
     <td width="50%">
-      <video autoplay loop muted width="100%">
-        <source src="./docs/SDF.mp4" type="video/mp4">
-      </video>
+      <img width="100%" src="./docs/SDF.gif">
     </td>
   </tr>
 </table>
