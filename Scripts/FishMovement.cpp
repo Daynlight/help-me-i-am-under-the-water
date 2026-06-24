@@ -43,7 +43,7 @@ public:
     initial_game_data = *game_object_data;
 
     int interpolate_points_size = 0;
-    auto it1 = game_object_data->parameters.find("interpolate_position_points");
+    auto it1 = game_object_data->parameters.find("p_size");
     if (it1 != game_object_data->parameters.end()) {
       if (auto* point_size = std::get_if<int>(&it1->second)) {
         interpolate_points_size = *point_size;
@@ -51,7 +51,7 @@ public:
     };
     
     glm::vec3 interpolate_value = glm::vec3(218.0f, 53, -31);
-    auto it2 = game_object_data->parameters.find("interpolate_position_0");
+    auto it2 = game_object_data->parameters.find("p_0");
     if (it2 != game_object_data->parameters.end()) {
       if (auto* str_ptr = std::get_if<glm::vec3>(&it2->second)) {
         glm::vec3 value = *str_ptr;
@@ -63,7 +63,7 @@ public:
 
 
     for(int i = 1; i <= interpolate_points_size; i++){
-      auto it3 = game_object_data->parameters.find("interpolate_position_" + std::to_string(i));
+      auto it3 = game_object_data->parameters.find("p_" + std::to_string(i));
       if (it3 != game_object_data->parameters.end()) {
         if (auto* str_ptr = std::get_if<glm::vec3>(&it3->second)) {
           glm::vec3 value = *str_ptr;

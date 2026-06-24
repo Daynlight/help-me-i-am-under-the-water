@@ -40,6 +40,7 @@ void UW::ObjectsSerialization::save(const UW::GameObject& object) {
   record.scale = object.game_object_data.scale;
   record.textures = object.game_object_data.textures;
   record.materials = object.game_object_data.materials;
+  record.parameters = object.game_object_data.parameters;
   for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
   outFile << record;
@@ -88,6 +89,7 @@ void UW::ObjectsSerialization::saveAll(std::vector<UW::GameObject>& objects) {
     record.scale = object.game_object_data.scale;
     record.textures = object.game_object_data.textures;
     record.materials = object.game_object_data.materials;
+    record.parameters = object.game_object_data.parameters;
     for(auto script : object.scripts) record.scripts.emplace_back(script.getPath());
 
     outFile << record;
@@ -130,6 +132,7 @@ void UW::ObjectsSerialization::loadAll(std::vector<UW::GameObject>& objects) {
         object.game_object_data.scale = record.scale;
         object.game_object_data.textures = std::move(record.textures);
         object.game_object_data.materials = std::move(record.materials);
+        object.game_object_data.parameters = std::move(record.parameters);
         for(auto& script : record.scripts) object.scripts.emplace_back(script);
 
         objects.push_back(std::move(object));
@@ -187,6 +190,35 @@ std::ostream& UW::operator<<(std::ostream& os, const UW::GameObjectRecord& recor
     size_t scr_sz = scr.size();
     os.write(reinterpret_cast<const char*>(&scr_sz), sizeof(scr_sz));
     if (scr_sz > 0) os.write(scr.data(), scr_sz);
+  };
+
+
+  size_t param_count = record.parameters.size();
+  os.write(reinterpret_cast<const char*>(&param_count), sizeof(param_count));
+
+  for (const auto& [param_name, param_var] : record.parameters) {
+    size_t name_sz = param_name.size();
+    os.write(reinterpret_cast<const char*>(&name_sz), sizeof(name_sz));
+    if (name_sz > 0) os.write(param_name.data(), name_sz);
+
+    size_t type_idx = param_var.index();
+    os.write(reinterpret_cast<const char*>(&type_idx), sizeof(type_idx));
+
+    std::visit([&os](auto&& arg) {
+      using T = std::decay_t<decltype(arg)>;
+      
+      if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, bool>) {
+        os.write(reinterpret_cast<const char*>(&arg), sizeof(T));
+      }
+      else if constexpr (std::is_same_v<T, glm::vec2> || std::is_same_v<T, glm::vec3>) {
+        os.write(reinterpret_cast<const char*>(&arg), sizeof(T));
+      }
+      else if constexpr (std::is_same_v<T, std::string>) {
+        size_t str_sz = arg.size();
+        os.write(reinterpret_cast<const char*>(&str_sz), sizeof(str_sz));
+        if (str_sz > 0) os.write(arg.data(), str_sz);
+      }
+    }, param_var);
   };
 
   return os;
@@ -261,6 +293,76 @@ std::istream& UW::operator>>(std::istream& is, UW::GameObjectRecord& record) {
     is.read(reinterpret_cast<char*>(&scr_sz), sizeof(scr_sz));
     scr.resize(scr_sz);
     if (scr_sz > 0) is.read(&scr[0], scr_sz);
+  };
+
+
+  size_t param_count = 0;
+  if (!is.read(reinterpret_cast<char*>(&param_count), sizeof(param_count))) return is;
+
+  if (param_count > 10000) {
+    is.setstate(std::ios::failbit);
+    return is;
+  };
+
+  record.parameters.clear();
+  for (size_t i = 0; i < param_count; ++i) {
+    size_t name_sz = 0;
+    is.read(reinterpret_cast<char*>(&name_sz), sizeof(name_sz));
+    std::string param_name;
+    param_name.resize(name_sz);
+    if (name_sz > 0) is.read(&param_name[0], name_sz);
+
+    size_t type_idx = 0;
+    is.read(reinterpret_cast<char*>(&type_idx), sizeof(type_idx));
+
+    UW::GameObjectParameterType param_var;
+    switch (type_idx) {
+      case 0: { // int
+        int val = 0;
+        is.read(reinterpret_cast<char*>(&val), sizeof(val));
+        param_var = val;
+        break;
+      }
+      case 1: { // float
+        float val = 0.0f;
+        is.read(reinterpret_cast<char*>(&val), sizeof(val));
+        param_var = val;
+        break;
+      }
+      case 2: { // bool
+        bool val = false;
+        is.read(reinterpret_cast<char*>(&val), sizeof(val));
+        param_var = val;
+        break;
+      }
+      case 3: { // glm::vec2
+        glm::vec2 val(0.0f);
+        is.read(reinterpret_cast<char*>(&val), sizeof(val));
+        param_var = val;
+        break;
+      }
+      case 4: { // glm::vec3
+        glm::vec3 val(0.0f);
+        is.read(reinterpret_cast<char*>(&val), sizeof(val));
+        param_var = val;
+        break;
+      }
+      case 5: { // std::string
+        size_t str_sz = 0;
+        is.read(reinterpret_cast<char*>(&str_sz), sizeof(str_sz));
+        std::string val;
+        val.resize(str_sz);
+        if (str_sz > 0) is.read(&val[0], str_sz);
+        param_var = val;
+        break;
+      }
+      default: {
+        is.setstate(std::ios::failbit);
+        return is;
+      };
+    };
+
+    record.parameters[param_name] = std::move(param_var);
   };
 
   return is;

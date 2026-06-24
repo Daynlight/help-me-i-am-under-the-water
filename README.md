@@ -253,6 +253,11 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Assets
 - [ ] Releases
 
+- [ ] Scripts param auto reload
+- [ ] Scripts runtime copy
+- [ ] Script on off btn
+- [ ] Fix FishMovement
+- [x] Parameters serialization
 - [x] Multiple Scripts seg fault (Scripts)
 - [x] Object Add object issue (Scripts)
 - [x] Object Delete Script (Scripts)
@@ -297,4 +302,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Script System for ```PRODUCTION```.
 - [ ] Scripts multiple compilation issue.
 - [ ] Script async compile.
+- [ ] Game data backup
+- [ ] Production optimization
+- [ ] Text Renderer
 </details>
