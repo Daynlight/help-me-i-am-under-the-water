@@ -48,12 +48,12 @@ public:
 
 
 
-    std::string child_name = game_object_data->name + "_child_1";
-    child_objects.emplace_back(child_name);
-    object_manager->emplace_back(child_name);
-    GameObjectData* child_data = object_manager->getGameObjectData(child_name);
-    child_data->mesh = "Pufferfish";
-    child_data->position = {163, 26, -21};
+    // std::string child_name = game_object_data->name + "_child_1";
+    // child_objects.emplace_back(child_name);
+    // object_manager->emplace_back(child_name);
+    // GameObjectData* child_data = object_manager->getGameObjectData(child_name);
+    // child_data->mesh = "Pufferfish";
+    // child_data->position = {163, 26, -21};
 
 
     

@@ -23,13 +23,17 @@ void UW::ObjectManager::emplace_back(const std::string &name){
 
 
 void UW::ObjectManager::erase(const std::string &name) {
-  objects.erase(
-    std::remove_if(objects.begin(), objects.end(),
-      [&name](const UW::GameObject& obj) {
-        return obj.game_object_data.name == name;
-      }),
-    objects.end()
-  );
+  for (auto it = objects.begin(); it != objects.end(); ) {
+    if (it->game_object_data.name == name) {
+      it->onDestroy();
+      it->scripts.clear(); 
+      it->mesh_id = -1;
+      it = objects.erase(it);
+      
+    } else {
+      ++it; 
+    };
+  };
 };
 
 
