@@ -110,6 +110,23 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
 
 
 void UW::Resources::initMeshes(){
+  // ============================= //
+  // ========== Empty ============ //
+  // ============================= //
+  std::vector<float> empty_vertices = {
+    1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f
+  };
+
+  std::vector<unsigned int> empty_indices = {0, 1, 2};
+
+  CW::Renderer::Mesh empty_quad;
+  empty_quad.addVertices(empty_vertices, 3, 0);
+  empty_quad.addIndices(empty_indices);
+  meshes.emplace_back("empty", std::move(empty_quad));
+
+
   // ======================= //
   // ======= Terrain ======= //
   // ======================= //

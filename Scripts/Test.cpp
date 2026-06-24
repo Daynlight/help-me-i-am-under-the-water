@@ -41,13 +41,41 @@ public:
   void OnLoad(){
     logger->info("Test Script", "Loaded");
     initial_game_data = *game_object_data;
-    position = glm::vec3(218.0f, 53, -31);
-    path.push_back(glm::vec3(218.0f, 53, -31));
-    path.push_back(glm::vec3(160.0f, 24, -150));
-    path.push_back(glm::vec3(201.0f, 38, -148));
+
+    int interpolate_points_size = 0;
+    auto it1 = game_object_data->parameters.find("interpolate_position_points");
+    if (it1 != game_object_data->parameters.end()) {
+      if (auto* point_size = std::get_if<int>(&it1->second)) {
+        interpolate_points_size = *point_size;
+      };
+    };
+    
+    glm::vec3 interpolate_value = glm::vec3(218.0f, 53, -31);
+    auto it2 = game_object_data->parameters.find("interpolate_position_0");
+    if (it2 != game_object_data->parameters.end()) {
+      if (auto* str_ptr = std::get_if<glm::vec3>(&it2->second)) {
+        glm::vec3 value = *str_ptr;
+          logger->info(SCRIPT_FILE_NAME, "Position[0] = [" + std::to_string(value.x) + ", " + std::to_string(value.y) + ", " + std::to_string(value.z) + "]");
+      }
+    }
+    position = interpolate_value;
+    path.push_back(interpolate_value);
+
+
+    for(int i = 1; i <= interpolate_points_size; i++){
+      auto it3 = game_object_data->parameters.find("interpolate_position_" + std::to_string(i));
+      if (it3 != game_object_data->parameters.end()) {
+        if (auto* str_ptr = std::get_if<glm::vec3>(&it3->second)) {
+          glm::vec3 value = *str_ptr;
+          path.push_back(value);
+          logger->info(SCRIPT_FILE_NAME, "Position[" + std::to_string(i) + "] = [" + std::to_string(value.x) + ", " + std::to_string(value.y) + ", " + std::to_string(value.z) + "]");
+        };
+      };
+    };
   };
   
   void OnUpdate(float delta_time){
+    
   };
   
   void OnFixedUpdate(float fixed_delta_time){

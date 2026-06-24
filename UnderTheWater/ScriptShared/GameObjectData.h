@@ -12,10 +12,17 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <variant>
 
 
 
 namespace UW{
+inline constexpr const char* gameObjectParameterTypeName[] = {"int", "float", "bool", "vec2", "vec3", "str"};
+using GameObjectParameterType = std::variant<int, float, bool, glm::vec2, glm::vec3, std::string>;
+
+
+
 struct GameObjectData{
   std::string name = "";
   std::string mesh = "";
@@ -25,5 +32,7 @@ struct GameObjectData{
   glm::vec3 position = glm::vec3(0.0f);
   glm::vec3 rotation = glm::vec3(0.0f);
   glm::vec3 scale = glm::vec3(1.0f);
+
+  std::unordered_map<std::string, GameObjectParameterType> parameters;
 };
 };

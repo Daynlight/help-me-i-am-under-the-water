@@ -182,6 +182,117 @@ void UW::UI_Objects::guiObjectEditor(){
   if(ImGui::Button(label.c_str())) {
     object.scripts.emplace_back(GameObjectScriptRecord("new script"));
   };
+
+
+  ImGui::SeparatorText("Parameters");
+
+  auto& params = object.game_object_data.parameters;
+
+  for (auto it = params.begin(); it != params.end();) {
+    const std::string& current_name = it->first;
+    auto& param_value = it->second;
+
+    ImGui::PushID(current_name.c_str());
+
+    bool delete_triggered = false;
+    bool rename_triggered = false;
+    char name_buffer[128];
+    strncpy(name_buffer, current_name.c_str(), sizeof(name_buffer) - 1);
+    name_buffer[sizeof(name_buffer) - 1] = '\0';
+
+    ImGui::SetNextItemWidth(120.0f);
+    if (ImGui::InputText("##ParamName", name_buffer, sizeof(name_buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+      rename_triggered = true;
+    }
+    if (ImGui::IsItemDeactivatedAfterEdit()) {
+      rename_triggered = true;
+    }
+
+    ImGui::SameLine();
+
+    int current_type_idx = static_cast<int>(param_value.index());
+    ImGui::SetNextItemWidth(70.0f);
+    if (ImGui::Combo("##ParamType", &current_type_idx, UW::gameObjectParameterTypeName, IM_ARRAYSIZE(UW::gameObjectParameterTypeName))) {
+      switch (current_type_idx) {
+        case 0: param_value = 0; break;
+        case 1: param_value = 0.0f; break;
+        case 2: param_value = false; break;
+        case 3: param_value = glm::vec2(0.0f); break;
+        case 4: param_value = glm::vec3(0.0f); break;
+        case 5: param_value = std::string(""); break;
+      }
+    }
+
+    ImGui::SameLine();
+
+    std::visit([](auto&& arg) {
+      using T = std::decay_t<decltype(arg)>;
+      ImGui::SetNextItemWidth(150.0f);
+      
+      if constexpr (std::is_same_v<T, int>) {
+        ImGui::InputInt("##val", &arg);
+      }
+      else if constexpr (std::is_same_v<T, float>) {
+        ImGui::DragFloat("##val", &arg, 0.05f);
+      }
+      else if constexpr (std::is_same_v<T, bool>) {
+        ImGui::Checkbox("##val", &arg);
+      }
+      else if constexpr (std::is_same_v<T, glm::vec2>) {
+        ImGui::DragFloat2("##val", &arg.x, 0.05f);
+      }
+      else if constexpr (std::is_same_v<T, glm::vec3>) {
+        ImGui::DragFloat3("##val", &arg.x, 0.05f);
+      }
+      else if constexpr (std::is_same_v<T, std::string>) {
+        char str_buffer[256];
+        strncpy(str_buffer, arg.c_str(), sizeof(str_buffer) - 1);
+        str_buffer[sizeof(str_buffer) - 1] = '\0';
+        if (ImGui::InputText("##val", str_buffer, sizeof(str_buffer))) {
+          arg = std::string(str_buffer);
+        }
+      }
+    }, param_value);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Delete")) {
+      delete_triggered = true;
+    }
+
+    ImGui::PopID();
+
+    if (delete_triggered) {
+      it = params.erase(it);
+    } 
+    else if (rename_triggered && std::string(name_buffer) != current_name && !std::string(name_buffer).empty()) {
+      std::string new_key = name_buffer;
+      
+      if (params.find(new_key) == params.end()) {
+        params[new_key] = std::move(param_value);
+        it = params.erase(it);
+      } else {
+        ++it;
+      }
+    } 
+    else {
+      ++it;
+    }
+  }
+
+  ImGui::Spacing();
+
+  std::string add_label = "Add Parameter (" + std::to_string(params.size()) + ")";
+  if (ImGui::Button(add_label.c_str())) {
+    std::string unique_new_name = "NewParameter_" + std::to_string(params.size());
+    
+    int safety_counter = 0;
+    while(params.find(unique_new_name) != params.end()) {
+      unique_new_name = "NewParameter_" + std::to_string(params.size() + (++safety_counter));
+    }
+    
+    params[unique_new_name] = 0;
+  }
 };
 
 
