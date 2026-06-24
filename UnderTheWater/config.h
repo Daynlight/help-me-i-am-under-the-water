@@ -25,12 +25,12 @@ namespace UW::Config{
   // generation
   inline constexpr unsigned int SEED = 123123;
   inline constexpr float MAX_HEIGHT = 125.0f;
-  inline constexpr float WATER_HEIGHT = 70.0f;
+  inline constexpr float WATER_HEIGHT = 125.0f;
   inline constexpr float CHUNK_SIZE = 256.0f;
   inline constexpr unsigned int CHUNK_RADIUS = 1;                         // 3 x 3
   inline constexpr glm::vec2 TESS_BOUND = glm::vec2(8.0f, 256.0f);
   inline constexpr float TESS_DISTANCE_COFF = 0.000005f;
-  inline constexpr float FOG_DENSITY = 0.017f;
+  inline constexpr float FOG_DENSITY = 0.02f;
   inline constexpr glm::vec3 FOG_COLOR = glm::vec3(0.0f, 0.4f, 0.55f);
   
   // ui

@@ -29,7 +29,7 @@ UW::Scene::~Scene(){
 void UW::Scene::onLoad(){
   Logger::get().info("Scene", "Loading Scene");
   
-  DataSerializer::get().loadAll(object_manager.objects);
+  DataSerializer::get().loadAll();
   Logger::get().info("Scene", "Data Loaded from DataSerializer");
 
 
@@ -103,11 +103,11 @@ void UW::Scene::onLoad(){
 void UW::Scene::onUpdate(float delta_time){
   camera.event(&window);
 
-  for(UW::GameObject& el : object_manager.objects) el.onUpdate(delta_time);
+  for(UW::GameObject& el : UW::ObjectManager::get().objects) el.onUpdate(delta_time);
   for(UW::Meduse& meduse : meduses) meduse.onUpdate(delta_time);
-  terrain.onUpdate(delta_time);
+  if(terrain_on) terrain.onUpdate(delta_time);
   skybox.onUpdate(delta_time);
-  water.onUpdate(delta_time);
+  if(water_on) water.onUpdate(delta_time);
 };
 
 
@@ -118,16 +118,16 @@ void UW::Scene::onFixedUpdate(float fixed_delta_time){
 
   if(save_acc >= UW::Config::SAVE_TIMESTAMP){
     save_acc -= UW::Config::SAVE_TIMESTAMP;
-    DataSerializer::get().saveAll(object_manager.objects);
+    DataSerializer::get().saveAll();
     Logger::get().info("Scene", "Auto-Save scene data");
   };
 #endif
 
-  for(UW::GameObject& el : object_manager.objects) el.onFixedUpdate(fixed_delta_time);
+  for(UW::GameObject& el : UW::ObjectManager::get().objects) el.onFixedUpdate(fixed_delta_time);
   for(UW::Meduse& meduse : meduses) meduse.onFixedUpdate(fixed_delta_time);
-  terrain.onFixedUpdate(fixed_delta_time);
+  if(terrain_on) terrain.onFixedUpdate(fixed_delta_time);
   skybox.onFixedUpdate(fixed_delta_time);
-  water.onFixedUpdate(fixed_delta_time);
+  if(water_on) water.onFixedUpdate(fixed_delta_time);
 };
 
 
@@ -136,14 +136,14 @@ void UW::Scene::onDestroy() {
   Logger::get().info("Scene", "Destroying Scene");
 
 #ifndef PRODUCTION
-  for(GameObject& object : object_manager.objects) object.onDestroy();
+  for(GameObject& object : UW::ObjectManager::get().objects) object.onDestroy();
   Logger::get().info("Scene", "Objects onDestroy");
 
-  DataSerializer::get().saveAll(object_manager.objects);
+  DataSerializer::get().saveAll();
   Logger::get().info("Scene", "Force saved scene data");
 #endif
   
-  object_manager.objects.clear();
+  UW::ObjectManager::get().objects.clear();
   Logger::get().info("Scene", "Objects Removed");
 
   Logger::get().info("Scene", "Destroyed Scene");
@@ -172,7 +172,7 @@ void UW::Scene::compileShadows(){
   window.beginFrame();
 
   terrain.render(&window, light_camera, light_camera, shadows_uniform_off);
-  for(UW::GameObject& object : object_manager.objects) object.render(&window, light_camera, light_camera, shadows_uniform_off);
+  for(UW::GameObject& object : UW::ObjectManager::get().objects) object.render(&window, light_camera, light_camera, shadows_uniform_off);
 
   shadows_fbo.unbind();
 };
@@ -238,10 +238,10 @@ void UW::Scene::renderFrame(UW::Camera& camera){
   glActiveTexture(GL_TEXTURE16);
   glBindTexture(GL_TEXTURE_2D, shadows_fbo.getDepthTexture());
 
-  terrain.render(&window, this->camera, camera, shadows_uniform_on);
+  if(terrain_on) terrain.render(&window, this->camera, camera, shadows_uniform_on);
   skybox.render(&window, this->camera, camera, shadows_uniform_off); 
-  water.render(&window, this->camera, camera, shadows_uniform_off);
-  for(UW::GameObject& object : object_manager.objects) object.render(&window, this->camera, camera, shadows_uniform_on);
+  if(water_on) water.render(&window, this->camera, camera, shadows_uniform_off);
+  for(UW::GameObject& object : UW::ObjectManager::get().objects) object.render(&window, this->camera, camera, shadows_uniform_on);
 
   
   glActiveTexture(GL_TEXTURE16);

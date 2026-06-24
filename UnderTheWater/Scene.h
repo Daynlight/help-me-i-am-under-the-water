@@ -42,7 +42,10 @@ private:
   bool shadows_on = UW::Config::DEFAULT_SHADOWS_ON;
   
   float save_acc = 0.0f;
-#endif
+  #endif
+  
+  bool water_on = false;
+  bool terrain_on = true;
   
   UW::Camera light_camera;
   CW::Renderer::Uniform shadows_uniform_on;
@@ -59,7 +62,6 @@ private:
   UW::Terrain terrain;
   UW::Water water;
   UW::Skybox skybox;
-  UW::ObjectManager object_manager;
   std::vector<UW::Meduse> meduses;
 
 public:

@@ -22,6 +22,10 @@
 
 
 namespace UW{
+class GameObjectScriptRecord;
+
+
+
 class GameObject : public Object{
 private:
   CW::Renderer::Uniform uniform;
@@ -39,6 +43,10 @@ public:
   GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials = {}, const std::vector<std::string>& textures = {}, const std::vector<UW::GameObjectScriptRecord>& scripts = {}, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f));
   GameObject(const std::string& name, const GameObject& other);
   ~GameObject();
+  GameObject(const GameObject& other);
+  GameObject& operator=(const GameObject& other);
+  GameObject(GameObject&& other) noexcept;
+  GameObject& operator=(GameObject&& other) noexcept;
 
   void onLoad() override;
   void onDestroy() override;

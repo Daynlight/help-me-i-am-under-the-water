@@ -37,6 +37,7 @@ struct GameObjectRecord {
   std::vector<std::string> textures;
   std::vector<std::string> materials;
   std::vector<std::string> scripts;
+  std::unordered_map<std::string, UW::GameObjectParameterType> parameters;
 
   friend std::ostream& operator<<(std::ostream& os, const GameObjectRecord& record);
   friend std::istream& operator>>(std::istream& is, GameObjectRecord& record);

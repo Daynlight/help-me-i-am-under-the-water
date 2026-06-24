@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <iostream>
 #include <regex>
+#include <memory>
 
 #include <cmrc/cmrc.hpp>
 
@@ -33,6 +34,8 @@
 
 namespace UW {
   class GameObject; 
+  class MeshSerialization;
+  class ObjectsSerialization;
 };
 
 
@@ -40,11 +43,11 @@ namespace UW {
 namespace UW{
 class DataSerializer{
 private:
-  DataSerializer() = default;
+  DataSerializer();
   ~DataSerializer() = default;
 
-  MeshSerialization mesh_serializer;
-  ObjectsSerialization objects_serializer;
+  std::unique_ptr<MeshSerialization> mesh_serializer;
+  std::unique_ptr<ObjectsSerialization> objects_serializer;
   MaterialsSerialization materials_serializer;
   LightsSerialization lights_serializer;
   ShaderSerialization shader_serializer;
@@ -60,9 +63,9 @@ public:
 
 public:
 #ifndef PRODUCTION
-  void saveAllObjects(std::vector<UW::GameObject> &objects);
+  void saveAllObjects(std::vector<GameObject>& objects);
 #endif
-  void loadAllObjects(std::vector<UW::GameObject> &objects);
+  void loadAllObjects(std::vector<GameObject>& objects);
 
 #ifndef PRODUCTION
   void saveAllMaterials(UW::Materials &materials);
@@ -97,10 +100,10 @@ public:
   void loadAllTextures();
 
 #ifndef PRODUCTION
-  void saveAll(std::vector<UW::GameObject> &objects);
+  void saveAll();
 #endif
 
-  void loadAll(std::vector<UW::GameObject> &objects);
+  void loadAll();
 
 };
 }; // namespace UW

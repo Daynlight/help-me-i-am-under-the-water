@@ -56,7 +56,6 @@ void UW::UI_AssetLoader::loadModelFromFile(const std::string& path) {
 
   current_scene = importer.ReadFile(path, 
     aiProcess_Triangulate | 
-    aiProcess_FlipUVs | 
     aiProcess_CalcTangentSpace |
     aiProcess_GenNormals
   );
@@ -240,7 +239,7 @@ void UW::UI_AssetLoader::finalizeImport() {
       glm::vec3(1.0f)
     );
 
-    scene.object_manager.objects.push_back(new_obj);
+    UW::ObjectManager::get().objects.push_back(new_obj);
   };
 
   Logger::get().info("UI_AssetLoader", "Separate Import successful!");
@@ -334,7 +333,7 @@ void UW::UI_AssetLoader::finalizeImportMerged(const std::string& merged_name) {
     glm::vec3(1.0f)
   );
 
-  scene.object_manager.objects.push_back(new_obj);
+  UW::ObjectManager::get().objects.push_back(new_obj);
 
   Logger::get().info("UI_AssetLoader", "Merged Import successful!");
   clearTemporaryData(); 

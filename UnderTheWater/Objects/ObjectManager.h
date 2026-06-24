@@ -14,15 +14,37 @@
 #include "DataSerializer/DataSerializer.h"
 #include "Objects/Object.h"
 #include "Objects/GameObject.h"
+#include "ScriptShared/IObjectManger.h"
 
 
 
 namespace UW{
-class ObjectManager{
+class GameObject;
+
+
+
+class ObjectManager : public IObjectManager{
 private:
 
 public:
+  static ObjectManager& get();
+
+  ObjectManager(const ObjectManager&) = delete;
+  ObjectManager& operator=(const ObjectManager&) = delete;
+  ObjectManager(ObjectManager&&) = delete;
+  ObjectManager& operator=(ObjectManager&&) = delete;
+
+private:
+  ObjectManager() = default;
+  ~ObjectManager() = default;
+
+public:
   std::vector<UW::GameObject> objects;
+
+  void emplace_back(const std::string& name);
+  void erase(const std::string& name);
+  GameObjectData* getGameObjectData(const std::string& name);
+
   
 };
 }; // namespace UW

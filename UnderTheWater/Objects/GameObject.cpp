@@ -9,6 +9,16 @@
 
 
 
+void PatchScriptPointers(std::vector<UW::GameObjectScriptRecord>& scripts, UW::GameObjectData* new_data_ptr) {
+  for (auto& record : scripts) {
+    if (record.script) {
+      record.script->game_object_data = new_data_ptr;
+    };
+  };
+};
+
+
+
 UW::GameObject::GameObject(const std::string& name, const std::string& mesh, const std::string& shader, const std::vector<std::string>& materials, const std::vector<std::string>& textures, const std::vector<UW::GameObjectScriptRecord>& scripts, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
   : scripts(scripts) {
   UW::Logger::get().info("GameObject", "GameObject Constructor Called!");
@@ -41,6 +51,60 @@ UW::GameObject::GameObject(const std::string& name, const GameObject& other){
 
 UW::GameObject::~GameObject(){
   onDestroy();
+};
+
+
+
+UW::GameObject::GameObject(const GameObject& other) 
+  : Object(other), uniform(other.uniform), scripts(other.scripts),
+    mesh_last(other.mesh_last), mesh_id(other.mesh_id), mesh_version(other.mesh_version),
+    game_object_data(other.game_object_data)
+{
+  PatchScriptPointers(this->scripts, &this->game_object_data);
+}
+
+
+
+UW::GameObject& UW::GameObject::operator=(const GameObject& other) {
+  if (this == &other) return *this;
+  
+  Object::operator=(other);
+  uniform = other.uniform;
+  scripts = other.scripts;
+  mesh_last = other.mesh_last;
+  mesh_id = other.mesh_id;
+  mesh_version = other.mesh_version;
+  game_object_data = other.game_object_data;
+
+  PatchScriptPointers(this->scripts, &this->game_object_data);
+  return *this;
+}
+
+
+
+UW::GameObject::GameObject(GameObject&& other) noexcept
+  : Object(std::move(other)), uniform(std::move(other.uniform)), scripts(std::move(other.scripts)),
+    mesh_last(std::move(other.mesh_last)), mesh_id(other.mesh_id), mesh_version(other.mesh_version),
+    game_object_data(std::move(other.game_object_data)) 
+{
+  PatchScriptPointers(this->scripts, &this->game_object_data);
+};
+
+
+
+UW::GameObject& UW::GameObject::operator=(GameObject&& other) noexcept {
+  if (this == &other) return *this;
+
+  Object::operator=(std::move(other));
+  uniform = std::move(other.uniform);
+  scripts = std::move(other.scripts);
+  mesh_last = std::move(other.mesh_last);
+  mesh_id = other.mesh_id;
+  mesh_version = other.mesh_version;
+  game_object_data = std::move(other.game_object_data);
+
+  PatchScriptPointers(this->scripts, &this->game_object_data);
+  return *this;
 };
 
 
@@ -112,7 +176,7 @@ void UW::GameObject::render(CW::Renderer::Renderer *renderer, Camera &culling_ca
 
     for(unsigned int i = 0; i < game_object_data.textures.size(); i++){
       Resources::get().getTexture(this->game_object_data.textures[i]).bind(i);
-      uniform[this->game_object_data.textures[i]]->set<int>(i);
+      uniform["texture" + std::to_string(i)]->set<int>(i);
     };
     
     Resources::get().getShader(this->game_object_data.shader).getUniforms().emplace_back(&uniform);

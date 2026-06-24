@@ -120,7 +120,7 @@ Use cmake command with ```PRODUCTION``` FLAG
 ```bash
 mkdir -p build-prod
 cd build-prod
-cmake -B . -DPRODUCTION=ON ..
+cmake -B . -DPRODUCTION=ON -DCMAKE_BUILD_TYPE=Release ..
 cmake --build .
 cd ..
 ./build-prod/bin/UnderTheWater
@@ -253,6 +253,11 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Assets
 - [ ] Releases
 
+- [ ] Scripts param auto reload
+- [ ] Scripts runtime copy
+- [ ] Script on off btn
+- [ ] Fix FishMovement
+- [x] Parameters serialization
 - [x] Multiple Scripts seg fault (Scripts)
 - [x] Object Add object issue (Scripts)
 - [x] Object Delete Script (Scripts)
@@ -265,6 +270,9 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Shaders UI Check
 - [x] Scripts UI Check
 - [x] Object UI Check
+- [x] Asset loader on load terrain break
+- [x] Asset loader multiple meshes corrupts
+- [x] Asset loader materials didn't import or missing materials
 - [x] Asset Loader UI Check
 </details>
 
@@ -294,4 +302,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Script System for ```PRODUCTION```.
 - [ ] Scripts multiple compilation issue.
 - [ ] Script async compile.
+- [ ] Game data backup
+- [ ] Production optimization
+- [ ] Text Renderer
 </details>

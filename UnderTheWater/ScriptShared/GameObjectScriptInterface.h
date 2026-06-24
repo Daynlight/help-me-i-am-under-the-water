@@ -7,10 +7,13 @@
 
 #pragma once
 #include "ILogger.h"
+#include "ScriptRegister.h"
 #include "GameObjectData.h"
+#include "IObjectManger.h"
 
 
-#if defined(_WIN32) || defined(_WIN64)
+
+#if !defined(PRODUCTION) && (defined(_WIN32) || defined(_WIN64))
   #ifdef BUILDING_SCRIPT_DLL
     #define SCRIPT_API __declspec(dllexport)
   #else
@@ -27,6 +30,7 @@ class GameObjectScriptInterface {
 public:
   GameObjectData* game_object_data = nullptr;
   ILogger* logger = nullptr;
+  IObjectManager* object_manager = nullptr;
 
   virtual ~GameObjectScriptInterface() = default;
   

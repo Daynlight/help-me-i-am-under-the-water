@@ -71,8 +71,10 @@ void UW::App::onLoad(){
 void UW::App::onDestroy() {
   Logger::get().info("App", "Destroying App");
 
+#ifndef PRODUCTION
   ui.onDestroy();
   Logger::get().info("App", "UI Destroyed");
+#endif
 
   scene.onDestroy();
   Logger::get().info("App", "Scene Destroyed");

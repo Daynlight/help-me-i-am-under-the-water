@@ -62,6 +62,9 @@ inline void UW::UI_Info::guiInfo(){
 
   if(ImGui::Checkbox("Post Processing", &scene.post_processing_on));
   if(ImGui::Checkbox("Shadows", &scene.shadows_on));
+
+  if(ImGui::Checkbox("Water_on", &scene.water_on));
+  if(ImGui::Checkbox("Terrain_on", &scene.terrain_on));
 };
 
 

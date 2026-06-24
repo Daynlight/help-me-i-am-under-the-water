@@ -65,7 +65,7 @@ CW::Renderer::Texture &UW::Resources::getTexture(const std::string &path_to_asse
     
     return it->second;
   } catch (const std::runtime_error& e) {
-  }
+  };
 
   if (std::filesystem::exists(local_path) && !std::filesystem::is_directory(local_path)) {
     std::ifstream file(local_path, std::ios::binary | std::ios::ate);
@@ -110,6 +110,23 @@ CW::Renderer::Shader &UW::Resources::getShader(const std::string &path_to_asset)
 
 
 void UW::Resources::initMeshes(){
+  // ============================= //
+  // ========== Empty ============ //
+  // ============================= //
+  std::vector<float> empty_vertices = {
+    1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f
+  };
+
+  std::vector<unsigned int> empty_indices = {0, 1, 2};
+
+  CW::Renderer::Mesh empty_quad;
+  empty_quad.addVertices(empty_vertices, 3, 0);
+  empty_quad.addIndices(empty_indices);
+  meshes.emplace_back("empty", std::move(empty_quad));
+
+
   // ======================= //
   // ======= Terrain ======= //
   // ======================= //
