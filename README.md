@@ -36,6 +36,35 @@ Project for **GRK** under water scene. Build on top of my library [**CWindow**](
 
 
 
+## TOC
+- [Demos](#demos)
+- [About](#about)
+- [TOC](#toc)
+- [Methods](#methods)
+- [Controls](#controls)
+- [UI](#ui)
+- [Installation and Usage](#installation-and-usage)
+- [Compiling End Product](#compiling-end-product)
+- [Architecture](#architecture)
+  - [Build System](#build-system)
+  - [Core Modules](#core-modules)
+- [Tasks Presentation](#tasks-presentation)
+  - [Normal mapping](#normal-mapping)
+  - [PBR](#pbr)
+  - [Quaternion camera](#quaternion-camera)
+  - [Shadow mapping](#shadow-mapping)
+  - [Parallel Transport Frames](#parallel-transport-frames)
+  - [Underwater skybox](#underwater-skybox)
+  - [**A09** Ray-marched SDF object](#a09-ray-marched-sdf-object)
+  - [**B07** Heightmap-based seabed mesh](#b07-heightmap-based-seabed-mesh)
+- [Supported Platforms](#supported-platforms)
+- [Prerequisites](#prerequisites)
+- [License](#license)
+- [Author](#author)
+- [TODO](#todo)
+
+
+
 ## Methods
 - [x] normal mapping 
 - [x] PBR 
@@ -76,33 +105,8 @@ Can be edited in [config.h](UnderTheWater/config.h)
 * **Shader Explorer**
 * **Shader Editor**
 * **Script Explorer**
-* **Script Editor**
-
-
-
-## TOC
-- [Demos](#demos)
-- [About](#about)
-- [Methods](#methods)
-- [Controls](#controls)
-- [UI](#ui)
-- [TOC](#toc)
-- [Installation and Usage](#installation-and-usage)
-- [Compiling End Product](#compiling-end-product)
-- [Supported Platforms](#supported-platforms)
-- [Architecture](#architecture)
-  - [Build System](#build-system)
-  - [Lights](#lights)
-  - [Materials](#materials)
-  - [Assets](#assets)
-  - [Resources](#resources)
-  - [Shaders](#shaders)
-  - [Terrain](#terrain)
-  - [Water](#water)
-- [Prerequisites](#prerequisites)
-- [License](#license)
-- [Author](#author)
-- [TODO](#todo)
+* **Script Editor**  
+All in **Editor** mode. **Production** have turn off ui.
 
 
 
@@ -149,34 +153,72 @@ cd ..
 
 
 
-## Supported Platforms
-* Linux X11
-* Windows 
-
-
-
 ## Architecture
 ### Build System
 We use **cmake** for ease of build with **git submodules** for git packages.
 
-### Lights
-Lights are store on **SSBO GPU side** with parameters like ```position```, ```color```, ```strength```. It's provides easier way to store light parameters with multiple instances and avoids unnsescary uniforms bindings. They are created once in ```Resources``` Singleton class and reuse for each object. This way we save memory.
+### Core Modules
+#### [DataSerializer](UnderTheWater/DataSerializer/) {SINGLETON}
+Focuses only on reading and saving. For loading data uses ```cmrc``` that **bakes** assets into executable. Data are stored in ```binary``` format for faster access and avoiding parsing. Everything that is baked via ```cmrc``` is save in [GameData](GameData/) folder. 
 
-### Materials
-Materials like Lights are stored on **SSBO GPU side** that allows multiple materials by one mesh. Material contains typical **PBR parameters** like ```albedo```, ```roughness```, ```metallic```, ```emission_color```, ```emission_strength```, ```ambient_occlusion```. We can edit materials via **ImGui** every time we change parameters we recompile **SSBO**.
+* **Meshes**: Faster to read then **Assimp**. Saved as multiple files each for one  mesh in [Assets/Meshes](GameData/Assets//Meshes/) folder each with ```.msh``` extension. On load we search for file in this directory with ```.msh``` extension. Loaded to [```Resources```](UnderTheWater/Resources/) saved in ```UW::Meshes``` that controls versioning and allows avoiding ```unordered_map``` for editor.
+* **Shaders**: Accessible via ```Resources```. Saved as multiple files in [Assets/Shaders](GameData/Assets/Shaders/) folders **each folder is one compiled shader** with ```.glsl``` extension. List of allowed script types is in [config.h](UnderTheWater/config.h).
+* **Scripts**: In DataSerializer saves and loads ```.cpp``` script to ```UI``` editor. Logic of ```hot-reloading``` and compiling to ```PRODUCTION``` is in [ScriptController](UnderTheWater/ScriptController/) and [ScriptShared](UnderTheWater/ScriptShared/).
+* **Lights**: World static lights loaded to ```Resources``` and compile as ```SSBO```. Single file [```Lights.lit```](GameData/Lights.lit).
+* **Materials**: World static materials loaded to ```Resources``` and compile as ```SSBO```. Single file [```Materials.pbr```](GameData/Materials.pbr).
+* **Objects**:  World objects loaded to ```ObjectManager``` singleton class. Single file [```Objects.obj```](GameData/Objects.obj).
+* **Textures**: Textures are a bit different they are accessible in ```Resources``` by ```getTexture()``` after first time loading they are stored in ```unordered_map```.
 
-### Assets
-All assets are baked into executable with ```cmrc``` this secures them for **modifications by users** and **stealing**.
+#### [Resources](UnderTheWater/Resources/) {SINGLETON}
+Are one point where we are storing [```Meshes```, ```Textures```, ```Shaders```, ```Materials```, ```Lights```]. For now all are loaded and store to end of app life time but in future we will manage them wisely. Probably base on ```calls count``` and free ```VRAM```.
 
-### Resources
-Resources is singleton class where we initialize all our assets. We use them in other objects like ```terrain```. Resources contains data about ```materials```, ```textures```, ```meshes```, ```shaders```, ```lights```.
+#### [ObjectManager](UnderTheWater/Objects/ObjectManager.h) {SINGLETON}
+One point where we stores all ```GameObjects```. Inherit from Interface [IObjectManager](UnderTheWater/ScriptShared/IObjectManger.h) for bridging between script and main app. Allows creation, deletion, and getting [GameObjectData](UnderTheWater/ScriptShared/GameObjectData.h) via name.   
+**![ Script access to object manager is not full working for now ]!**
 
-### Shaders
-Shaders are loaded via cmrc or from folder as fallback are **private** and **safety**.
+#### [Logger](UnderTheWater/Utils/Logger.cpp) {SINGLETON}
+Is used for logging [```info```, ```warn```, ```erro```]. Logs are saved in ```editor.log``` up to 10000 lines. Can be changed in [```config```](UnderTheWater/config.h). Mainly for debugging detecting errors and work monitoring. Can be used to report bugs. Is inherit by [ILogger](UnderTheWater/ScriptShared/ILogger.h) interface to bridge between script and main app.
 
-### Terrain
+#### [App](UnderTheWater/App.h) and [Scene](UnderTheWater/Scene.h)
 
-### Water
+#### [GameObject](UnderTheWater/Objects/GameObject.h)
+
+#### [UI](UnderTheWater/UI/)
+
+#### [Script Controller](UnderTheWater/ScriptController/) and [ScriptShared](UnderTheWater/ScriptShared/)
+
+
+
+## Tasks Presentation
+### Normal mapping 
+<img width="100%" src="./docs/Normals.png">
+
+### PBR 
+<img width="100%" src="./docs/PBR.gif">
+
+### Quaternion camera
+<img width="100%" src="./docs/QuaterionCamera.gif">
+
+### Shadow mapping
+<img width="100%" src="./docs/Shadows.gif">
+
+### Parallel Transport Frames
+
+### Underwater skybox
+<img width="100%" src="./docs/Skybox.gif">
+
+### **A09** Ray-marched SDF object
+<img width="100%" src="./docs/SDF.gif">
+
+### **B07** Heightmap-based seabed mesh
+<img width="100%" src="./docs/Terrain.gif">
+
+
+
+## Supported Platforms
+* Linux X11
+* Windows 
+
 
 
 ## Prerequisites
@@ -206,7 +248,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 
 ## TODO
 <details>
-<summary>Iteration 1</summary>
+<summary> Iteration 1 </summary>
 
 - [x] Engine setup
 - [x] Normals
@@ -223,7 +265,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details>
 
 <details>
-<summary>Iteration 2 (7.06.2026)</summary>
+<summary> Iteration 2 (7.06.2026) </summary>
 
 - [x] Unified Object system
 - [x] Base Object UI
@@ -242,7 +284,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details>
 
 <details>
-<summary>Iteration 3 (15.06.2026)</summary>
+<summary> Iteration 3 (15.06.2026) </summary>
   
 - [x] Mesh serialization.
 - [x] Compile flag for end product ```PRODUCTION```
@@ -254,7 +296,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details>
 
 <details>
-<summary>Iteration 4(19.06.2026)</summary>
+<summary> Iteration 4(19.06.2026) </summary>
 
 - [x] FBO Render to texture
 - [x] Under water fog
@@ -264,20 +306,16 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [x] Parallel Transport Layer
 </details>
 
-</details open>
-<summary> 🌟 Iteration 5 🌟 (25.06.2026) </summary>
+<details>
+<summary> Iteration 5 (25.06.2026) </summary>
 
 - [x] Clean up
 - [x] Scripts Win support
-- [ ] Optimization
-- [ ] Docs
-- [ ] Assets
-- [ ] Releases
-
-- [ ] Scripts param auto reload
-- [ ] Scripts runtime copy
-- [ ] Script on off btn
-- [ ] Fix FishMovement
+- [x] Optimization
+- [x] Docs
+- [x] Assets
+- [x] Releases
+- [x] Fix FishMovement
 - [x] Parameters serialization
 - [x] Multiple Scripts seg fault (Scripts)
 - [x] Object Add object issue (Scripts)
@@ -298,7 +336,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 </details>
 
 <details>
-<summary>Iteration 6</summary>
+<summary> Backlog </summary>
 
 - [ ] Terrain sometimes break after adding new mesh (mesh_id).
 - [ ] Engine like Shaders, Assets, Textures:
@@ -326,4 +364,7 @@ Shaders are loaded via cmrc or from folder as fallback are **private** and **saf
 - [ ] Game data backup
 - [ ] Production optimization
 - [ ] Text Renderer
+- [ ] Scripts param auto reload
+- [ ] Scripts runtime copy
+- [ ] Script on off btn
 </details>
